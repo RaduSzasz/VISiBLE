@@ -1,1 +1,1 @@
-web: echo "PROCFILE COMMAND." 
+web: ./gradlew runAll 
