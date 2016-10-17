@@ -1,3 +1,6 @@
-language: java
-jdk:
-  - oraclejdk8
+before_script:
+  - cd backend && ./gradlew stage
+  - cd frontend && npm install
+script:
+  - cd backend && ./gradlew check
+  - cd frontend && npm test
