@@ -11,8 +11,12 @@ before_install:
 
 before_script:
   - cd backend && ./gradlew stage
+  - cd ..
   - cd frontend && npm install
+  - cd ..
 
 script:
   - cd backend && ./gradlew check
+  - cd ..
   - cd frontend && npm test
+  - cd ..
