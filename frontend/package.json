@@ -8,7 +8,8 @@
     "tsc": "tsc",
     "tsc:w": "tsc -w",
     "typings": "typings",
-    "build:prod": "tsc"
+    "build:prod": "tsc",
+    "test": "echo done"
   },
   "license": "ISC",
   "dependencies": {
