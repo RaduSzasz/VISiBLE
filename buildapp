@@ -1,0 +1,11 @@
+# Build backend and frontend`
+cd backend && ./gradlew stage
+cd ..
+cd frontend && npm install
+cd ..
+
+# Test backend and frontend`
+cd backend && ./gradlew check
+cd ..
+cd frontend && npm test
+cd ..
