@@ -1,5 +1,5 @@
-import { Component }       from '@angular/core';
-import { UploadComponent } from '../upload/upload.component';
+import { Component }         from '@angular/core';
+import { UploadComponent }   from '../upload/upload.component';
 import { UPLOAD_DIRECTIVES } from 'ng2-uploader/ng2-uploader';
 
 @Component({
@@ -8,18 +8,21 @@ import { UPLOAD_DIRECTIVES } from 'ng2-uploader/ng2-uploader';
   templateUrl: 'src/app/app.component.html'
 })
 
-
 export class AppComponent {
   title = 'VISiBLE';
   uploadFile: any;
   hasBaseDropZoneOver: boolean = false;
+  filename: string;
+  uploadSuccess: boolean = false;
   options: Object = {
-    url: 'http://localhost:3000'
+    url: 'http://localhost:8080'
   };
 
   handleUpload(data): void {
     if (data && data.response) {
+      this.filename = data.originalName;
       data = JSON.parse(data.response);
+      this.uploadSuccess = true;
       this.uploadFile = data;
     }
   }
