@@ -1,7 +1,7 @@
-# Build backend and frontend`
-cd backend && ./gradlew stage
+# Build frontend and backend
+cd frontend && npm install && npm run tsc
 cd ..
-cd frontend && npm install
+cd backend && ./gradlew stage
 cd ..
 
 # Test backend and frontend`
@@ -9,3 +9,6 @@ cd backend && ./gradlew check
 cd ..
 cd frontend && npm test
 cd ..
+
+# Deploying locally
+heroku local

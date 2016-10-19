@@ -1,2 +1,6 @@
 <h1>{{title}}</h1>
-<upload></upload>
+<!-- app.component.html -->
+<input type="file" ngFileSelect [options]="options" (onUpload)="handleUpload($event)">
+<div>
+  Response: {{ uploadFile | json }}
+</div>
