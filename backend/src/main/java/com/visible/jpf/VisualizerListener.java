@@ -1,12 +1,12 @@
-package gov.nasa.jpf.symbc;
+package com.visible.jpf;
 
 import gov.nasa.jpf.PropertyListenerAdapter;
 import gov.nasa.jpf.search.Search;
-import gov.nasa.jpf.symbc.numeric.PCChoiceGenerator;
-import gov.nasa.jpf.vm.ChoiceGenerator;
-import gov.nasa.jpf.vm.ThreadChoiceGenerator;
 
 public class VisualizerListener extends PropertyListenerAdapter {
+
+    public VisualizerListener() {
+    }
 
     @Override
     public void stateAdvanced(Search search) {
