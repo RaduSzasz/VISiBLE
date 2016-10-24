@@ -14,7 +14,7 @@ apply plugin: 'spring-boot'
 
 jar {
   baseName = 'gs-spring-boot'
-    version =  '0.1.0'
+  version =  '0.1.0'
 }
 
 repositories {
@@ -30,11 +30,11 @@ dependencies {
     exclude module: "spring-boot-starter-tomcat"
   }
   compile("org.springframework.boot:spring-boot-starter-jetty")
-    // end::jetty[]
-    // tag::actuator[]
-    compile("org.springframework.boot:spring-boot-starter-actuator")
-    // end::actuator[]
-    testCompile("junit:junit")
+  // end::jetty[]
+  // tag::actuator[]
+  compile("org.springframework.boot:spring-boot-starter-actuator")
+  // end::actuator[]
+  testCompile("junit:junit")
 }
 
 task stage(dependsOn: build) << { }
