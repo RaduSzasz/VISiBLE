@@ -10,13 +10,7 @@ before_install:
   - nvm install $NODE_VERSION
 
 before_script:
-  - cd backend && ./gradlew stage
-  - cd ..
-  - cd frontend && npm install
-  - cd ..
+  - ./gradlew stage
 
 script:
-  - cd backend && ./gradlew check
-  - cd ..
-  - cd frontend && npm test
-  - cd ..
+  - ./gradlew check
