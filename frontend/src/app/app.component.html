@@ -2,7 +2,8 @@
 
 <br>
 <input type="file"
-  ngFileSelect [options]="options"
+  ngFileSelect 
+  [options]="options"
   (onUpload)="handleUpload($event)">
 
 <div *ngIf='uploadSuccess'>
