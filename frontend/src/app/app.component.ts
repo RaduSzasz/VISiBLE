@@ -15,7 +15,7 @@ export class AppComponent {
   filename: string;
   uploadSuccess: boolean = false;
   options: Object = {
-    url: 'http://localhost:8080'
+    url: 'http://localhost:5000/upload'
   };
 
   handleUpload(data): void {
