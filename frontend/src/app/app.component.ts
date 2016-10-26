@@ -1,6 +1,5 @@
 import { Component }         from '@angular/core';
 import { UploadComponent }   from '../upload/upload.component';
-import { UPLOAD_DIRECTIVES } from 'ng2-uploader/ng2-uploader';
 
 @Component({
   selector: 'my-app',

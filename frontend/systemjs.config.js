@@ -7,7 +7,7 @@
   var map = {
     'app':                        'dist/src',
     '@angular':                   'node_modules/@angular',
-    'ng2-uploader':                 'node_modules/ng2-uploader',
+    'ng2-uploader':               'node_modules/ng2-uploader',
     'angular-in-memory-web-api':  'node_modules/angular-in-memory-web-api',
     'rxjs':                       'node_modules/rxjs'
   };
