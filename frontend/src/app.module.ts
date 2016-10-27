@@ -8,7 +8,6 @@ import { UploadComponent }     from './upload/upload.component';
 
 import { UPLOAD_DIRECTIVES } from 'ng2-uploader/ng2-uploader';
 
-
 @NgModule({
   imports: [
     BrowserModule,
