@@ -1,1 +1,10 @@
-Upload Component
+<input type="file"
+  ngFileSelect 
+  [options]="options"
+  (onUpload)="handleUpload($event)">
+
+<div *ngIf='uploadSuccess'>
+  <br>
+  {{filename}} was successfully uploaded
+</div>
+

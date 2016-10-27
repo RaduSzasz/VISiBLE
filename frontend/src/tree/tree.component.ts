@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import * as D3 from 'd3';
+import * as d3 from 'd3';
 import * as Moment from 'moment';
 
 @Component({
