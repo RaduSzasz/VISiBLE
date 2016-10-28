@@ -1,13 +1,23 @@
+package com.visible.jpf;
+
 import gov.nasa.jpf.PropertyListenerAdapter;
 import gov.nasa.jpf.search.Search;
 import gov.nasa.jpf.vm.*;
 
 public class VisualiserListener extends PropertyListenerAdapter {
 
+	private String mainFile;
+	public Logger logger;
+
+	public VisualiserListener(String mainFile, Logger logger) {
+		this.mainFile = mainFile.substring(0, mainFile.lastIndexOf("."));
+		this.logger = logger;
+	}
+
 	@Override
 	public void stateAdvanced(Search search) {
-			super.stateAdvanced(search);
-		ChoiceGenerator choiceGenerator = search.getVM().getChoiceGenerator();
+		super.stateAdvanced(search);
+		logger.log(search.getDepth());
 	}
 
 	@Override
@@ -33,7 +43,17 @@ public class VisualiserListener extends PropertyListenerAdapter {
 	public void executeInstruction(VM vm, ThreadInfo currentThread, Instruction instructionToExecute) {
 		super.executeInstruction(vm, currentThread, instructionToExecute);
 		String methodName = instructionToExecute.getMethodInfo().getName();
-		System.out.println(methodName);
+		String className = instructionToExecute.getMethodInfo().getClassName();
+
+		if (!methodName.equals(logger.getCurrentMethod()) && className.equals(mainFile)) {
+			logger.log(methodName);
+			StringBuilder sb = new StringBuilder();
+			for (int i = 0; i < logger.getCurrentDepth(); i++) {
+				sb.append(" ");
+			}
+			sb.append(methodName);
+			System.out.println(sb.toString());
+		}
 	}
 
 }

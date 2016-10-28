@@ -12,9 +12,11 @@ public class JPFAdapter {
     System.out.println(args[0]);
     Config config = JPF.createConfig(args);
     JPF jpf = new JPF(config);
-    VisualiserListener listener = new VisualiserListener();
+    Logger logger = new Logger();
+    VisualiserListener listener = new VisualiserListener(name, logger);
     jpf.addListener(listener);
     jpf.run();
+    System.out.println(logger);
   }
 
 

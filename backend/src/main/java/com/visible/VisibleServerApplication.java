@@ -9,8 +9,8 @@ import com.visible.jpf.JPFAdapter;
 public class VisibleServerApplication {
 
 	public static void main(String[] args) {
-    JPFAdapter j = new JPFAdapter();
-    j.runJPF("Crossing.jpf");
+    JPFAdapter jpf = new JPFAdapter();
+    jpf.runJPF("Crossing.jpf");
 		SpringApplication.run(VisibleServerApplication.class, args);
 	}
 }
