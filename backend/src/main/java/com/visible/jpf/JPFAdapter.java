@@ -12,7 +12,8 @@ public class JPFAdapter {
     System.out.println(args[0]);
     Config config = JPF.createConfig(args);
     JPF jpf = new JPF(config);
-    // jpf.addListener(new VisualizerListener());
+    VisualiserListener listener = new VisualiserListener();
+    jpf.addListener(listener);
     jpf.run();
   }
 
