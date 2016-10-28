@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { UPLOAD_DIRECTIVES } from 'ng2-uploader/ng2-uploader';
 
 const URL = 'localhost:5000';
 
@@ -12,6 +13,7 @@ export class UploadComponent {
   hasBaseDropZoneOver: boolean = false;
   filename: string;
   uploadSuccess: boolean = false;
+  response: string;
   options: Object = {
     url: 'http://localhost:5000/upload'
   };
@@ -20,6 +22,7 @@ export class UploadComponent {
     if (data && data.response) {
       this.filename = data.originalName;
       data = JSON.parse(data.response);
+      this.response = data.code;
       this.uploadSuccess = true;
       this.uploadFile = data;
     }

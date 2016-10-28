@@ -9,6 +9,8 @@ import { TreeComponent }     from './tree/tree.component';
 
 import { UPLOAD_DIRECTIVES } from 'ng2-uploader/ng2-uploader';
 
+import { TreeService } from './tree/tree.service';
+
 @NgModule({
   imports: [
     BrowserModule,
@@ -21,7 +23,7 @@ import { UPLOAD_DIRECTIVES } from 'ng2-uploader/ng2-uploader';
     TreeComponent,
     UPLOAD_DIRECTIVES
   ],
-  providers: [ ],
+  providers: [ TreeService ],
   bootstrap: [ AppComponent ]
 })
 export class AppModule { }
