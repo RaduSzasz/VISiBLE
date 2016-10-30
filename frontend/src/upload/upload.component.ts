@@ -22,7 +22,7 @@ export class UploadComponent {
     if (data && data.response) {
       this.filename = data.originalName;
       data = JSON.parse(data.response);
-      this.response = data.code;
+      this.response = data.code.replace(/\n/g, "<br>");
       this.uploadSuccess = true;
       this.uploadFile = data;
     }
