@@ -18,7 +18,7 @@
     'ng2-uploader':               { defaultExtension: 'js' },
     'rxjs':                       { defaultExtension: 'js' },
     'angular-in-memory-web-api':  { main: 'index.js', defaultExtension: 'js' },
-    'd3':                         { main: 'build/d3.js', defaultExtension: 'js' }
+    'd3':                         { main: 'd3.js', defaultExtension: 'js' }
   };
   var ngPackageNames = [
     'common',
