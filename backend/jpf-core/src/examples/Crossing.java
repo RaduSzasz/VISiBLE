@@ -237,6 +237,7 @@ public class Crossing {
       new Person("Joe", 10)
     };
 
+
     Crossing crossing = new Crossing( persons, Side.LEFT);
     crossing.solve();
   }

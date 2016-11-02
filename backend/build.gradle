@@ -35,6 +35,7 @@ dependencies {
   compile("org.springframework.boot:spring-boot-starter-actuator")
 
   compile files('jpf-core/build/jpf.jar')
+  compile files('jpf-symbc/build/jpf-symbc.jar')
   // end::actuator[]
   testCompile("junit:junit")
 }
