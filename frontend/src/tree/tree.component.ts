@@ -75,7 +75,7 @@ export class TreeComponent {
       .attr("x", function(d) { return d.children || d._children ? -13 : 13; })
       .attr("dy", ".35em")
       .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
-      .text(function(d) { return d.name; })
+      .text(function(d) { return d.data; })
       .style("fill-opacity", 1e-6);
 
       // Transition nodes to their new position.
@@ -145,6 +145,6 @@ export class TreeComponent {
         d._children = null;
       }
       update(d);
-    }
+    } 
   }
 }

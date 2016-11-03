@@ -2,30 +2,36 @@ import { Tree } from './tree';
 
 export var TREE: Tree = 
 {
-  "name": "Top Level",
-  "mother": "null",
+  "index": 0,
+  "data": "Condition A",
+  "incoming": [], 
   "children": [
     {
-      "name": "Level 2: A",
-      "mother": "Top Level",
+      "index": 1,
+      "data": "Condition B",
+      "incoming": [0],
       "children": [
         {
-          "name": "Son of A",
-          "mother": "Level 2: A",
+          "index": 2,
+          "data": "Something",
+          "incoming": [1],
           "children": []
         },
         {
-          "name": "Daughter of A",
-          "mother": "Level 2: A",
+          "index": 3,
+          "data": "Something else",
+          "incoming": [1],
           "children": []
         }
       ]
     },
     {
-      "name": "Level 2: B",
-      "mother": "Top Level",
+      "index": 4,
+      "data": "Also something",
+      "incoming": [0],
       "children": []
     }
   ]
 };
+
 
