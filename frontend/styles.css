@@ -144,12 +144,13 @@ nav a.active {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* Tree styles */
+/* Tree css  */
 
 .node {
   cursor: pointer;
 }
 
+<<<<<<< HEAD
 .overlay{
   background-color:#EEE;
 }
@@ -184,4 +185,24 @@ nav a.active {
 
 .ghostCircle, .activeDrag .ghostCircle{
   display: none;
+=======
+.node circle {
+  fill: #fff;
+  stroke: steelblue;
+  stroke-width: 3px;
+}
+
+.node text {
+  font: 12px sans-serif;
+}
+
+.link{
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 2px;
+}
+
+h2{
+  color: red;
+>>>>>>> 97e22d485f9b78dbd3d2a2a8d711062f20e83b71
 }
