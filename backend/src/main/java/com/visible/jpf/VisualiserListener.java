@@ -4,6 +4,7 @@ import gov.nasa.jpf.PropertyListenerAdapter;
 import gov.nasa.jpf.jvm.bytecode.*;
 import gov.nasa.jpf.search.Search;
 import gov.nasa.jpf.vm.*;
+import gov.nasa.jpf.symbc.numeric.PCChoiceGenerator;
 
 public class VisualiserListener extends PropertyListenerAdapter {
 
@@ -18,10 +19,16 @@ public class VisualiserListener extends PropertyListenerAdapter {
 	@Override
 	public void stateAdvanced(Search search) {
 		super.stateAdvanced(search);
-		if (search.getVM().getInstruction() instanceof IfInstruction) {
-			System.out.println(search.getDepth());
+		ChoiceGenerator cg = search.getVM().getChoiceGenerator();
+		if (cg instanceof PCChoiceGenerator) {
+			PCChoiceGenerator pcg = (PCChoiceGenerator) cg;
+			System.out.println("Current PC: " + pcg.getCurrentPC());
+			Object[] choices = pcg.getAllChoices();
+			for (Object o : choices) {
+				System.out.println("Choice option " + o);
+			}
 		}
- 	}
+	}
 
 	@Override
 	public void stateBacktracked(Search search) {

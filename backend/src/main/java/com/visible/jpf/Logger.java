@@ -18,10 +18,9 @@ public class Logger {
 
     @Override
     public String toString() {
-        // Print methods called, states visited
-        for (IfState s : conditions) {
-            System.out.println(s);
-        }
-        return "JPF Terminated";
+        StringBuilder sb = new StringBuilder();
+        conditions.forEach(sb::append);
+        sb.append("JPF Terminated");
+        return sb.toString();
     }
 }

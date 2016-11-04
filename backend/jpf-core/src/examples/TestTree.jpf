@@ -1,0 +1,4 @@
+target=TestTree
+symbolic.method=TestTree.maxOf3(sym#sym#sym)
+
+listener = .symbc.SymbolicListener
