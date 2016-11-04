@@ -18,6 +18,9 @@ public class VisualiserListener extends PropertyListenerAdapter {
 	@Override
 	public void stateAdvanced(Search search) {
 		super.stateAdvanced(search);
+		if (search.getVM().getInstruction() instanceof IfInstruction) {
+			System.out.println(search.getDepth());
+		}
  	}
 
 	@Override
@@ -28,9 +31,6 @@ public class VisualiserListener extends PropertyListenerAdapter {
 	@Override
 	public void stateProcessed(Search search) {
 		super.stateProcessed(search);
-		VM vm = search.getVM();
-		SystemState state = vm.getSystemState();
-		logger.log(state);
 	}
 
 	@Override
@@ -41,7 +41,6 @@ public class VisualiserListener extends PropertyListenerAdapter {
 	@Override
 	public void choiceGeneratorAdvanced(VM vm, ChoiceGenerator<?> currentCG) {
 		super.choiceGeneratorAdvanced(vm, currentCG);
-		logger.log(vm.getSystemState());
 	}
 
 	@Override
@@ -54,9 +53,11 @@ public class VisualiserListener extends PropertyListenerAdapter {
 		}
 
 		if (instruction instanceof IfInstruction) {
-			System.out.println("Position: " + instructionToExecute.getLineNumber());
 			IfInstruction ifInstr = (IfInstruction) instruction;
-			System.out.println("Condition value " + ifInstr.getConditionValue());
+			String sourceCode = instruction.getSourceLine();
+			String condition = sourceCode.substring(sourceCode.indexOf('('), sourceCode.indexOf(')'));
+			boolean conditionValue = ifInstr.getConditionValue();
+			logger.log(condition, conditionValue);
 		} else if (instruction instanceof GOTO) {
 			GOTO gotoInstr = (GOTO) instruction;
 			System.out.println("Do I back jump???? " + gotoInstr.isBackJump());
@@ -66,16 +67,10 @@ public class VisualiserListener extends PropertyListenerAdapter {
 	@Override
 	public void methodEntered(VM vm, ThreadInfo currentThread, MethodInfo enteredMethod) {
 		super.methodEntered(vm, currentThread, enteredMethod);
-		if (enteredMethod.getClassName().equals(mainFile)) {
-//			System.out.println("Entering: " + enteredMethod.getBaseName());
-		}
 	}
 
 	@Override
 	public void methodExited(VM vm, ThreadInfo currentThread, MethodInfo exitedMethod) {
 		super.methodExited(vm, currentThread, exitedMethod);
-		if (exitedMethod.getClassName().equals(mainFile)) {
-//			System.out.println("Exiting: " + exitedMethod.getBaseName());
-		}
 	}
 }

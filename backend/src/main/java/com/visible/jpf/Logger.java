@@ -1,31 +1,27 @@
 package com.visible.jpf;
 
-import gov.nasa.jpf.vm.SystemState;
-
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Logger {
 
-    private Set<String> methods;
-    private Set<SystemState> states;
+    List<IfState> conditions;
 
     public Logger() {
-        this.states = new HashSet<>();
-        this.methods = new HashSet<>();
+        this.conditions = new ArrayList<>();
     }
 
-    public void log(String currentMethod) {
-        methods.add(currentMethod);
-    }
-
-    public void log(SystemState state) {
-        states.add(state);
+    public void log(String condition, boolean conditionValue) {
+        IfState ifState = new IfState(condition, conditionValue);
+        conditions.add(ifState);
     }
 
     @Override
     public String toString() {
         // Print methods called, states visited
+        for (IfState s : conditions) {
+            System.out.println(s);
+        }
         return "JPF Terminated";
     }
 }

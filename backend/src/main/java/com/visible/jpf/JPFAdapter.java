@@ -2,7 +2,6 @@ package com.visible.jpf;
 
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
-import gov.nasa.jpf.listener.ChoiceTracker;
 
 public class JPFAdapter {
 
