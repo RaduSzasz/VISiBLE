@@ -1,5 +1,7 @@
 package com.visible.jpf;
 
+import gov.nasa.jpf.Config;
+import gov.nasa.jpf.JPF;
 import gov.nasa.jpf.PropertyListenerAdapter;
 import gov.nasa.jpf.jvm.bytecode.*;
 import gov.nasa.jpf.search.Search;
@@ -11,8 +13,12 @@ public class VisualiserListener extends PropertyListenerAdapter {
 	private String mainFile;
 	public Logger logger;
 
-	public VisualiserListener(String fileName, Logger logger) {
-		this.mainFile = fileName.substring(0, fileName.lastIndexOf("."));
+	public VisualiserListener(Config config, JPF jpf) {
+
+	}
+
+	public VisualiserListener(String targetName, Logger logger) {
+		this.mainFile = targetName;
 		this.logger = logger;
 	}
 
@@ -23,10 +29,7 @@ public class VisualiserListener extends PropertyListenerAdapter {
 		if (cg instanceof PCChoiceGenerator) {
 			PCChoiceGenerator pcg = (PCChoiceGenerator) cg;
 			System.out.println("Current PC: " + pcg.getCurrentPC());
-			Object[] choices = pcg.getAllChoices();
-			for (Object o : choices) {
-				System.out.println("Choice option " + o);
-			}
+			System.out.println("Current offset " + pcg.getOffset());
 		}
 	}
 
@@ -67,7 +70,7 @@ public class VisualiserListener extends PropertyListenerAdapter {
 			logger.log(condition, conditionValue);
 		} else if (instruction instanceof GOTO) {
 			GOTO gotoInstr = (GOTO) instruction;
-			System.out.println("Do I back jump???? " + gotoInstr.isBackJump());
+			//System.out.println("Do I back jump???? " + gotoInstr.isBackJump());
 		}
 	}
 
