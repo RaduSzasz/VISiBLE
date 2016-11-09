@@ -38,3 +38,5 @@ dependencies {
 }
 
 task stage(dependsOn: build) << { }
+
+processResources.dependsOn ":frontend:build"
