@@ -1,3 +1,8 @@
-<h2>Tree here.</h2>
+<div>
+  <div>
+    <textarea rows="20" cols="60" [(ngModel)]="TREE_STRING"></textarea>
+  </div>
+  <button (click) = 'getTree()'>Get Tree</button>
+</div>
 
-<button (click) = 'getTree()'>Get Tree</button>
+<svg></svg>

@@ -7,8 +7,6 @@ import { AppComponent }        from './app/app.component';
 import { UploadComponent }     from './upload/upload.component';
 import { TreeComponent }     from './tree/tree.component';
 
-import { UPLOAD_DIRECTIVES } from 'ng2-uploader/ng2-uploader';
-
 import { TreeService } from './tree/tree.service';
 
 import { UPLOAD_DIRECTIVES } from 'ng2-uploader/ng2-uploader';
