@@ -11,6 +11,8 @@ import { UPLOAD_DIRECTIVES } from 'ng2-uploader/ng2-uploader';
 
 import { TreeService } from './tree/tree.service';
 
+import { UPLOAD_DIRECTIVES } from 'ng2-uploader/ng2-uploader';
+
 @NgModule({
   imports: [
     BrowserModule,
