@@ -2,7 +2,6 @@ import { Component, ElementRef, OnInit } from '@angular/core';
 import * as d3 from 'd3';
 import * as Moment from 'moment';
 import { TreeService } from './tree.service';
-import { TREE } from './mocktree';
 
 @Component({
   selector: 'tree-container',
@@ -15,7 +14,7 @@ export class TreeComponent implements OnInit {
   private _svg;
   private _tree;
   private _diagonal;
-  public TREE_STRING = JSON.stringify(TREE, undefined, 4);
+  public TREE_STRING;
 
   constructor(private treeService: TreeService,
               private elemRef: ElementRef) { }
@@ -32,11 +31,14 @@ export class TreeComponent implements OnInit {
                 .attr('height', height + margin.top + margin.bottom)
                 .append('g')
                 .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+
+    this.treeService.getTree().then(t => {
+      this.TREE_STRING = JSON.stringify(t, undefined, 4);
+      this.drawTree();
+    });
   }
 
   getTree() {
-    console.log('Get tree function called.');
-    this.treeService.getTree().then()
     this.drawTree();
   }
 
