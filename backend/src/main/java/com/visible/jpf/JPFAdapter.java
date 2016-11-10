@@ -9,11 +9,11 @@ public class JPFAdapter {
 
   public static void runJPF(String name) {
     String[] args = new String[2];
-    args[0] = "backend/jpf-symbc/src/examples/demo/" + name;
+    args[0] = "backend/jpf-core/src/examples/" + name;
     args[1] = "+site=backend/site.properties";
     String targetName = name.substring(0, name.lastIndexOf("."));
     Config config = JPF.createConfig(args);
-    config.setProperty("symbolic.dp", "coral");
+    config.setProperty("symbolic.dp", "z3");
     config.setProperty("target", targetName);
     config.setProperty("symbolic.method", targetName + ".maxOf3(sym#sym#sym)");
     JPF jpf = new JPF(config);
