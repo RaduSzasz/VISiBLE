@@ -3,10 +3,10 @@ package com.visible.jpf;
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
 import gov.nasa.jpf.PropertyListenerAdapter;
-import gov.nasa.jpf.jvm.bytecode.*;
 import gov.nasa.jpf.search.Search;
-import gov.nasa.jpf.vm.*;
 import gov.nasa.jpf.symbc.numeric.PCChoiceGenerator;
+import gov.nasa.jpf.symbc.numeric.PathCondition;
+import gov.nasa.jpf.vm.*;
 
 public class VisualiserListener extends PropertyListenerAdapter {
 
@@ -28,8 +28,9 @@ public class VisualiserListener extends PropertyListenerAdapter {
 		ChoiceGenerator cg = search.getVM().getChoiceGenerator();
 		if (cg instanceof PCChoiceGenerator) {
 			PCChoiceGenerator pcg = (PCChoiceGenerator) cg;
-			System.out.println("Current PC: " + pcg.getCurrentPC());
-			System.out.println("Current offset " + pcg.getOffset());
+			PathCondition pc = pcg.getCurrentPC();
+			System.out.println("Current PC: " + pc + " simplifies to " + pc.simplify
+							());
 		}
 	}
 
@@ -56,22 +57,6 @@ public class VisualiserListener extends PropertyListenerAdapter {
 	@Override
 	public void executeInstruction(VM vm, ThreadInfo currentThread, Instruction instructionToExecute) {
 		super.executeInstruction(vm, currentThread, instructionToExecute);
-
-		Instruction instruction = instructionToExecute;
-		if (!instruction.getMethodInfo().getClassName().equals(mainFile)) {
-			return;
-		}
-
-		if (instruction instanceof IfInstruction) {
-			IfInstruction ifInstr = (IfInstruction) instruction;
-			String sourceCode = instruction.getSourceLine();
-			String condition = sourceCode.substring(sourceCode.indexOf('('), sourceCode.indexOf(')'));
-			boolean conditionValue = ifInstr.getConditionValue();
-			logger.log(condition, conditionValue);
-		} else if (instruction instanceof GOTO) {
-			GOTO gotoInstr = (GOTO) instruction;
-			//System.out.println("Do I back jump???? " + gotoInstr.isBackJump());
-		}
 	}
 
 	@Override
