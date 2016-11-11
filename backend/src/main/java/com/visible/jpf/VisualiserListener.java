@@ -18,6 +18,12 @@ import gov.nasa.jpf.vm.ChoiceGenerator;
 
 public class VisualiserListener extends PropertyListenerAdapter {
 
+	private final TreeInfo treeInfo;
+
+	public VisualiserListener(TreeInfo treeInfo) {
+		this.treeInfo = treeInfo;
+	}
+
 	private static class State {
 		int id;
 		State parent;
