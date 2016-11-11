@@ -57,12 +57,21 @@ export class TreeComponent implements OnInit {
     var node = svg.selectAll('g.node').data(nodes);
 
     // Update text at nodes
-    node.select('text').text((d:any) => d.data);
+    node.select('text').text((d) => d.data);
 
     // Enter any new nodes at the parent's previous position.
     var nodeEnter = node.enter().append('g')
     .attr('class', 'node')
-    .attr('transform', (d) => `translate(${d.x}, ${d.y})`);
+    .attr('transform', (d) => `translate(${d.x}, ${d.y})`)
+    .on('click', function(d, i){
+      // Send a request to the backend.
+      
+      console.log(d.index)
+      console.log(d.incoming)
+      console.log(d)
+      console.log(i)
+      d3.select(this).style("fill", "red");
+    }) ;
 
     nodeEnter.append('circle')
     .attr('r', 10)

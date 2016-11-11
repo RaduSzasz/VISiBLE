@@ -8,6 +8,7 @@ import { UploadComponent }     from './upload/upload.component';
 import { TreeComponent }     from './tree/tree.component';
 
 import { TreeService } from './tree/tree.service';
+import { ApiService } from './shared/api.service';
 
 import { UPLOAD_DIRECTIVES } from 'ng2-uploader/ng2-uploader';
 
@@ -23,7 +24,10 @@ import { UPLOAD_DIRECTIVES } from 'ng2-uploader/ng2-uploader';
     TreeComponent,
     UPLOAD_DIRECTIVES
   ],
-  providers: [ TreeService ],
+  providers: [ 
+    TreeService,
+    ApiService
+  ],
   bootstrap: [ AppComponent ]
 })
 export class AppModule { }

@@ -4,23 +4,23 @@ export var TREE: Tree =
 {
   "index": 0,
   "data": "Condition A",
-  "incoming": [], 
+  "incoming": null, 
   "children": [
     {
       "index": 1,
       "data": "Condition B",
-      "incoming": [0],
+      "incoming": 0,
       "children": [
         {
           "index": 2,
           "data": "Something",
-          "incoming": [1],
+          "incoming": 1,
           "children": []
         },
         {
           "index": 3,
           "data": "Something else",
-          "incoming": [1],
+          "incoming": 1,
           "children": []
         }
       ]
@@ -28,10 +28,8 @@ export var TREE: Tree =
     {
       "index": 4,
       "data": "Also something",
-      "incoming": [0],
+      "incoming": 0,
       "children": []
     }
   ]
 };
-
-
