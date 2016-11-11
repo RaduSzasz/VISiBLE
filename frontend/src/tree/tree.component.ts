@@ -23,23 +23,21 @@ export class TreeComponent implements OnInit {
     var margin = {top: 20, right: 120, bottom: 20, left: 120};
     var width = 960 - margin.right - margin.left;
     var height = 500 - margin.top - margin.bottom;
-    this._tree = d3.layout.tree().size([height, width]);
-    this._diagonal = d3.svg.diagonal().projection(d => [d.y, d.x]);
+    this._tree = d3.layout.tree().size([width, height]);
+    this._diagonal = d3.svg.diagonal();
 
     this._svg = d3.select(this.elemRef.nativeElement).select('svg')
                 .attr('width', width + margin.right + margin.left)
                 .attr('height', height + margin.top + margin.bottom)
                 .append('g')
                 .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+  }
 
+  getTree() {
     this.treeService.getTree().then(t => {
       this.TREE_STRING = JSON.stringify(t, undefined, 4);
       this.drawTree();
     });
-  }
-
-  getTree() {
-    this.drawTree();
   }
 
   drawTree() {
@@ -64,7 +62,7 @@ export class TreeComponent implements OnInit {
     // Enter any new nodes at the parent's previous position.
     var nodeEnter = node.enter().append('g')
     .attr('class', 'node')
-    .attr('transform', (d) => `translate(${d.y}, ${d.x})`);
+    .attr('transform', (d) => `translate(${d.x}, ${d.y})`);
 
     nodeEnter.append('circle')
     .attr('r', 10)

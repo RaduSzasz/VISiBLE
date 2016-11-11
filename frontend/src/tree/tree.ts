@@ -1,6 +1,6 @@
 export class Tree {
   index: Number;
   data: String;
-  incoming: Number[];
+  incoming: Tree;
   children: Tree[];
 }
