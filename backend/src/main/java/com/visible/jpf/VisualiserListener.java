@@ -1,13 +1,5 @@
 package com.visible.jpf;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
-
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
 import gov.nasa.jpf.PropertyListenerAdapter;
@@ -16,42 +8,28 @@ import gov.nasa.jpf.symbc.numeric.PCChoiceGenerator;
 import gov.nasa.jpf.symbc.numeric.PathCondition;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
 public class VisualiserListener extends PropertyListenerAdapter {
 
-	private final TreeInfo treeInfo;
+	private TreeInfo treeInfo;
 
-	public VisualiserListener(TreeInfo treeInfo) {
+	public VisualiserListener(Config config, JPF jpf, TreeInfo treeInfo) {
+		this(config, jpf);
 		this.treeInfo = treeInfo;
 	}
 
-	private static class State {
-		int id;
-		State parent;
-		List<State> children;
-		PathCondition pc;
+	private State root;
+	private State prev;
+	private Map<Integer, State> stateById;
 
-		State(int id, State parent, PathCondition pc) {
-			this.id = id;
-			this.children = new LinkedList<>();
-			this.parent = parent;
-			this.pc = pc;
-		}
-
-		@Override
-		public String toString() {
-			return "State [id=" + id + " parent=" + parent.id +
-					", children=" + children.stream().map(s -> s.id).collect(Collectors.toList()) + ", pc="
-					+ pc + "]";
-		}
-	}
-
-	State root;
-	State prev;
-	Map<Integer, State> stateById;
-
-	public PCDumpListener(Config conf, JPF jpf) {
+	public VisualiserListener(Config conf, JPF jpf) {
 		root = prev = new State(-1, null, null);
 		stateById = new HashMap<>();
+		this.treeInfo = new TreeInfo();
 	}
 
 	public void stateAdvanced(Search search) {
@@ -71,6 +49,7 @@ public class VisualiserListener extends PropertyListenerAdapter {
 
 		System.out.println("[advance] new: " + s);
 		prev = s;
+		treeInfo.log(s);
 		System.out.println("press enter to continue: ");
 		try {
 			System.in.read();

@@ -9,8 +9,7 @@ import com.visible.jpf.JPFAdapter;
 public class VisibleServerApplication {
 
 	public static void main(String[] args) {
-    JPFAdapter jpf = new JPFAdapter();
-    jpf.runJPF("HelloWorld");
+		JPFAdapter.runJPF("TestTree");
 		SpringApplication.run(VisibleServerApplication.class, args);
 	}
 }

@@ -9,7 +9,15 @@ public class TestTree {
 
 		// Function logic for maxOfThree()
 		// PC: true
-		if (x >= y) {
+	  max = maxOfThree(x, y, z);	
+
+		System.out.println(max);
+	}
+
+  private static int maxOfThree(int x, int y, int z) {
+
+    int max = 0;
+    if (x >= y) {
 			
 			if (x >= z) {
 				// PC: x > y && x >= z
@@ -35,7 +43,6 @@ public class TestTree {
 				max = z;
 			}
 		}
-
-		System.out.println(max);
-	}
+    return max;
+  }
 }
