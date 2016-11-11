@@ -10,7 +10,7 @@ public class VisibleServerApplication {
 
 	public static void main(String[] args) {
     JPFAdapter jpf = new JPFAdapter();
-    jpf.runJPF("Crossing");
+    jpf.runJPF("HelloWorld");
 		SpringApplication.run(VisibleServerApplication.class, args);
 	}
 }
