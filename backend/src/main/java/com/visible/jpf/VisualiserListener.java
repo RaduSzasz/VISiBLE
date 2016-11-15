@@ -11,7 +11,6 @@ import gov.nasa.jpf.vm.ChoiceGenerator;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 public class VisualiserListener extends PropertyListenerAdapter {
 
@@ -34,7 +33,7 @@ public class VisualiserListener extends PropertyListenerAdapter {
 
 	public void stateAdvanced(Search search) {
 		if (search.isIgnoredState()) {
-			System.out.println("[advance] ignored state - returning!");
+			System.out.println("[advanced] ignored state - returning!");
 			return;
 		}
 
@@ -47,7 +46,7 @@ public class VisualiserListener extends PropertyListenerAdapter {
 			s = stateById.get(search.getStateId());
 		}
 
-		System.out.println("[advance] new: " + s);
+		System.out.println("[advanced] new: " + s);
 		prev = s;
 		treeInfo.log(s);
 		System.out.println("press enter to continue: ");
@@ -73,27 +72,27 @@ public class VisualiserListener extends PropertyListenerAdapter {
 
 	@Override
 	public void stateProcessed(Search search) {
-		System.out.println("Finished with state " + search.getStateId());
+		System.out.println("Finished with State " + search.getStateId());
 	}
 
 	@Override
 	public void stateBacktracked(Search search) {
 		State s = stateById.get(search.getStateId());
-		System.out.println("[backtrack] s:" + s);
+		System.out.println("[backtrack]: " + s);
 		prev = s;
 	}
 
 	@Override
 	public void stateRestored(Search search) {
 		State s = stateById.get(search.getStateId());
-		System.out.println("[backtrack] s:" + s);
+		System.out.println("[backtrack]:" + s);
 		prev = s;
 	}
 
 	@Override
 	public void searchFinished(Search search) {
-		for (Entry<Integer, State> e : stateById.entrySet()) {
-			System.out.println(e.getKey() + "\t-> " + e.getValue());
-		}
+//		for (Entry<Integer, State> e : stateById.entrySet()) {
+//			System.out.println(e.getKey() + "\t-> " + e.getValue());
+//		}
 	}
 }

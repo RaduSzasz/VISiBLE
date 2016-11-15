@@ -1,20 +1,26 @@
 package com.visible.jpf;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class TreeInfo {
 
+    List<State> visited;
     State current;
 
     public TreeInfo() {
-        current = new State(-1, null, null);
+        this.current = new State(-1, null, null);
+        this.visited = new ArrayList<>();
     }
 
-    public void log(State state) {
-        this.current = state;
+    public void log(State current) {
+        visited.add(current);
     }
 
     @Override
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder();
-        return stringBuilder.toString();
+        StringBuilder sb = new StringBuilder();
+        visited.stream().map(s -> sb.append(s));
+        return sb.toString();
     }
 }

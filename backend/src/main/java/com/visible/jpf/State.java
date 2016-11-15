@@ -8,23 +8,39 @@ import java.util.stream.Collectors;
 
 public class State {
 
-        int id;
-        private State parent;
-        List<State> children;
-        private PathCondition pc;
+  private State parent;
+  List<State> children;
+  private PathCondition pc;
+  int id;
 
-        State(int id, State parent, PathCondition pc) {
-            this.id = id;
-            this.children = new LinkedList<>();
-            this.parent = parent;
-            this.pc = pc;
-        }
+  public int getId() {
+    return id;
+  }
 
-        @Override
-        public String toString() {
-            return "State [id=" + id + " parent=" + parent.id +
-                    ", children=" + children.stream().map(s -> s.id).collect(Collectors.toList()) + ", pc="
-                    + pc + "]";
-        }
+  public State getParent() {
+    return parent;
+  }
+
+  public List<State> getChildren() {
+    return children;
+  }
+
+  public PathCondition getPc() {
+    return pc;
+  }
+
+  State(int id, State parent, PathCondition pc) {
+    this.id = id;
+    this.children = new LinkedList<>();
+    this.parent = parent;
+    this.pc = pc;
+  }
+
+  @Override
+  public String toString() {
+    return "State [id=" + id + " parent=" + parent.id +
+            ", children=" + children.stream().map(s -> s.id).collect(Collectors.toList()) + ", pc="
+            + pc + "]";
+  }
 
 }

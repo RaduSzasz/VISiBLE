@@ -9,7 +9,7 @@ import com.visible.jpf.JPFAdapter;
 public class VisibleServerApplication {
 
 	public static void main(String[] args) {
-		JPFAdapter.runJPF("TestTree");
+		JPFAdapter.runJPF("TestTree", "maxOfThree", 3);
 		SpringApplication.run(VisibleServerApplication.class, args);
 	}
 }
