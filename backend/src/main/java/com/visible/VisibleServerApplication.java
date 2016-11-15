@@ -9,9 +9,10 @@ import java.util.concurrent.Executors;
 @SpringBootApplication
 public class VisibleServerApplication {
 
-	public static void main(String[] args) {
+	private static int NUMBER_OF_THREADS = 2;
 
-		Executor executor = Executors.newFixedThreadPool(2);
+	public static void main(String[] args) {
+		Executor executor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
 		executor.execute(new JPFAdapter("TestTree", "maxOfThree", 3));
 		SpringApplication.run(VisibleServerApplication.class, args);
 	}

@@ -66,7 +66,6 @@ public class VisualiserListener extends PropertyListenerAdapter {
 		prev = s;
 		System.out.println("Tree Information: " + treeInfo.toString());
 
-		// Communication with Frontend
 		while (!shouldMoveForward) {
 				ThreadInfo threadInfo = search.getVM().getCurrentThread();
 				this.threadInfo = threadInfo;
@@ -110,9 +109,5 @@ public class VisualiserListener extends PropertyListenerAdapter {
 	@Override
 	public void searchFinished(Search search) {
 		System.out.println("[finished]");
-//		for (Entry<Integer, State> e : stateById.entrySet()) {
-//			System.out.println(e.getKey() + "\t-> " + e.getValue());
-//		}
 	}
-
 }

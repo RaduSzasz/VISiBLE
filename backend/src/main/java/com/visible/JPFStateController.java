@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class TestController {
+public class JPFStateController {
 
-	@RequestMapping("/test")
+	@RequestMapping("/nextstate")
 	public String test() {
 		TreeInfo treeInfo = JPFAdapter.getListenerTreeInfo();
 		JPFAdapter.moveForward();
