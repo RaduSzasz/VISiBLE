@@ -2,9 +2,19 @@ package com.visible.jpf;
 
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
-import gov.nasa.jpf.PropertyListenerAdapter;
 
-public class JPFAdapter {
+public class JPFAdapter implements Runnable {
+
+    private static VisualiserListener visualiser;
+    private String name;
+    private String method;
+    private int argNum;
+
+    public JPFAdapter(String name, String method, int argNum) {
+        this.name = name;
+        this.method = method;
+        this.argNum = argNum;
+    }
 
     public static void runJPF(String name, String method, int argNum) {
         String[] args = new String[2];
@@ -19,7 +29,7 @@ public class JPFAdapter {
 
         JPF jpf = new JPF(config);
         TreeInfo treeInfo = new TreeInfo();
-        PropertyListenerAdapter visualiser = new VisualiserListener(config, jpf, treeInfo);
+        visualiser = new VisualiserListener(config, jpf, treeInfo);
 
         jpf.addListener(visualiser);
         jpf.run();
@@ -32,5 +42,22 @@ public class JPFAdapter {
         }
         sb.append("sym)");
         return sb.toString();
+    }
+
+    public static TreeInfo getListenerTreeInfo() {
+     try {
+         return visualiser.getTreeInfo();
+     } catch (Exception e) {
+         return null;
+     }
+    }
+
+    public static void moveForward() {
+        visualiser.moveForward();
+    }
+
+    @Override
+    public void run() {
+        JPFAdapter.runJPF(name, method, argNum);
     }
 }
