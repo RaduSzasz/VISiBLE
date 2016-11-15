@@ -46,14 +46,16 @@ public class VisualiserListener extends PropertyListenerAdapter {
 			s = stateById.get(search.getStateId());
 		}
 
-		System.out.println("[advanced] new: " + s);
-		prev = s;
 		treeInfo.log(s);
-		System.out.println("press enter to continue: ");
+		System.out.println("[advanced]");
+		prev = s;
+		System.out.println("Tree Information: " + treeInfo.toString());
+
+		// Communication with Frontend
+		System.out.println("Press Enter to Continue");
 		try {
 			System.in.read();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -78,19 +80,20 @@ public class VisualiserListener extends PropertyListenerAdapter {
 	@Override
 	public void stateBacktracked(Search search) {
 		State s = stateById.get(search.getStateId());
-		System.out.println("[backtrack]: " + s);
+		System.out.println("[backtracked]");
 		prev = s;
 	}
 
 	@Override
 	public void stateRestored(Search search) {
 		State s = stateById.get(search.getStateId());
-		System.out.println("[backtrack]:" + s);
+		System.out.println("[backtracked]");
 		prev = s;
 	}
 
 	@Override
 	public void searchFinished(Search search) {
+		System.out.println("[finished]");
 //		for (Entry<Integer, State> e : stateById.entrySet()) {
 //			System.out.println(e.getKey() + "\t-> " + e.getValue());
 //		}

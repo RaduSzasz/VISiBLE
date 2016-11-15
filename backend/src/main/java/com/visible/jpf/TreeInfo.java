@@ -20,7 +20,7 @@ public class TreeInfo {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        visited.stream().map(s -> sb.append(s));
+        visited.forEach(sb::append);
         return sb.toString();
     }
 }

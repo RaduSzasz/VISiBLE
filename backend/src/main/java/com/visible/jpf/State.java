@@ -4,7 +4,6 @@ import gov.nasa.jpf.symbc.numeric.PathCondition;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class State {
 
@@ -38,9 +37,16 @@ public class State {
 
   @Override
   public String toString() {
-    return "State [id=" + id + " parent=" + parent.id +
-            ", children=" + children.stream().map(s -> s.id).collect(Collectors.toList()) + ", pc="
-            + pc + "]";
+    StringBuilder stringBuilder = new StringBuilder();
+    stringBuilder.append("State " + id);
+    stringBuilder.append("\n");
+    stringBuilder.append("Parent Id " + parent.id) ;
+    stringBuilder.append("\nChildren ");
+    children.stream().map(s -> s.getId());
+    stringBuilder.append("\n");
+    stringBuilder.append("PC " + pc);
+
+    return stringBuilder.toString();
   }
 
 }
