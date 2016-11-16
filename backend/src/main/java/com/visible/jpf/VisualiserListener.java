@@ -63,8 +63,8 @@ public class VisualiserListener extends PropertyListenerAdapter {
 
 		treeInfo.setCurrentState(s);
 		System.out.println("[advanced]");
+		System.out.println(s);
 		prev = s;
-		System.out.println("Tree Information: " + treeInfo.toString());
 
 		while (!shouldMoveForward) {
 				ThreadInfo threadInfo = search.getVM().getCurrentThread();
@@ -82,6 +82,7 @@ public class VisualiserListener extends PropertyListenerAdapter {
 		if (cg != null) {
 			pc = ((PCChoiceGenerator) cg).getCurrentPC();
 		}
+
 		State s = new State(search.getStateId(), prev, pc);
 		prev.children.add(s);
 		return s;

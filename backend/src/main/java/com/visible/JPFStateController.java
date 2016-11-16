@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class JPFStateController {
 
 	@RequestMapping("/nextstate")
-	public String test() {
+	public String moveForward() {
 		TreeInfo treeInfo = JPFAdapter.getListenerTreeInfo();
 		JPFAdapter.moveForward();
 		return (treeInfo == null) ? "null" : treeInfo.toString();

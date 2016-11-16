@@ -39,12 +39,23 @@ public class State {
   public String toString() {
     StringBuilder stringBuilder = new StringBuilder();
     stringBuilder.append("State " + id);
-    stringBuilder.append("\n");
-    stringBuilder.append("Parent Id " + parent.id) ;
-    stringBuilder.append("\nChildren ");
-    children.stream().map(s -> s.getId());
-    stringBuilder.append("\n");
-    stringBuilder.append("PC " + pc);
+    stringBuilder.append("<br>");
+    stringBuilder.append("Parent " + parent.id) ;
+    stringBuilder.append("<br>Children [");
+
+    if (children.isEmpty()) {
+      stringBuilder.append("empty");
+    } else {
+      for (State s : children) {
+        stringBuilder.append(s.getId());
+        stringBuilder.append(", ");
+      }
+    }
+
+    stringBuilder.append("]<br>");
+    stringBuilder.append("PC [" + pc + "]");
+    stringBuilder.append("<br>");
+    stringBuilder.append("<br>");
 
     return stringBuilder.toString();
   }
