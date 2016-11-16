@@ -52,8 +52,8 @@ public class JPFAdapter implements Runnable {
      }
     }
 
-    public static void moveForward() {
-        visualiser.moveForward();
+    public static boolean moveForward() {
+        return visualiser.moveForward();
     }
 
     @Override

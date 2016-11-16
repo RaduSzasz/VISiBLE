@@ -12,7 +12,7 @@ public class JPFStateController {
 	@RequestMapping("/nextstate")
 	public String moveForward() {
 		TreeInfo treeInfo = JPFAdapter.getListenerTreeInfo();
-		JPFAdapter.moveForward();
-		return (treeInfo == null) ? "null" : treeInfo.toString();
+		boolean finished = JPFAdapter.moveForward();
+		return finished ? "Finished" : ((treeInfo == null) ? "null" : treeInfo.toString());
 	}
 }
