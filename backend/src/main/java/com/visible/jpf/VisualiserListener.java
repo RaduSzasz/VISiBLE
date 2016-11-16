@@ -15,24 +15,19 @@ import java.util.Map;
 public class VisualiserListener extends PropertyListenerAdapter {
 
 	private TreeInfo treeInfo;
-
 	private boolean shouldMoveForward;
-
 	private ThreadInfo threadInfo;
-
 	private State prev;
-
 	private Map<Integer, State> stateById;
-
-	public void moveForward() {
-		this.shouldMoveForward = true;
-		threadInfo.setRunning();
-	}
 
 	public TreeInfo getTreeInfo() {
 		return treeInfo;
 	}
 
+	public void moveForward() {
+		this.shouldMoveForward = true;
+		threadInfo.setRunning();
+	}
 
 	public VisualiserListener(Config config, JPF jpf, TreeInfo treeInfo) {
 		this(config, jpf);
@@ -48,7 +43,7 @@ public class VisualiserListener extends PropertyListenerAdapter {
 
 	public void stateAdvanced(Search search) {
 		if (search.isIgnoredState()) {
-			System.out.println("[advanced] ignored state - returning!");
+			System.out.println("[advanced] ignored state");
 			return;
 		}
 

@@ -12,10 +12,12 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/upload")
 public class FileUploadController {
 
+  private String codeAsString;
+
   @PostMapping
   public JavaProgram handleFileUpload(@RequestParam("file") MultipartFile file,
       RedirectAttributes redirectAttributes) throws java.io.IOException, java.io.UnsupportedEncodingException{
-    String codeAsString = new String(file.getBytes(), "UTF-8");
+    this.codeAsString = new String(file.getBytes(), "UTF-8");
     return new JavaProgram(codeAsString);
   }
 }
