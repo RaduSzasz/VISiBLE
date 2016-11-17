@@ -1,7 +1,10 @@
 var express = require('express');
 var app = express();
 
-var nodes = require('./nodes.json');
+var nodesService = require('./nodes.service');
+
+var PORT = process.env.PORT || 5000;
+
 
 app.post('/upload', (req, res) => {
   // Some code to put the file to jpf
@@ -30,14 +33,9 @@ app.get('/uploads/:uid/nodes/:nid', (req, res) => {
 
 app.get('/nodes/:nid', (req, res) => {
   var nid = req.params.nid;
-  var 
+  res.json(nodesService.getNode(nid));
 });
 
-app.get('/', (req, res) => {
-  // Some code to put the file to jpf
-  res.send('Home page')
-})
-
-app.listen(5000, () => {
-  console.log('SERVER RUNNING ON PORT 5000') 
+app.listen(PORT, () => {
+  console.log('SERVER RUNNING ON PORT ' + PORT) 
 })

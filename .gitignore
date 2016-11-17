@@ -16,7 +16,7 @@
 build/
 frontend/dist/
 frontend/node/
-frontend/node_modules/
+node_modules/
 frontend/src/dummy-backend.js
 frontend/typings/modules/
 hs_err_pid*
