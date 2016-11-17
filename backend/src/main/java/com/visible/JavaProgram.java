@@ -1,21 +1,31 @@
 /* This class represents the uploaded Java files */
 package com.visible;
 
-import javax.tools.*;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 
 public class JavaProgram{
 
-  private File file;
+  private String path;
+  private String fileName;
+  private byte[] code;
 
-  public JavaProgram(File source) {
-    this.file = source;
+  public JavaProgram(String fileName, byte[] code) {
+    this.fileName = fileName;
+    this.code = code;
+    this.path = System.getProperty("user.dir") + "/backend/input";
   }
 
-  public void compile() throws IOException {
-    JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-    compiler.run(null, null, null, file.getPath());
+  public void saveToDirectory() {
+    try {
+      String fileCode = new String(code, "UTF-8");
+      PrintStream stream = new PrintStream(path + File.pathSeparator +
+              fileName);
+      stream.println(fileCode);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 
 }

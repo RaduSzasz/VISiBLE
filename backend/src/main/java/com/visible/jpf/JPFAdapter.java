@@ -3,6 +3,9 @@ package com.visible.jpf;
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
 
+import java.io.File;
+import java.io.IOException;
+
 public class JPFAdapter implements Runnable {
 
     private static VisualiserListener visualiser;
@@ -18,6 +21,13 @@ public class JPFAdapter implements Runnable {
 
     public static void runJPF(String name, String method, int argNum) {
         String[] args = new String[2];
+        String path = System.getProperty("user.dir") + "/backend/input/";
+        File jpfFile = new File(path + name + ".jpf");
+        try {
+            jpfFile.createNewFile();
+        } catch (IOException e) {
+             // Do Nothing for Now
+        }
         args[0] = "backend/input/" + name + ".jpf";
 //        args[0] = "backend/jpf-core/src/examples/" + name + ".jpf";
         args[1] = "+site=backend/site.properties";
@@ -33,6 +43,7 @@ public class JPFAdapter implements Runnable {
         visualiser = new VisualiserListener(config, jpf, treeInfo);
 
         jpf.addListener(visualiser);
+
         jpf.run();
     }
 
