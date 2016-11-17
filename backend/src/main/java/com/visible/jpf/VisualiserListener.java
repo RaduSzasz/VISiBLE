@@ -19,7 +19,7 @@ public class VisualiserListener extends PropertyListenerAdapter {
 	private ThreadInfo threadInfo;
 	private State prev;
 	private Map<Integer, State> stateById;
-	private boolean isFinished;
+	private boolean searchHasFinished;
 
 	public TreeInfo getTreeInfo() {
 		return treeInfo;
@@ -28,14 +28,14 @@ public class VisualiserListener extends PropertyListenerAdapter {
 	public boolean moveForward() {
 		this.shouldMoveForward = true;
 		threadInfo.setRunning();
-		return isFinished;
+		return searchHasFinished;
 	}
 
 	public VisualiserListener(Config config, JPF jpf, TreeInfo treeInfo) {
 		this(config, jpf);
 		this.treeInfo = treeInfo;
 		this.shouldMoveForward = false;
-		this.isFinished = false;
+		this.searchHasFinished = false;
 	}
 
 	public VisualiserListener(Config conf, JPF jpf) {
@@ -108,6 +108,6 @@ public class VisualiserListener extends PropertyListenerAdapter {
 	@Override
 	public void searchFinished(Search search) {
 		System.out.println("[finished]");
-		this.isFinished = true;
+		this.searchHasFinished = true;
 	}
 }

@@ -1,4 +1,4 @@
-public class TestTree {
+public class Test {
 	
 
 	public static void main(String[] args) {
@@ -9,12 +9,12 @@ public class TestTree {
 
 		// Function logic for maxOfThree()
 		// PC: true
-	  max = maxOfThree(x, y, z);	
+	  max = symVis(x, y, z);	
 
 		System.out.println(max);
 	}
 
-  private static int maxOfThree(int x, int y, int z) {
+  private static int symVis(int x, int y, int z) {
 
     int max = 0;
     if (x >= y) {

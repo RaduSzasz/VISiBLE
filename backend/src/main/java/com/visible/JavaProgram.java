@@ -1,19 +1,21 @@
 /* This class represents the uploaded Java files */
 package com.visible;
 
-import javax.tools.JavaCompiler;
+import javax.tools.*;
+import java.io.File;
+import java.io.IOException;
 
 public class JavaProgram{
 
-  private String code;
-  JavaCompiler compiler;
+  private File file;
 
-  public JavaProgram(String code){
-    this.code = code;
+  public JavaProgram(File source) {
+    this.file = source;
   }
-  
-  public String getCode(){
-    return this.code;
+
+  public void compile() throws IOException {
+    JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+    compiler.run(null, null, null, file.getPath());
   }
 
 }

@@ -16,7 +16,7 @@ public class VisibleServerApplication {
 
 	public static void main(String[] args) {
 		executor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
-		adapter = new JPFAdapter("TestTree", "maxOfThree", 3);
+		adapter = new JPFAdapter("Test", "symVis", 3);
 		executor.execute(adapter);
 		SpringApplication.run(VisibleServerApplication.class, args);
 	}

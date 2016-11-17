@@ -18,7 +18,8 @@ public class JPFAdapter implements Runnable {
 
     public static void runJPF(String name, String method, int argNum) {
         String[] args = new String[2];
-        args[0] = "backend/jpf-core/src/examples/" + name + ".jpf";
+        args[0] = "backend/input/" + name + ".jpf";
+//        args[0] = "backend/jpf-core/src/examples/" + name + ".jpf";
         args[1] = "+site=backend/site.properties";
 
         Config config = JPF.createConfig(args);
