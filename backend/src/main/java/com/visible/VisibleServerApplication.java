@@ -15,9 +15,6 @@ public class VisibleServerApplication {
 	private static JPFAdapter adapter;
 
 	public static void main(String[] args) {
-		executor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
-		adapter = new JPFAdapter("Test", "symVis", 3);
-		executor.execute(adapter);
 		SpringApplication.run(VisibleServerApplication.class, args);
 	}
 
@@ -27,6 +24,14 @@ public class VisibleServerApplication {
 			// Do Nothing
 		}
 		executor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
+		executor.execute(adapter);
+	}
+
+	public static void setupJPF(String fileName, String symMethod, int numArgs) {
+
+		//TODO Get filename without extension properly
+		executor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
+		adapter = new JPFAdapter(fileName, symMethod, numArgs);
 		executor.execute(adapter);
 	}
 }

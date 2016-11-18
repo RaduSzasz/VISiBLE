@@ -20,7 +20,11 @@ public class FileUploadController {
       RedirectAttributes redirectAttributes) throws java.io.IOException, java.io.UnsupportedEncodingException{
 
     String fileName = file.getOriginalFilename();
-    JavaProgram javaProgram = new JavaProgram(fileName, file.getBytes());
+    String name = fileName.substring(0, fileName.lastIndexOf("."));
+    JavaProgram javaProgram = new JavaProgram(name, file.getBytes());
+
+    // TODO Get symbolic method name and number of symbolic arguments from user
+    VisibleServerApplication.setupJPF(name, "symVis", 3);
     return fileName + " uploaded successfully";
   }
 }
