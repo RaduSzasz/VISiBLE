@@ -18,6 +18,7 @@ export function parseTree(nodes) {
   nodes.forEach(n => {
     // `t` is the corresponding tree of `n`
     var t = trees[n.id];
+    console.log(trees[n.parent_]);
     t.setParent(trees[n.parent_] || null);
     n.children.forEach(cn => {
       t.addChild(trees[cn])
@@ -35,11 +36,11 @@ export function parseTree(nodes) {
 @Injectable()
 export class TreeService {
 
-  constructor(api: ApiService) {}
+  constructor(private api: ApiService) {}
 
   getTree(i):Promise<Tree> {
     return new Promise((resolve, reject) => {
-      api.get(`nodes/${i}`, (nodes) => resolve(parseTree(nodes)));
+      this.api.get(`nodes/${i}`).then(nodes => resolve(parseTree(nodes)));
     });
   }
 }

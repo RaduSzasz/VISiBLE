@@ -5,6 +5,11 @@ var nodesService = require('./nodes.service');
 
 var PORT = process.env.PORT || 5000;
 
+app.use(function (req, res, next) {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    next();
+});
+
 
 app.post('/upload', (req, res) => {
   // Some code to put the file to jpf
