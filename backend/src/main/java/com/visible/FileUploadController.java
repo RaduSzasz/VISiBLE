@@ -20,7 +20,6 @@ public class FileUploadController {
       RedirectAttributes redirectAttributes) throws java.io.IOException, java.io.UnsupportedEncodingException{
 
     String fileName = file.getOriginalFilename();
-//    file.transferTo();
     JavaProgram javaProgram = new JavaProgram(fileName, file.getBytes());
     return fileName + " uploaded successfully";
   }
