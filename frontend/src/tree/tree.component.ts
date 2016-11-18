@@ -60,19 +60,21 @@ export class TreeComponent implements OnInit {
     node.select('text').text((d) => d.data);
 
     // Enter any new nodes at the parent's previous position.
-    var nodeEnter = node.enter().append('g')
-    .attr('class', 'node')
-    .attr('transform', (d) => `translate(${d.x}, ${d.y})`)
-    .on('click', function(d, i){
-      console.log('hi');
-      d3.select(this).style("fill", "red");
-    }) ;
+    var nodeEnter = node.enter().append('g');
+    node.attr('class', 'node')
+      .attr('transform', (d) => `translate(${d.x}, ${d.y})`)
+      .on('click', (d, i) => {
+        this.treeService.getTree(d.id).then(t => {
+          d.addChild(t);
+          this.drawTree();
+        });
+      }) ;
 
-    nodeEnter.append('circle')
+    node.append('circle')
     .attr('r', 10)
     .style('fill', d => 'lightsteelblue');
 
-    nodeEnter.append('text')
+    node.append('text')
     .attr('dx', d => d.children? -13 : 13)
     .attr('dy', '.35em')
     .attr('text-anchor', d => d.children? 'end' : 'start')
@@ -85,9 +87,9 @@ export class TreeComponent implements OnInit {
     var link = svg.selectAll('path.link').data(links);
 
     // Enter any new links at the parent's previous position.
-    link.enter().insert('path', 'g')
-    .attr('class', 'link')
-    .attr('d', diagonal);
+    var linkEnter = link.enter().insert('path', 'g');
+    link.attr('class', 'link')
+      .attr('d', diagonal);
 
     link.exit().remove();
 

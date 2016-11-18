@@ -15,6 +15,7 @@ export class Tree {
   }
 
   public addChild(c: Tree) {
+    if(!this.children) this.children = [];
     if(!!c) this.children.push(c);
     return this;
   }
