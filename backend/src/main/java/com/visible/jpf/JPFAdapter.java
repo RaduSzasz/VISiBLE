@@ -28,6 +28,7 @@ public class JPFAdapter implements Runnable {
         } catch (IOException e) {
              // Do Nothing for Now
         }
+
         args[0] = "backend/input/" + mainClassName + ".jpf";
         args[1] = "+site=backend/site.properties";
 

@@ -28,8 +28,6 @@ public class VisibleServerApplication {
 	}
 
 	public static void setupJPF(String fileName, String symMethod, int numArgs) {
-
-		//TODO Get filename without extension properly
 		executor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
 		adapter = new JPFAdapter(fileName, symMethod, numArgs);
 		executor.execute(adapter);
