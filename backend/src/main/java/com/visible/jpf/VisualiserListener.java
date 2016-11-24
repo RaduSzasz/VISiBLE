@@ -57,6 +57,7 @@ public class VisualiserListener extends PropertyListenerAdapter {
 			stateById.put(s.id, s);
 		} else {
 			s = stateById.get(search.getStateId());
+			
 		}
 
 		treeInfo.addState(s);
