@@ -10,19 +10,19 @@ import { TreeComponent }     from './tree/tree.component';
 import { TreeService } from './tree/tree.service';
 import { ApiService } from './shared/api.service';
 
-import { UPLOAD_DIRECTIVES } from 'ng2-uploader/ng2-uploader';
+import { Ng2UploaderModule } from 'ng2-uploader/ng2-uploader';
 
 @NgModule({
   imports: [
     BrowserModule,
     FormsModule,
-    HttpModule
+    HttpModule,
+    Ng2UploaderModule
   ],
   declarations: [
     AppComponent,
     UploadComponent,
     TreeComponent,
-    UPLOAD_DIRECTIVES
   ],
   providers: [ 
     TreeService,

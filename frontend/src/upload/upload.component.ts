@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { UPLOAD_DIRECTIVES } from 'ng2-uploader/ng2-uploader';
 
 const URL = 'localhost:5000/upload';
 
