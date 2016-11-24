@@ -1,5 +1,6 @@
 import { Component }         from '@angular/core';
 import { UploadComponent }   from '../upload/upload.component';
+import { TreeComponent } from '../tree/tree.component';
 
 @Component({
   selector: 'my-app',
@@ -9,24 +10,4 @@ import { UploadComponent }   from '../upload/upload.component';
 
 export class AppComponent {
   title = 'VISiBLE';
-  uploadFile: any;
-  hasBaseDropZoneOver: boolean = false;
-  filename: string;
-  uploadSuccess: boolean = false;
-  options: Object = {
-    url: 'http://localhost:5000/upload'
-  };
-
-  handleUpload(data): void {
-    if (data && data.response) {
-      this.filename = data.originalName;
-      data = JSON.parse(data.response);
-      this.uploadSuccess = true;
-      this.uploadFile = data;
-    }
-  }
-
-  fileOverBase(e:any):void {
-    this.hasBaseDropZoneOver = e;
-  }
 }

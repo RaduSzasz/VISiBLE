@@ -143,3 +143,66 @@ nav a.active {
 * {
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Tree css  */
+
+.node {
+  cursor: pointer;
+}
+
+<<<<<<< HEAD
+.overlay{
+  background-color:#EEE;
+}
+
+.node circle {
+  fill: #fff;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+.node text {
+  font-size:10px; 
+  font-family:sans-serif;
+}
+
+.link {
+  fill: none;
+/*  stroke: #ccc; */
+  stroke: #d50000;
+  stroke-width: 1.5px;
+}
+
+.templink {
+  fill: none;
+  stroke: red;
+  stroke-width: 3px;
+}
+
+.ghostCircle.show{
+  display:block;
+}
+
+.ghostCircle, .activeDrag .ghostCircle{
+  display: none;
+=======
+.node circle {
+  fill: #fff;
+  stroke: steelblue;
+  stroke-width: 3px;
+}
+
+.node text {
+  font: 12px sans-serif;
+}
+
+.link{
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 2px;
+}
+
+h2{
+  color: red;
+>>>>>>> 97e22d485f9b78dbd3d2a2a8d711062f20e83b71
+}

@@ -5,6 +5,9 @@ import { HttpModule }   from '@angular/http';
 
 import { AppComponent }        from './app/app.component';
 import { UploadComponent }     from './upload/upload.component';
+import { TreeComponent }     from './tree/tree.component';
+
+import { TreeService } from './tree/tree.service';
 
 import { UPLOAD_DIRECTIVES } from 'ng2-uploader/ng2-uploader';
 
@@ -17,9 +20,10 @@ import { UPLOAD_DIRECTIVES } from 'ng2-uploader/ng2-uploader';
   declarations: [
     AppComponent,
     UploadComponent,
+    TreeComponent,
     UPLOAD_DIRECTIVES
   ],
-  providers: [ ],
+  providers: [ TreeService ],
   bootstrap: [ AppComponent ]
 })
 export class AppModule { }
