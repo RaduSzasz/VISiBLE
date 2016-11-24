@@ -8,14 +8,23 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.tools.JavaFileObject;
+import java.io.File;
+
 @RestController
 @RequestMapping("/upload")
 public class FileUploadController {
 
   @PostMapping
-  public JavaProgram handleFileUpload(@RequestParam("file") MultipartFile file,
+  public String handleFileUpload(@RequestParam("file") MultipartFile file,
       RedirectAttributes redirectAttributes) throws java.io.IOException, java.io.UnsupportedEncodingException{
-    String codeAsString = new String(file.getBytes(), "UTF-8");
-    return new JavaProgram(codeAsString);
+
+    String fileName = file.getOriginalFilename();
+    String name = fileName.substring(0, fileName.lastIndexOf("."));
+    JavaProgram javaProgram = new JavaProgram(name, file.getBytes());
+
+    // TODO Get symbolic method name and number of symbolic arguments from user
+    VisibleServerApplication.setupJPF(name, "symVis", 3);
+    return fileName + " uploaded successfully";
   }
 }
