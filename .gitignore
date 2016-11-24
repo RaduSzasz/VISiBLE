@@ -27,7 +27,7 @@ build/
 build/
 frontend/dist/
 frontend/node/
-frontend/node_modules/
+node_modules/
 frontend/src/dummy-backend.js
 
 # IntelliJ useless stuff

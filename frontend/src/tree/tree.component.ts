@@ -11,10 +11,10 @@ import { TreeService } from './tree.service';
 })
 
 export class TreeComponent implements OnInit {
-  private _svg;
-  private _tree;
-  private _diagonal;
-  public TREE_STRING;
+  private _d3_svg;
+  private _d3_tree;
+  private _d3_diagonal;
+  public tree;
 
   constructor(private treeService: TreeService,
               private elemRef: ElementRef) { }
@@ -23,10 +23,10 @@ export class TreeComponent implements OnInit {
     var margin = {top: 20, right: 120, bottom: 20, left: 120};
     var width = 960 - margin.right - margin.left;
     var height = 500 - margin.top - margin.bottom;
-    this._tree = d3.layout.tree().size([width, height]);
-    this._diagonal = d3.svg.diagonal();
+    this._d3_tree = d3.layout.tree().size([width, height]);
+    this._d3_diagonal = d3.svg.diagonal();
 
-    this._svg = d3.select(this.elemRef.nativeElement).select('svg')
+    this._d3_svg = d3.select(this.elemRef.nativeElement).select('svg')
                 .attr('width', width + margin.right + margin.left)
                 .attr('height', height + margin.top + margin.bottom)
                 .append('g')
@@ -34,18 +34,18 @@ export class TreeComponent implements OnInit {
   }
 
   getTree() {
-    this.treeService.getTree().then(t => {
-      this.TREE_STRING = JSON.stringify(t, undefined, 4);
+    this.treeService.getTree(0).then(t => {
+      this.tree = t;
       this.drawTree();
     });
   }
 
   drawTree() {
-    var tree = this._tree;
-    var svg = this._svg;
-    var diagonal = this._diagonal;
+    var tree = this._d3_tree;
+    var svg = this._d3_svg;
+    var diagonal = this._d3_diagonal;
 
-    var root = JSON.parse(this.TREE_STRING);
+    var root = this.tree;
 
     // Compute the new tree layout.
     var nodes = tree.nodes(root);
@@ -57,18 +57,24 @@ export class TreeComponent implements OnInit {
     var node = svg.selectAll('g.node').data(nodes);
 
     // Update text at nodes
-    node.select('text').text((d:any) => d.data);
+    node.select('text').text((d) => d.data);
 
     // Enter any new nodes at the parent's previous position.
-    var nodeEnter = node.enter().append('g')
-    .attr('class', 'node')
-    .attr('transform', (d) => `translate(${d.x}, ${d.y})`);
+    var nodeEnter = node.enter().append('g');
+    node.attr('class', 'node')
+      .attr('transform', (d) => `translate(${d.x}, ${d.y})`)
+      .on('click', (d, i) => {
+        this.treeService.getTree(d.id).then(t => {
+          d.addChild(t);
+          this.drawTree();
+        });
+      }) ;
 
-    nodeEnter.append('circle')
+    node.append('circle')
     .attr('r', 10)
     .style('fill', d => 'lightsteelblue');
 
-    nodeEnter.append('text')
+    node.append('text')
     .attr('dx', d => d.children? -13 : 13)
     .attr('dy', '.35em')
     .attr('text-anchor', d => d.children? 'end' : 'start')
@@ -81,9 +87,9 @@ export class TreeComponent implements OnInit {
     var link = svg.selectAll('path.link').data(links);
 
     // Enter any new links at the parent's previous position.
-    link.enter().insert('path', 'g')
-    .attr('class', 'link')
-    .attr('d', diagonal);
+    var linkEnter = link.enter().insert('path', 'g');
+    link.attr('class', 'link')
+      .attr('d', diagonal);
 
     link.exit().remove();
 
