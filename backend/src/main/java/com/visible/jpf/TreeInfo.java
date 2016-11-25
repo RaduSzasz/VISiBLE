@@ -1,7 +1,5 @@
 package com.visible.jpf;
 
-import gov.nasa.jpf.symbc.numeric.PathCondition;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -9,10 +7,6 @@ import java.util.stream.Collectors;
 public class TreeInfo {
 
     private static final String DELIM = ",";
-
-    public List<State> getStatesToSend() {
-        return statesToSend;
-    }
 
     private List<State> statesToSend;
 

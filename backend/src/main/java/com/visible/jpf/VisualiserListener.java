@@ -3,12 +3,10 @@ package com.visible.jpf;
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
 import gov.nasa.jpf.PropertyListenerAdapter;
-import gov.nasa.jpf.jvm.bytecode.IfInstruction;
 import gov.nasa.jpf.search.Search;
 import gov.nasa.jpf.symbc.numeric.PCChoiceGenerator;
 import gov.nasa.jpf.symbc.numeric.PathCondition;
 import gov.nasa.jpf.vm.ChoiceGenerator;
-import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
 
@@ -23,7 +21,6 @@ public class VisualiserListener extends PropertyListenerAdapter {
 	private State prev;
 	private Map<Integer, State> stateById;
 	private boolean searchHasFinished;
-	private int shouldIBacktrack = 0;
 
 	public TreeInfo getTreeInfo() {
 		return treeInfo;
@@ -61,12 +58,10 @@ public class VisualiserListener extends PropertyListenerAdapter {
 			stateById.put(s.id, s);
 		} else {
 			s = stateById.get(search.getStateId());
-			
 		}
 
 		treeInfo.addState(s);
-		System.out.println("[advanced]");
-		System.out.println(s);
+		System.out.println("[advanced]\n" + s);
 		prev = s;
 
 		while (!shouldMoveForward) {
@@ -76,17 +71,12 @@ public class VisualiserListener extends PropertyListenerAdapter {
 		}
 
 		shouldMoveForward = false;
-
-		if (shouldIBacktrack >= 1) {
-            System.out.println("BACKTRAAAAACKING!!!!!");
-            search.getVM().backtrack();
-        }
 	}
 
 	private State createNewState(Search search) {
 		PathCondition pc = null;
-		ChoiceGenerator<?> cg = search.getVM()
-				.getLastChoiceGeneratorOfType(PCChoiceGenerator.class);
+		ChoiceGenerator<?> cg = search.getVM().getLastChoiceGeneratorOfType(PCChoiceGenerator.class);
+		System.out.println(search + "\n" + cg);
 		if (cg != null) {
 			pc = ((PCChoiceGenerator) cg).getCurrentPC();
 		}
@@ -102,14 +92,14 @@ public class VisualiserListener extends PropertyListenerAdapter {
 	}
 
 	@Override
-	public void stateBacktracked(Search search) {
+	public void stateRestored(Search search) {
 		State s = stateById.get(search.getStateId());
-		System.out.println("[backtracked]");
+		System.out.println("[restored]");
 		prev = s;
 	}
 
 	@Override
-	public void stateRestored(Search search) {
+	public void stateBacktracked(Search search) {
 		State s = stateById.get(search.getStateId());
 		System.out.println("[backtracked]");
 		prev = s;
@@ -127,29 +117,21 @@ public class VisualiserListener extends PropertyListenerAdapter {
 		ChoiceGenerator<?> cg = vm.getChoiceGenerator();
 		Search search = vm.getSearch();
 		int currentState = search.getStateId();
-		System.out.println("CGs equal?" + (cg == currentCG));
-		if (cg instanceof PCChoiceGenerator) {
 
-			if (cg.getTotalNumberOfChoices() > 1) {
-
-			    shouldIBacktrack++;
-				Instruction instruction = vm.getInstruction();
-
-				ThreadInfo threadInfo = vm.getCurrentThread();
-
-				if (instruction instanceof IfInstruction) {
-
-					if (nextStep) {
-						System.out.println("currentState = " + currentState + "LEFT");
-						((PCChoiceGenerator) cg).select(0);
-					} else {
-						System.out.println("currentState = " + currentState + "RIGHT");
-						((PCChoiceGenerator) cg).select(1);
-					}
-				}
-
-			}
-		}
-		nextStep = !nextStep;
+//		if (cg instanceof PCChoiceGenerator) {
+//			if (cg.getTotalNumberOfChoices() > 1) {
+//				Instruction instruction = vm.getInstruction();
+//				if (instruction instanceof IfInstruction) {
+//					if (nextStep) {
+//						System.out.println("currentState = " + currentState + "LEFT");
+//						cg.select(0);
+//					} else {
+//						System.out.println("currentState = " + currentState + "RIGHT");
+//						cg.select(1);
+//					}
+//				}
+//			}
+//		}
+//		nextStep = !nextStep;
 	}
 }
