@@ -3,11 +3,14 @@ package com.visible.jpf;
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
 import gov.nasa.jpf.PropertyListenerAdapter;
+import gov.nasa.jpf.jvm.bytecode.IfInstruction;
 import gov.nasa.jpf.search.Search;
 import gov.nasa.jpf.symbc.numeric.PCChoiceGenerator;
 import gov.nasa.jpf.symbc.numeric.PathCondition;
 import gov.nasa.jpf.vm.ChoiceGenerator;
+import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.VM;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,6 +23,7 @@ public class VisualiserListener extends PropertyListenerAdapter {
 	private State prev;
 	private Map<Integer, State> stateById;
 	private boolean searchHasFinished;
+	private int shouldIBacktrack = 0;
 
 	public TreeInfo getTreeInfo() {
 		return treeInfo;
@@ -72,6 +76,11 @@ public class VisualiserListener extends PropertyListenerAdapter {
 		}
 
 		shouldMoveForward = false;
+
+		if (shouldIBacktrack >= 1) {
+            System.out.println("BACKTRAAAAACKING!!!!!");
+            search.getVM().backtrack();
+        }
 	}
 
 	private State createNewState(Search search) {
@@ -110,5 +119,37 @@ public class VisualiserListener extends PropertyListenerAdapter {
 	public void searchFinished(Search search) {
 		System.out.println("[finished]");
 		this.searchHasFinished = true;
+	}
+	boolean nextStep = true;
+
+	@Override
+	public void choiceGeneratorAdvanced(VM vm, ChoiceGenerator<?> currentCG) {
+		ChoiceGenerator<?> cg = vm.getChoiceGenerator();
+		Search search = vm.getSearch();
+		int currentState = search.getStateId();
+		System.out.println("CGs equal?" + (cg == currentCG));
+		if (cg instanceof PCChoiceGenerator) {
+
+			if (cg.getTotalNumberOfChoices() > 1) {
+
+			    shouldIBacktrack++;
+				Instruction instruction = vm.getInstruction();
+
+				ThreadInfo threadInfo = vm.getCurrentThread();
+
+				if (instruction instanceof IfInstruction) {
+
+					if (nextStep) {
+						System.out.println("currentState = " + currentState + "LEFT");
+						((PCChoiceGenerator) cg).select(0);
+					} else {
+						System.out.println("currentState = " + currentState + "RIGHT");
+						((PCChoiceGenerator) cg).select(1);
+					}
+				}
+
+			}
+		}
+		nextStep = !nextStep;
 	}
 }
