@@ -4,9 +4,11 @@ import gov.nasa.jpf.symbc.numeric.PathCondition;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class State {
 
+  private static final String DELIM = ",";
   private State parent;
   List<State> children;
   private PathCondition pc;
@@ -37,27 +39,24 @@ public class State {
 
   @Override
   public String toString() {
-    StringBuilder stringBuilder = new StringBuilder();
-    stringBuilder.append("State " + id);
-    stringBuilder.append("<br>");
-    stringBuilder.append("Parent " + parent.id) ;
-    stringBuilder.append("<br>Children [");
-
-    if (children.isEmpty()) {
-      stringBuilder.append("empty");
+    StringBuilder sb = new StringBuilder();
+    sb.append("{");
+    sb.append("\"id\":" + getId() + DELIM);
+    sb.append("\"parent_\":" + getParent().getId() + DELIM);
+    sb.append("\"children\": " + TreeInfo.stringWithDelim(children.stream().map(State::getId).collect(Collectors.toList()), DELIM) + DELIM);
+    PathCondition pc = getPc();
+    String pathCondition = "";
+    if (pc == null) {
+        pathCondition = "true";
     } else {
-      for (State s : children) {
-        stringBuilder.append(s.getId());
-        stringBuilder.append(", ");
-      }
+        pathCondition = pc.stringPC();
+        pathCondition = pathCondition.substring(pathCondition.indexOf('_') - 1, pathCondition.length());
     }
-
-    stringBuilder.append("]<br>");
-    stringBuilder.append("PC [" + pc + "]");
-    stringBuilder.append("<br>");
-    stringBuilder.append("<br>");
-
-    return stringBuilder.toString();
+    sb.append("\"pc\" : \"" + pathCondition + "\"");
+    sb.append("}\n");
+    return sb.toString();
   }
+
+
 
 }

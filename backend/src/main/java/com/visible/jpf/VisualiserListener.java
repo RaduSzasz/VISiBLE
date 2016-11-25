@@ -8,6 +8,7 @@ import gov.nasa.jpf.symbc.numeric.PCChoiceGenerator;
 import gov.nasa.jpf.symbc.numeric.PathCondition;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.VM;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -57,12 +58,10 @@ public class VisualiserListener extends PropertyListenerAdapter {
 			stateById.put(s.id, s);
 		} else {
 			s = stateById.get(search.getStateId());
-			
 		}
 
 		treeInfo.addState(s);
-		System.out.println("[advanced]");
-		System.out.println(s);
+		System.out.println("[advanced]\n" + s);
 		prev = s;
 
 		while (!shouldMoveForward) {
@@ -76,8 +75,8 @@ public class VisualiserListener extends PropertyListenerAdapter {
 
 	private State createNewState(Search search) {
 		PathCondition pc = null;
-		ChoiceGenerator<?> cg = search.getVM()
-				.getLastChoiceGeneratorOfType(PCChoiceGenerator.class);
+		ChoiceGenerator<?> cg = search.getVM().getLastChoiceGeneratorOfType(PCChoiceGenerator.class);
+		System.out.println(search + "\n" + cg);
 		if (cg != null) {
 			pc = ((PCChoiceGenerator) cg).getCurrentPC();
 		}
@@ -93,14 +92,14 @@ public class VisualiserListener extends PropertyListenerAdapter {
 	}
 
 	@Override
-	public void stateBacktracked(Search search) {
+	public void stateRestored(Search search) {
 		State s = stateById.get(search.getStateId());
-		System.out.println("[backtracked]");
+		System.out.println("[restored]");
 		prev = s;
 	}
 
 	@Override
-	public void stateRestored(Search search) {
+	public void stateBacktracked(Search search) {
 		State s = stateById.get(search.getStateId());
 		System.out.println("[backtracked]");
 		prev = s;
@@ -110,5 +109,29 @@ public class VisualiserListener extends PropertyListenerAdapter {
 	public void searchFinished(Search search) {
 		System.out.println("[finished]");
 		this.searchHasFinished = true;
+	}
+	boolean nextStep = true;
+
+	@Override
+	public void choiceGeneratorAdvanced(VM vm, ChoiceGenerator<?> currentCG) {
+		ChoiceGenerator<?> cg = vm.getChoiceGenerator();
+		Search search = vm.getSearch();
+		int currentState = search.getStateId();
+
+//		if (cg instanceof PCChoiceGenerator) {
+//			if (cg.getTotalNumberOfChoices() > 1) {
+//				Instruction instruction = vm.getInstruction();
+//				if (instruction instanceof IfInstruction) {
+//					if (nextStep) {
+//						System.out.println("currentState = " + currentState + "LEFT");
+//						cg.select(0);
+//					} else {
+//						System.out.println("currentState = " + currentState + "RIGHT");
+//						cg.select(1);
+//					}
+//				}
+//			}
+//		}
+//		nextStep = !nextStep;
 	}
 }

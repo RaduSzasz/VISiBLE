@@ -13,6 +13,6 @@ public class JPFStateController {
 	public String moveForward() {
 		TreeInfo treeInfo = JPFAdapter.getListenerTreeInfo();
 		boolean finished = JPFAdapter.moveForward();
-		return finished ? "Finished" : ((treeInfo == null) ? "null" : treeInfo.toString());
+		return finished ? "Finished" : ((treeInfo == null) ? "null" : treeInfo.toJSON());
 	}
 }
