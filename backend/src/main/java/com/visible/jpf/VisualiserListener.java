@@ -3,10 +3,12 @@ package com.visible.jpf;
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
 import gov.nasa.jpf.PropertyListenerAdapter;
+import gov.nasa.jpf.jvm.bytecode.IfInstruction;
 import gov.nasa.jpf.search.Search;
 import gov.nasa.jpf.symbc.numeric.PCChoiceGenerator;
 import gov.nasa.jpf.symbc.numeric.PathCondition;
 import gov.nasa.jpf.vm.ChoiceGenerator;
+import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
 
@@ -21,12 +23,14 @@ public class VisualiserListener extends PropertyListenerAdapter {
 	private State prev;
 	private Map<Integer, State> stateById;
 	private boolean searchHasFinished;
+	private boolean nextStepIsLeft = true;
 
 	public TreeInfo getTreeInfo() {
 		return treeInfo;
 	}
 
-	public boolean moveForward() {
+	public boolean moveForward(boolean nextStepIsLeft) {
+		this.nextStepIsLeft = nextStepIsLeft;
 		this.shouldMoveForward = true;
 		threadInfo.setRunning();
 		return searchHasFinished;
@@ -60,23 +64,16 @@ public class VisualiserListener extends PropertyListenerAdapter {
 			s = stateById.get(search.getStateId());
 		}
 
+		// TODO We are adding the wrong state here!
+		// Returning (i-1)th state for ith request
 		treeInfo.addState(s);
 		System.out.println("[advanced]\n" + s);
 		prev = s;
-
-		while (!shouldMoveForward) {
-				ThreadInfo threadInfo = search.getVM().getCurrentThread();
-				this.threadInfo = threadInfo;
-				threadInfo.setSleeping();
-		}
-
-		shouldMoveForward = false;
 	}
 
 	private State createNewState(Search search) {
 		PathCondition pc = null;
 		ChoiceGenerator<?> cg = search.getVM().getLastChoiceGeneratorOfType(PCChoiceGenerator.class);
-		System.out.println(search + "\n" + cg);
 		if (cg != null) {
 			pc = ((PCChoiceGenerator) cg).getCurrentPC();
 		}
@@ -110,7 +107,6 @@ public class VisualiserListener extends PropertyListenerAdapter {
 		System.out.println("[finished]");
 		this.searchHasFinished = true;
 	}
-	boolean nextStep = true;
 
 	@Override
 	public void choiceGeneratorAdvanced(VM vm, ChoiceGenerator<?> currentCG) {
@@ -118,20 +114,25 @@ public class VisualiserListener extends PropertyListenerAdapter {
 		Search search = vm.getSearch();
 		int currentState = search.getStateId();
 
-//		if (cg instanceof PCChoiceGenerator) {
-//			if (cg.getTotalNumberOfChoices() > 1) {
-//				Instruction instruction = vm.getInstruction();
-//				if (instruction instanceof IfInstruction) {
-//					if (nextStep) {
-//						System.out.println("currentState = " + currentState + "LEFT");
-//						cg.select(0);
-//					} else {
-//						System.out.println("currentState = " + currentState + "RIGHT");
-//						cg.select(1);
-//					}
-//				}
-//			}
-//		}
-//		nextStep = !nextStep;
+		if (cg instanceof PCChoiceGenerator) {
+			if (cg.getTotalNumberOfChoices() > 1) {
+				Instruction instruction = vm.getInstruction();
+				if (instruction instanceof IfInstruction) {
+					while (!shouldMoveForward) {
+						ThreadInfo threadInfo = search.getVM().getCurrentThread();
+						this.threadInfo = threadInfo;
+						threadInfo.setSleeping();
+					}
+					shouldMoveForward = false;
+					if (nextStepIsLeft) {
+						System.out.println("currentState = " + currentState + " going LEFT");
+						cg.select(0);
+					} else {
+						System.out.println("currentState = " + currentState + " going RIGHT");
+						cg.select(1);
+					}
+				}
+			}
+		}
 	}
 }

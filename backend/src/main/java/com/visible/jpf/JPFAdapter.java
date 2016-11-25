@@ -64,8 +64,9 @@ public class JPFAdapter implements Runnable {
      }
     }
 
-    public static boolean moveForward() {
-        return visualiser.moveForward();
+    // TODO Change boolean to LEFT RIGHT enum
+    public static boolean moveForward(boolean direction) {
+        return visualiser.moveForward(direction);
     }
 
     @Override
