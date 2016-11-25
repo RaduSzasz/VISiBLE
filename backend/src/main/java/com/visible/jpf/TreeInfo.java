@@ -4,8 +4,11 @@ import gov.nasa.jpf.symbc.numeric.PathCondition;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class TreeInfo {
+
+    private static final String DELIM = ",";
 
     public List<State> getStatesToSend() {
         return statesToSend;
@@ -34,18 +37,17 @@ public class TreeInfo {
     }
 
     public String toJSON() {
+        return stringWithDelim(statesToSend, DELIM);
+    }
+
+    public static <T> String stringWithDelim(List<T> list, String delim) {
         StringBuilder sb = new StringBuilder();
         sb.append("[");
-        for (State s: statesToSend) {
-            sb.append("{");
-            sb.append("id :" + s.getId() + ",\n");
-            sb.append("parent_ :" + s.getParent().getId() + ",\n");
-            s.getChildren().forEach(state -> sb.append(state.getId()));
-            PathCondition pc = s.getPc();
-            sb.append("pc :" + ((pc == null) ? "null" : pc.stringPC()));
-            sb.append("}\n");
-        }
+        sb.append(list.stream()
+                      .map(Object::toString)
+                      .collect(Collectors.joining(delim)));
         sb.append("]");
         return sb.toString();
     }
+
 }
