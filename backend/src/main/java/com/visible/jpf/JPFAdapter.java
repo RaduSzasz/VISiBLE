@@ -12,6 +12,10 @@ public class JPFAdapter implements Runnable {
     private String name;
     private String method;
     private int argNum;
+    private static final String PATH_TO_INPUT = "backend/input/";
+    private static final String JPF_EXTENSION = ".jpf";
+    private static final String SITE_PROPERTIES = "+site=backend/site.properties";
+    private static final String SOLVER = "no_solver";
 
     public JPFAdapter(String name, String method, int argNum) {
         this.name = name;
@@ -21,19 +25,20 @@ public class JPFAdapter implements Runnable {
 
     public static void runJPF(String mainClassName, String method, int argNum) {
         String[] args = new String[2];
-        String path = System.getProperty("user.dir") + "/backend/input/";
-        File jpfFile = new File(path + mainClassName + ".jpf");
+        String path = System.getProperty("user.dir") + "/" + PATH_TO_INPUT;
+        File jpfFile = new File(path + mainClassName + JPF_EXTENSION);
         try {
             jpfFile.createNewFile();
         } catch (IOException e) {
-             // Do Nothing for Now
+            System.err.println(mainClassName + JPF_EXTENSION + " could not be created");
+            return;
         }
 
-        args[0] = "backend/input/" + mainClassName + ".jpf";
-        args[1] = "+site=backend/site.properties";
+        args[0] = PATH_TO_INPUT + mainClassName + JPF_EXTENSION;
+        args[1] = SITE_PROPERTIES;
 
         Config config = JPF.createConfig(args);
-        config.setProperty("symbolic.dp", "no_solver");
+        config.setProperty("symbolic.dp", SOLVER);
         config.setProperty("target", mainClassName);
         String symbolicMethod = mainClassName + "." + method + getSymbArgs(argNum);
         config.setProperty("symbolic.method", symbolicMethod);

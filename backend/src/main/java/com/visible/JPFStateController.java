@@ -13,6 +13,7 @@ public class JPFStateController {
 	@RequestMapping("/stepleft")
 	public String stepLeft() {
 		TreeInfo treeInfo = JPFAdapter.getListenerTreeInfo();
+		// TODO - On first access, we move forward THEN return the state, hence the off by one error
 		boolean finished = JPFAdapter.moveForward(Direction.LEFT);
 		return finished ? "Finished" : ((treeInfo == null) ? "null" : treeInfo.toJSON());
 	}
@@ -20,6 +21,7 @@ public class JPFStateController {
 	@RequestMapping("/stepright")
 	public String stepRight() {
 		TreeInfo treeInfo = JPFAdapter.getListenerTreeInfo();
+		// TODO - On first access, we move forward THEN return the state, hence the off by one error
 		boolean finished = JPFAdapter.moveForward(Direction.RIGHT);
 		return finished ? "Finished" : ((treeInfo == null) ? "null" : treeInfo.toJSON());
 	}
