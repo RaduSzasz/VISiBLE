@@ -46,7 +46,7 @@ public class State {
     sb.append("\"parent_\":" + getParent().getId() + DELIM);
     sb.append("\"children\": " + TreeInfo.stringWithDelim(children.stream().map(State::getId).collect(Collectors.toList()), DELIM) + DELIM);
     PathCondition pc = getPc();
-    String pathCondition = "";
+    String pathCondition;
     if (pc == null) {
         pathCondition = "true";
     } else {

@@ -20,14 +20,14 @@ public class VisualiserListener extends PropertyListenerAdapter {
 	private State prev;
 	private Map<Integer, State> stateById;
 	private boolean searchHasFinished;
-	private boolean nextStepIsLeft = true;
+	private Direction direction;
 
 	public TreeInfo getTreeInfo() {
 		return treeInfo;
 	}
 
-	public boolean moveForward(boolean nextStepIsLeft) {
-		this.nextStepIsLeft = nextStepIsLeft;
+	public boolean moveForward(Direction direction) {
+		this.direction = direction;
 		this.shouldMoveForward = true;
 		threadInfo.setRunning();
 		return searchHasFinished;
@@ -120,11 +120,9 @@ public class VisualiserListener extends PropertyListenerAdapter {
 						threadInfo.setSleeping();
 					}
 					shouldMoveForward = false;
-					if (nextStepIsLeft) {
-						System.out.println("currentState = " + currentState + " going LEFT");
+					if (direction == Direction.LEFT) {
 						cg.select(0);
 					} else {
-						System.out.println("currentState = " + currentState + " going RIGHT");
 						cg.select(1);
 					}
 				}

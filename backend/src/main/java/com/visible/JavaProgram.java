@@ -44,9 +44,7 @@ public class JavaProgram {
       if (exitCode != 0) {
         //TODO Inform frontend that code doesn't compile
         System.err.print(fileName + JAVA_EXTENSION + " does not compile.");
-        return;
       }
-      return;
     } catch (IOException e) {
       e.printStackTrace();
     } catch (InterruptedException e) {

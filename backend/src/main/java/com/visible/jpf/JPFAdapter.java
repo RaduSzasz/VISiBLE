@@ -58,15 +58,13 @@ public class JPFAdapter implements Runnable {
 
     public static TreeInfo getListenerTreeInfo() {
      try {
-         System.out.println("Not null");
          return visualiser.getTreeInfo();
      } catch (Exception e) {
          return null;
      }
     }
 
-    // TODO Change boolean to LEFT RIGHT enum
-    public static boolean moveForward(boolean direction) {
+    public static boolean moveForward(Direction direction) {
         return visualiser.moveForward(direction);
     }
 
