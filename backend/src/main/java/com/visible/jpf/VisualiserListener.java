@@ -7,10 +7,7 @@ import gov.nasa.jpf.jvm.bytecode.IfInstruction;
 import gov.nasa.jpf.search.Search;
 import gov.nasa.jpf.symbc.numeric.PCChoiceGenerator;
 import gov.nasa.jpf.symbc.numeric.PathCondition;
-import gov.nasa.jpf.vm.ChoiceGenerator;
-import gov.nasa.jpf.vm.Instruction;
-import gov.nasa.jpf.vm.ThreadInfo;
-import gov.nasa.jpf.vm.VM;
+import gov.nasa.jpf.vm.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -47,6 +44,7 @@ public class VisualiserListener extends PropertyListenerAdapter {
 		prev = new State(-1, null, null);
 		stateById = new HashMap<>();
 		this.treeInfo = new TreeInfo();
+		treeInfo.addState(prev);
 	}
 
 	public void stateAdvanced(Search search) {
@@ -64,8 +62,6 @@ public class VisualiserListener extends PropertyListenerAdapter {
 			s = stateById.get(search.getStateId());
 		}
 
-		// TODO We are adding the wrong state here!
-		// Returning (i-1)th state for ith request
 		treeInfo.addState(s);
 		System.out.println("[advanced]\n" + s);
 		prev = s;

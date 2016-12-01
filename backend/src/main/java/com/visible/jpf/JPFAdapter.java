@@ -58,6 +58,7 @@ public class JPFAdapter implements Runnable {
 
     public static TreeInfo getListenerTreeInfo() {
      try {
+         System.out.println("Not null");
          return visualiser.getTreeInfo();
      } catch (Exception e) {
          return null;

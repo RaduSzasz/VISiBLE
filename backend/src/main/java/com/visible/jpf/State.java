@@ -40,8 +40,9 @@ public class State {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
+    int id = getId();
     sb.append("{");
-    sb.append("\"id\":" + getId() + DELIM);
+    sb.append("\"id\":" + (id == -1 ? "root" : id) + DELIM);
     sb.append("\"parent_\":" + getParent().getId() + DELIM);
     sb.append("\"children\": " + TreeInfo.stringWithDelim(children.stream().map(State::getId).collect(Collectors.toList()), DELIM) + DELIM);
     PathCondition pc = getPc();
