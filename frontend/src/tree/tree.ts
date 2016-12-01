@@ -20,6 +20,14 @@ export class Tree {
     return this;
   }
 
+  public getLeft() {
+    return this.children[0].id < this.children[1].id? this.children[0]: this.children[1];
+  }
+
+  public getRight() {
+    return this.children[0].id > this.children[1].id? this.children[0]: this.children[1];
+  }
+
   public setPC(pc: String) {
     this.pc = pc;
     return this;

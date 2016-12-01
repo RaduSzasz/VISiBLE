@@ -46,6 +46,7 @@ export class TreeComponent implements OnInit, OnChanges {
     var diagonal = this._d3_diagonal;
 
     var root = this.tree;
+    var max_index = root.getSize() - 1;
 
     // Compute the new tree layout.
     var nodes = tree.nodes(root);
@@ -63,14 +64,16 @@ export class TreeComponent implements OnInit, OnChanges {
     var nodeEnter = node.enter().append('g');
     node.attr('class', 'node')
       .attr('transform', (d) => `translate(${d.x}, ${d.y})`)
-      /*
-      .on('click', (d, i) => {
+      .on('click', (d) => {
+        if(d.id == max_index - 1) console.log('lefttttt');
+        if(d.id == max_index) console.log('rightttt');
+        /*
         this.treeService.getTree(d.id).then(t => {
           d.addChild(t);
           this.drawTree();
         });
+       */
       }) ;
-     */
 
     node.append('circle')
     .attr('r', 10)
