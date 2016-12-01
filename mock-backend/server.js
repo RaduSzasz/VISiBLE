@@ -3,7 +3,7 @@ var app = express();
 
 var nodesService = require('./nodes.service');
 
-var PORT = process.env.PORT || 5000;
+var PORT = process.env.PORT || 5050;
 
 app.use(function (req, res, next) {
     res.setHeader('Access-Control-Allow-Origin', '*');

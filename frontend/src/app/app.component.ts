@@ -1,13 +1,7 @@
-import { Component }         from '@angular/core';
-import { UploadComponent }   from '../upload/upload.component';
-import { TreeComponent } from '../tree/tree.component';
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'my-app',
-  styleUrls: ['src/app/app.component.css'],
-  templateUrl: 'src/app/app.component.html'
+  template: `<h1>Setting up {{name}}</h1>`,
 })
-
-export class AppComponent {
-  title = 'VISiBLE';
-}
+export class AppComponent  { name = 'Testing'; }
