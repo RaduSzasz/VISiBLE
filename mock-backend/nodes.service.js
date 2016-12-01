@@ -1,4 +1,4 @@
-var nodes = require('./nodes.json');
+var nodes = require('./nodes');
 
 exports.getNode = (id) => {
   if(id >= nodes.length) throw "No such node";
