@@ -36,3 +36,5 @@ frontend/src/dummy-backend.js
 frontend/typings/modules/
 hs_err_pid*
 npm-debug.log
+
+backend/input/*
