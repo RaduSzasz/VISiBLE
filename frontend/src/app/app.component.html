@@ -1,6 +1,8 @@
 <h1>{{title}}: Upload a java file!</h1>
 
-<upload>
-</upload>
+<input type="file"
+  ngFileSelect 
+  [options]="options"
+  (onUpload)="setInitialTree($event)">
 
-<tree-container></tree-container>
+<tree-container [tree]="initialTree"></tree-container>
