@@ -1,0 +1,28 @@
+buildscript {
+  repositories {
+    maven {
+      url "https://plugins.gradle.org/m2/"
+    }
+  }
+
+  dependencies {
+    classpath "com.moowork.gradle:gradle-node-plugin:0.13"
+  }
+}
+
+apply plugin: 'com.moowork.node'
+
+npm_run{
+  args = ['build:prod']
+}
+
+task build(dependsOn: [npm_install, npm_run]) << {}
+npm_run.mustRunAfter npm_install
+
+task clean() << {
+  delete "node_modules"
+  delete "dist"
+}
+
+task stage(dependsOn: build) << {}
+task check(dependsOn: [npm_run_test]) << {}
