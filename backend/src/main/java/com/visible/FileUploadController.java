@@ -25,12 +25,8 @@ public class FileUploadController {
     JavaProgram javaProgram = new JavaProgram(name, file.getBytes());
 
     // TODO Get Symbolic Method name and number of arguments from frontend
-    VisibleServerApplication.setupJPF(name, "symVis", 1);
-    while (isJPFRunning()) {
-      // Do nothing
-    }
+    VisibleServerApplication.setupJPF(name, "symVis", 4);
     return fileName + " uploaded " + (javaProgram.isCompilationSuccessful() ?
-            "and compiled successfully." : "but could not be compiled.") +
-            JPFAdapter.getListenerTreeInfo().toJSON();
+            "and compiled successfully." : "but could not be compiled.");
   }
 }

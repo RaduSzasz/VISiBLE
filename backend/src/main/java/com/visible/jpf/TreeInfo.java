@@ -8,30 +8,32 @@ public class TreeInfo {
 
     private static final String DELIM = ",";
 
-    private List<State> statesToSend;
+    private List<State> states;
 
     public TreeInfo() {
-        this.statesToSend = new ArrayList<>();
+        this.states = new ArrayList<>();
     }
 
-    public void addState(State current) {
-        statesToSend.add(current);
+    public void addState(State current, State left, State right) {
+        states.add(current);
+        states.add(left);
+        states.add(right);
     }
 
     @Override
     public synchronized String toString() {
         StringBuilder sb = new StringBuilder();
-        if (statesToSend.isEmpty()) {
+        if (states.isEmpty()) {
             sb.append("empty");
         } else {
-            statesToSend.forEach(sb::append);
+            states.forEach(sb::append);
         }
 
         return sb.toString();
     }
 
     public String toJSON() {
-        return stringWithDelim(statesToSend, DELIM);
+        return stringWithDelim(states, DELIM);
     }
 
     public static <T> String stringWithDelim(List<T> list, String delim) {

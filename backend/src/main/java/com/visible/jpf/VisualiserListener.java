@@ -5,13 +5,18 @@ import gov.nasa.jpf.JPF;
 import gov.nasa.jpf.PropertyListenerAdapter;
 import gov.nasa.jpf.jvm.bytecode.IfInstruction;
 import gov.nasa.jpf.search.Search;
+import gov.nasa.jpf.search.heuristic.HeuristicSearch;
+import gov.nasa.jpf.search.heuristic.HeuristicState;
 import gov.nasa.jpf.symbc.numeric.PCChoiceGenerator;
 import gov.nasa.jpf.symbc.numeric.PathCondition;
-import gov.nasa.jpf.vm.*;
+import gov.nasa.jpf.vm.ChoiceGenerator;
+import gov.nasa.jpf.vm.Instruction;
+import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.VM;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Semaphore;
 
 public class VisualiserListener extends PropertyListenerAdapter {
 
@@ -22,17 +27,18 @@ public class VisualiserListener extends PropertyListenerAdapter {
 	private Map<Integer, State> stateById;
 	private boolean searchHasFinished;
 	private Direction direction;
+	private int count;
+	private HeuristicState heuristicState;
 
-	private static Semaphore sema;
+	public VisualiserListener(Config config, JPF jpf, TreeInfo treeInfo) {
+		this(config, jpf);
+		this.treeInfo = treeInfo;
+		this.shouldMoveForward = false;
+		this.searchHasFinished = false;
+		this.count = 0;
+	}
 
 	public TreeInfo getTreeInfo() {
-		try {
-			System.out.println("Trying to get tree");
-			sema.acquire();
-			System.out.println("Got tree");
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
 		return treeInfo;
 	}
 
@@ -43,26 +49,19 @@ public class VisualiserListener extends PropertyListenerAdapter {
 		return searchHasFinished;
 	}
 
-	public VisualiserListener(Config config, JPF jpf, TreeInfo treeInfo) {
-		this(config, jpf);
-		this.treeInfo = treeInfo;
-		this.shouldMoveForward = false;
-		this.searchHasFinished = false;
-		this.sema = new Semaphore(0);
-
-	}
-
 	public VisualiserListener(Config conf, JPF jpf) {
-		prev = new State(-1, null, null);
+		prev = new State(- 1, null, null);
 		stateById = new HashMap<>();
 		this.treeInfo = new TreeInfo();
 	}
 
 	public void stateAdvanced(Search search) {
+
 		if (search.isIgnoredState()) {
 			System.out.println("[advanced] ignored state");
 			return;
 		}
+
 
 		boolean isNew = search.isNewState();
 		State s;
@@ -73,9 +72,6 @@ public class VisualiserListener extends PropertyListenerAdapter {
 			s = stateById.get(search.getStateId());
 		}
 
-		treeInfo.addState(s);
-		sema.release();
-		System.out.println("You can now read");
 		System.out.println("[advanced]\n" + s);
 		prev = s;
 	}
@@ -118,23 +114,41 @@ public class VisualiserListener extends PropertyListenerAdapter {
 	}
 
 	@Override
+	public void stateStored(Search search) {
+		super.stateStored(search);
+		HeuristicSearch heuristicSearch = (HeuristicSearch) search;
+		List<HeuristicState> states = heuristicSearch.getChildStates();
+		if (heuristicState == null && states != null) {
+			heuristicState =  states.isEmpty() ? null : states.get(states.size() - 1);
+			if (heuristicState != null) {
+				System.out.println("Saved this state");
+			}
+		}
+		count++;
+		if (count > 1 && heuristicState != null) {
+			System.out.println("Restoring!!!!!!!!");
+			search.getVM().restoreState(heuristicState.getVMState());
+		}
+
+	}
+
+	@Override
 	public void choiceGeneratorAdvanced(VM vm, ChoiceGenerator<?>
 					currentCG) {
 		ChoiceGenerator<?> cg = vm.getChoiceGenerator();
 		Search search = vm.getSearch();
-		System.out.println("[cg Advanced]");
 
 		if (cg instanceof PCChoiceGenerator) {
 			if (cg.getTotalNumberOfChoices() > 1) {
 				Instruction instruction = vm.getInstruction();
 				if (instruction instanceof IfInstruction) {
-					while (!shouldMoveForward) {
+					while (! shouldMoveForward) {
 						ThreadInfo threadInfo = search.getVM().getCurrentThread();
 						this.threadInfo = threadInfo;
-						this.isJPFRunning = false;
 						threadInfo.setSleeping();
 					}
 					shouldMoveForward = false;
+
 					if (direction == Direction.LEFT) {
 						cg.select(0);
 					} else {
@@ -143,10 +157,6 @@ public class VisualiserListener extends PropertyListenerAdapter {
 				}
 			}
 		}
-	}
 
-	public boolean isJPFRunning() {
-		return isJPFRunning;
 	}
-
 }
