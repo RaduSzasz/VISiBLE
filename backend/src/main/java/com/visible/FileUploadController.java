@@ -23,9 +23,9 @@ public class FileUploadController {
     String name = fileName.substring(0, fileName.lastIndexOf("."));
     JavaProgram javaProgram = new JavaProgram(name, file.getBytes());
 
-    // TODO Get symbolic method name and number of symbolic arguments from user
-    VisibleServerApplication.setupJPF(name, "symVis", 1);
-    return fileName + " uploaded " + (javaProgram.isCompilationSuccessful() ? "and compiled successfully" :
-            "but could not be compiled");
+    // TODO Get Symbolic Method name and number of arguments from frontend
+    VisibleServerApplication.setupJPF(name, "symVis", 2);
+    return fileName + " uploaded " + (javaProgram.isCompilationSuccessful() ?
+            "and compiled successfully." : "but could not be compiled.");
   }
 }
