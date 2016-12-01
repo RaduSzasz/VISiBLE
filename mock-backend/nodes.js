@@ -1,4 +1,4 @@
-[
+module.exports = [
   {
     "id": 0,
     "parent_": -1,

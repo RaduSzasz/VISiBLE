@@ -1,4 +1,5 @@
-import { Component, ElementRef, OnInit } from '@angular/core';
+import { OnInit, OnChanges } from '@angular/core';
+import { Component, ElementRef, Input } from '@angular/core';
 import * as d3 from 'd3';
 import * as Moment from 'moment';
 import { TreeService } from './tree.service';
@@ -10,11 +11,11 @@ import { TreeService } from './tree.service';
   providers: [TreeService]
 })
 
-export class TreeComponent implements OnInit {
+export class TreeComponent implements OnInit, OnChanges {
   private _d3_svg;
   private _d3_tree;
   private _d3_diagonal;
-  public tree;
+  @Input() tree;
 
   constructor(private treeService: TreeService,
               private elemRef: ElementRef) { }
@@ -33,11 +34,10 @@ export class TreeComponent implements OnInit {
                 .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
   }
 
-  getTree() {
-    this.treeService.getTree(0).then(t => {
-      this.tree = t;
+  ngOnChanges(changes) {
+    if(changes['tree'].currentValue){
       this.drawTree();
-    });
+    }
   }
 
   drawTree() {
@@ -63,12 +63,14 @@ export class TreeComponent implements OnInit {
     var nodeEnter = node.enter().append('g');
     node.attr('class', 'node')
       .attr('transform', (d) => `translate(${d.x}, ${d.y})`)
+      /*
       .on('click', (d, i) => {
         this.treeService.getTree(d.id).then(t => {
           d.addChild(t);
           this.drawTree();
         });
       }) ;
+     */
 
     node.append('circle')
     .attr('r', 10)
