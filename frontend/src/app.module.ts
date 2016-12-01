@@ -1,11 +1,33 @@
 import { NgModule }      from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { FormsModule }   from '@angular/forms';
+import { HttpModule }   from '@angular/http';
 
-import { AppComponent }  from './app/app.component';
+import { AppComponent }        from './app/app.component';
+import { UploadComponent }     from './upload/upload.component';
+import { TreeComponent }     from './tree/tree.component';
+
+import { TreeService } from './tree/tree.service';
+import { ApiService } from './shared/api.service';
+
+import { Ng2UploaderModule } from 'ng2-uploader/ng2-uploader';
 
 @NgModule({
-  imports:      [ BrowserModule ],
-  declarations: [ AppComponent ],
-  bootstrap:    [ AppComponent ]
+  imports: [
+    BrowserModule,
+    FormsModule,
+    HttpModule,
+    Ng2UploaderModule
+  ],
+  declarations: [
+    AppComponent,
+    UploadComponent,
+    TreeComponent,
+  ],
+  providers: [ 
+    TreeService,
+    ApiService
+  ],
+  bootstrap: [ AppComponent ]
 })
 export class AppModule { }
