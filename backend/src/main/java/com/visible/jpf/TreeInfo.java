@@ -14,7 +14,7 @@ public class TreeInfo {
         this.statesToSend = new ArrayList<>();
     }
 
-    public synchronized void addState(State current) {
+    public void addState(State current) {
         statesToSend.add(current);
     }
 

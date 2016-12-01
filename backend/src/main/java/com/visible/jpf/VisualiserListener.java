@@ -11,6 +11,7 @@ import gov.nasa.jpf.vm.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Semaphore;
 
 public class VisualiserListener extends PropertyListenerAdapter {
 
@@ -22,7 +23,16 @@ public class VisualiserListener extends PropertyListenerAdapter {
 	private boolean searchHasFinished;
 	private Direction direction;
 
+	private static Semaphore sema;
+
 	public TreeInfo getTreeInfo() {
+		try {
+			System.out.println("Trying to get tree");
+			sema.acquire();
+			System.out.println("Got tree");
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		return treeInfo;
 	}
 
@@ -38,13 +48,14 @@ public class VisualiserListener extends PropertyListenerAdapter {
 		this.treeInfo = treeInfo;
 		this.shouldMoveForward = false;
 		this.searchHasFinished = false;
+		this.sema = new Semaphore(0);
+
 	}
 
 	public VisualiserListener(Config conf, JPF jpf) {
 		prev = new State(-1, null, null);
 		stateById = new HashMap<>();
 		this.treeInfo = new TreeInfo();
-		treeInfo.addState(prev);
 	}
 
 	public void stateAdvanced(Search search) {
@@ -63,6 +74,8 @@ public class VisualiserListener extends PropertyListenerAdapter {
 		}
 
 		treeInfo.addState(s);
+		sema.release();
+		System.out.println("You can now read");
 		System.out.println("[advanced]\n" + s);
 		prev = s;
 	}
@@ -105,10 +118,11 @@ public class VisualiserListener extends PropertyListenerAdapter {
 	}
 
 	@Override
-	public void choiceGeneratorAdvanced(VM vm, ChoiceGenerator<?> currentCG) {
+	public void choiceGeneratorAdvanced(VM vm, ChoiceGenerator<?>
+					currentCG) {
 		ChoiceGenerator<?> cg = vm.getChoiceGenerator();
 		Search search = vm.getSearch();
-		int currentState = search.getStateId();
+		System.out.println("[cg Advanced]");
 
 		if (cg instanceof PCChoiceGenerator) {
 			if (cg.getTotalNumberOfChoices() > 1) {
@@ -117,6 +131,7 @@ public class VisualiserListener extends PropertyListenerAdapter {
 					while (!shouldMoveForward) {
 						ThreadInfo threadInfo = search.getVM().getCurrentThread();
 						this.threadInfo = threadInfo;
+						this.isJPFRunning = false;
 						threadInfo.setSleeping();
 					}
 					shouldMoveForward = false;
@@ -129,4 +144,9 @@ public class VisualiserListener extends PropertyListenerAdapter {
 			}
 		}
 	}
+
+	public boolean isJPFRunning() {
+		return isJPFRunning;
+	}
+
 }

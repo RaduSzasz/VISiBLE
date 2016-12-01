@@ -8,6 +8,10 @@ import java.io.IOException;
 
 public class JPFAdapter implements Runnable {
 
+    public static VisualiserListener getVisualiser() {
+        return visualiser;
+    }
+
     private static VisualiserListener visualiser;
     private String name;
     private String method;
