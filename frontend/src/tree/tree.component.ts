@@ -1,4 +1,5 @@
-import { Component, ElementRef, OnInit } from '@angular/core';
+import { OnInit, OnChanges } from '@angular/core';
+import { Component, ElementRef, Input } from '@angular/core';
 import * as d3 from 'd3';
 import * as Moment from 'moment';
 import { TreeService } from './tree.service';
@@ -10,11 +11,11 @@ import { TreeService } from './tree.service';
   providers: [TreeService]
 })
 
-export class TreeComponent implements OnInit {
+export class TreeComponent implements OnInit, OnChanges {
   private _d3_svg;
   private _d3_tree;
   private _d3_diagonal;
-  public tree;
+  @Input() tree;
 
   constructor(private treeService: TreeService,
               private elemRef: ElementRef) { }
@@ -33,11 +34,10 @@ export class TreeComponent implements OnInit {
                 .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
   }
 
-  getTree() {
-    this.treeService.getTree(0).then(t => {
-      this.tree = t;
+  ngOnChanges(changes) {
+    if(changes['tree'].currentValue){
       this.drawTree();
-    });
+    }
   }
 
   drawTree() {
@@ -46,6 +46,7 @@ export class TreeComponent implements OnInit {
     var diagonal = this._d3_diagonal;
 
     var root = this.tree;
+    var max_index = root.getSize() - 1;
 
     // Compute the new tree layout.
     var nodes = tree.nodes(root);
@@ -56,40 +57,59 @@ export class TreeComponent implements OnInit {
     // Update the nodes…
     var node = svg.selectAll('g.node').data(nodes);
 
-    // Update text at nodes
-    node.select('text').text((d) => d.data);
-
     // Enter any new nodes at the parent's previous position.
     var nodeEnter = node.enter().append('g');
     node.attr('class', 'node')
       .attr('transform', (d) => `translate(${d.x}, ${d.y})`)
-      .on('click', (d, i) => {
-        this.treeService.getTree(d.id).then(t => {
-          d.addChild(t);
-          this.drawTree();
-        });
+      .on('click', (d) => {
+        var steer_promise;
+
+        if(d.id == max_index - 1) {
+          steer_promise = this.treeService.stepLeft();
+          console.log(steer_promise);
+        }
+
+        if(d.id == max_index) {
+          steer_promise = this.treeService.stepRight();
+        }
+       
+        if(d.id >= max_index -1) {
+            console.log('bye');
+          steer_promise.then(tree => {
+            console.log('hello');
+            d.children = tree.children;
+            this.drawTree();
+          });
+        }
       }) ;
 
-    node.append('circle')
+    nodeEnter.append('circle')
     .attr('r', 10)
-    .style('fill', d => 'lightsteelblue');
-
-    node.append('text')
-    .attr('dx', d => d.children? -13 : 13)
-    .attr('dy', '.35em')
-    .attr('text-anchor', d => d.children? 'end' : 'start')
-    .text((d:any) => d.data);
+    .style('fill', 'lightsteelblue');
 
     // Transition exiting nodes to the parent's new position.
     node.exit().remove();
 
     // Update the links…
-    var link = svg.selectAll('path.link').data(links);
+    var link = svg.selectAll('g.link').data(links);
 
     // Enter any new links at the parent's previous position.
-    var linkEnter = link.enter().insert('path', 'g');
-    link.attr('class', 'link')
+    var linkEnter = link.enter().insert('g', 'g.node')
+    linkEnter.append('path');
+    linkEnter.append('text');
+
+    link.selectAll('path')
+      .attr('class', 'link')
       .attr('d', diagonal);
+
+    link.selectAll('text')
+    .attr('x', d => 0.5*d.source.x + 0.5*d.target.x - 15)
+    .attr('y', d => 0.5*d.source.y + 0.5*d.target.y)
+    .attr('text-anchor', d => d.children? 'end' : 'start')
+    .text((d:any) => d.target.pc);
+
+    link.attr('class', 'link');
+
 
     link.exit().remove();
 

@@ -4,7 +4,6 @@ import { FormsModule }   from '@angular/forms';
 import { HttpModule }   from '@angular/http';
 
 import { AppComponent }        from './app/app.component';
-import { UploadComponent }     from './upload/upload.component';
 import { TreeComponent }     from './tree/tree.component';
 
 import { TreeService } from './tree/tree.service';
@@ -21,7 +20,6 @@ import { Ng2UploaderModule } from 'ng2-uploader/ng2-uploader';
   ],
   declarations: [
     AppComponent,
-    UploadComponent,
     TreeComponent,
   ],
   providers: [ 

@@ -5,41 +5,40 @@ var nodesService = require('./nodes.service');
 
 var PORT = process.env.PORT || 5000;
 
+var curNode = 0;
+
 app.use(function (req, res, next) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     next();
 });
 
-
+// Return the first three nodes.
 app.post('/upload', (req, res) => {
   // Some code to put the file to jpf
-  res.json({
-    "upload_id": 1
-  }) 
+  console.log('UPLOAD');
+  curNode = 0;
+
+  res.json(nodesService.getNode(curNode));
 });
 
-/*
-app.get('/uploads/:uid', (req, res) => {
-  var uid = req.params.uid;
-  res.json({
-    uid: uid
-  });
+// Return three nodes from the left child
+app.get('/stepleft', (req, res) => {
+  // Some code to put the file to jpf
+  curNode = 2*curNode + 1;
+  console.log('STEP LEFT');
+
+  res.json(nodesService.getNode(curNode));
 });
 
-app.get('/uploads/:uid/nodes/:nid', (req, res) => {
-  var uid = req.params.uid;
-  var nid = req.params.nid;
-  res.json({
-    uid: uid,
-    nid: nid
-  });
-});
-*/
+// Return three nodes from the right child
+app.get('/stepright', (req, res) => {
+  // Some code to put the file to jpf
+  curNode = 2*curNode + 2;
+  console.log('STEP RIGHT');
 
-app.get('/nodes/:nid', (req, res) => {
-  var nid = req.params.nid;
-  res.json(nodesService.getNode(nid));
+  res.json(nodesService.getNode(curNode));
 });
+
 
 app.listen(PORT, () => {
   console.log('SERVER RUNNING ON PORT ' + PORT) 

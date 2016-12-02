@@ -1,5 +1,7 @@
-import { Component }         from '@angular/core';
-import { UploadComponent }   from '../upload/upload.component';
+import { Component }     from '@angular/core';
+
+import { TreeService }   from '../tree/tree.service';
+import { Tree } from '../tree/tree';
 import { TreeComponent } from '../tree/tree.component';
 
 @Component({
@@ -9,5 +11,19 @@ import { TreeComponent } from '../tree/tree.component';
 })
 
 export class AppComponent {
+  public initialTree = null;
   title = 'VISiBLE';
+  options: Object = {
+    url: 'http://localhost:5000/upload'
+  };
+
+  constructor(private treeService: TreeService){ }
+
+  setInitialTree(data){
+    if (data && data.response) {
+      // this.filename = data.originalName;
+      // this.uploadSuccess = true;
+      this.initialTree = this.treeService.parseTree(JSON.parse(data.response));
+    }
+  }
 }

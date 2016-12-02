@@ -162,11 +162,10 @@ nav a.active {
 }
 
 .node text {
-  font-size:10px; 
   font-family:sans-serif;
 }
 
-.link {
+.link path{
   fill: none;
 /*  stroke: #ccc; */
   stroke: #d50000;
