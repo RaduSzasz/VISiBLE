@@ -65,8 +65,26 @@ export class TreeComponent implements OnInit, OnChanges {
     node.attr('class', 'node')
       .attr('transform', (d) => `translate(${d.x}, ${d.y})`)
       .on('click', (d) => {
-        if(d.id == max_index - 1) console.log('lefttttt');
-        if(d.id == max_index) console.log('rightttt');
+        var steer_promise;
+
+        if(d.id == max_index - 1) {
+          steer_promise = this.treeService.stepLeft();
+          console.log(steer_promise);
+        }
+
+        if(d.id == max_index) {
+          steer_promise = this.treeService.stepRight();
+        }
+       
+        // Call steer if defined 
+        if(d.id >= max_index -1) {
+            console.log('bye');
+          steer_promise.then(tree => {
+            console.log('hello');
+            d.children = tree.children;
+            this.drawTree();
+          });
+        }
         /*
         this.treeService.getTree(d.id).then(t => {
           d.addChild(t);

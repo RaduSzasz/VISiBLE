@@ -40,6 +40,7 @@ export class Tree {
   }
 
   public getSize(){
+    if(!this.children) this.children = [];
     return 1 + this.children.reduce((acc, c) => acc + c.getSize(), 0);
   }
 }
