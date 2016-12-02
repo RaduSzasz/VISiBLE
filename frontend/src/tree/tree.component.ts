@@ -57,9 +57,6 @@ export class TreeComponent implements OnInit, OnChanges {
     // Update the nodes…
     var node = svg.selectAll('g.node').data(nodes);
 
-    // Update text at nodes
-    node.select('text').text((d) => d.data);
-
     // Enter any new nodes at the parent's previous position.
     var nodeEnter = node.enter().append('g');
     node.attr('class', 'node')
@@ -76,7 +73,6 @@ export class TreeComponent implements OnInit, OnChanges {
           steer_promise = this.treeService.stepRight();
         }
        
-        // Call steer if defined 
         if(d.id >= max_index -1) {
             console.log('bye');
           steer_promise.then(tree => {
@@ -85,34 +81,35 @@ export class TreeComponent implements OnInit, OnChanges {
             this.drawTree();
           });
         }
-        /*
-        this.treeService.getTree(d.id).then(t => {
-          d.addChild(t);
-          this.drawTree();
-        });
-       */
       }) ;
 
-    node.append('circle')
+    nodeEnter.append('circle')
     .attr('r', 10)
-    .style('fill', d => 'lightsteelblue');
-
-    node.append('text')
-    .attr('dx', d => d.children? -13 : 13)
-    .attr('dy', '.35em')
-    .attr('text-anchor', d => d.children? 'end' : 'start')
-    .text((d:any) => d.data);
+    .style('fill', 'lightsteelblue');
 
     // Transition exiting nodes to the parent's new position.
     node.exit().remove();
 
     // Update the links…
-    var link = svg.selectAll('path.link').data(links);
+    var link = svg.selectAll('g.link').data(links);
 
     // Enter any new links at the parent's previous position.
-    var linkEnter = link.enter().insert('path', 'g');
-    link.attr('class', 'link')
+    var linkEnter = link.enter().insert('g', 'g.node')
+    linkEnter.append('path');
+    linkEnter.append('text');
+
+    link.selectAll('path')
+      .attr('class', 'link')
       .attr('d', diagonal);
+
+    link.selectAll('text')
+    .attr('x', d => 0.5*d.source.x + 0.5*d.target.x - 15)
+    .attr('y', d => 0.5*d.source.y + 0.5*d.target.y)
+    .attr('text-anchor', d => d.children? 'end' : 'start')
+    .text((d:any) => d.target.pc);
+
+    link.attr('class', 'link');
+
 
     link.exit().remove();
 

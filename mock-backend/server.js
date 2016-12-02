@@ -16,6 +16,7 @@ app.use(function (req, res, next) {
 app.post('/upload', (req, res) => {
   // Some code to put the file to jpf
   console.log('UPLOAD');
+  curNode = 0;
 
   res.json(nodesService.getNode(curNode));
 });
