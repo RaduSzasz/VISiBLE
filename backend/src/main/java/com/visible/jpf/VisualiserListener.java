@@ -1,13 +1,23 @@
 package com.visible.jpf;
 
-
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
 import gov.nasa.jpf.PropertyListenerAdapter;
+import gov.nasa.jpf.jvm.bytecode.*;
 import gov.nasa.jpf.jvm.bytecode.IFEQ;
-import gov.nasa.jpf.jvm.bytecode.IfInstruction;
 import gov.nasa.jpf.search.Search;
 import gov.nasa.jpf.symbc.bytecode.*;
+import gov.nasa.jpf.symbc.bytecode.IFGE;
+import gov.nasa.jpf.symbc.bytecode.IFGT;
+import gov.nasa.jpf.symbc.bytecode.IFLE;
+import gov.nasa.jpf.symbc.bytecode.IFLT;
+import gov.nasa.jpf.symbc.bytecode.IFNE;
+import gov.nasa.jpf.symbc.bytecode.IF_ICMPEQ;
+import gov.nasa.jpf.symbc.bytecode.IF_ICMPGE;
+import gov.nasa.jpf.symbc.bytecode.IF_ICMPGT;
+import gov.nasa.jpf.symbc.bytecode.IF_ICMPLE;
+import gov.nasa.jpf.symbc.bytecode.IF_ICMPLT;
+import gov.nasa.jpf.symbc.bytecode.IF_ICMPNE;
 import gov.nasa.jpf.symbc.numeric.Comparator;
 import gov.nasa.jpf.symbc.numeric.IntegerExpression;
 import gov.nasa.jpf.symbc.numeric.PCChoiceGenerator;
@@ -25,14 +35,16 @@ public class VisualiserListener extends PropertyListenerAdapter {
 	private Map<Integer, State> stateById;
 	private boolean searchHasFinished;
 	private List<String> choicesTrace;
+	private Direction direction;
 
 	public TreeInfo getTreeInfo() {
 		return treeInfo;
 	}
 
-	public boolean moveForward() {
+	public boolean moveForward(Direction direction) {
 		this.shouldMoveForward = true;
 		threadInfo.setRunning();
+		this.direction = direction;
 		return searchHasFinished;
 	}
 
@@ -65,7 +77,6 @@ public class VisualiserListener extends PropertyListenerAdapter {
 			s = stateById.get(search.getStateId());
 		}
 
-		treeInfo.addState(s);
 		System.out.println("[advanced]\n" + s);
 		prev = s;
 
@@ -81,7 +92,6 @@ public class VisualiserListener extends PropertyListenerAdapter {
 	private State createNewState(Search search) {
 		PathCondition pc = null;
 		ChoiceGenerator<?> cg = search.getVM().getLastChoiceGeneratorOfType(PCChoiceGenerator.class);
-		System.out.println(search + "\n" + cg);
 		if (cg != null) {
 			pc = ((PCChoiceGenerator) cg).getCurrentPC();
 		}
@@ -117,72 +127,42 @@ public class VisualiserListener extends PropertyListenerAdapter {
 	}
 	boolean nextStep = true;
 
-//	@Override
-//	public void choiceGeneratorAdvanced(VM vm, ChoiceGenerator<?> currentCG) {
-//		ChoiceGenerator<?> cg = vm.getChoiceGenerator();
-//		Search search = vm.getSearch();
-//		int currentState = search.getStateId();
-//
-////		if (cg instanceof PCChoiceGenerator) {
-////			if (cg.getTotalNumberOfChoices() > 1) {
-////				Instruction instruction = vm.getInstruction();
-////				if (instruction instanceof IfInstruction) {
-////					if (nextStep) {
-////						System.out.println("currentState = " + currentState + "LEFT");
-////						cg.select(0);
-////					} else {
-////						System.out.println("currentState = " + currentState + "RIGHT");
-////						cg.select(1);
-////					}
-////				}
-////			}
-////		}
-////		nextStep = !nextStep;
-//	}
-
 	private List<String> initializeChoicesTrace() {
 		List<String> newTrace = new LinkedList<String>();
 		newTrace.add("TRUE");
-
-		// Willem: also clear sym vars and prune paths
 		BytecodeUtils.clearSymVarCounter();
-
 		return newTrace;
 	}
 
 	@Override
 	public void choiceGeneratorAdvanced(VM vm, ChoiceGenerator<?> currentCG) {
 		ChoiceGenerator<?> cg = vm.getChoiceGenerator();
-		// System.out.println("STATE ADVANCED");
-		if (cg instanceof PCChoiceGenerator) {
+
+			if (cg instanceof PCChoiceGenerator) {
 			if (cg.getTotalNumberOfChoices() > 1) {
 				Instruction instruction = vm.getInstruction();
 				ThreadInfo threadInfo = vm.getCurrentThread();
 				if (instruction instanceof IfInstruction) {
 					Boolean nextStep = null;
-						nextStep = computeIFBranchPC(instruction, threadInfo, cg);
+					nextStep = computeIFBranchPC(instruction, threadInfo, cg);
 					if (nextStep == null) {
-						// TODO not sure it is the right way of doing it
 						if (this.choicesTrace.size() > 1) {
 							this.choicesTrace.remove(this.choicesTrace.size() - 1);
 						}
-						vm.ignoreState(); // Willem
-						// vm.backtrack();
+						vm.ignoreState();
 					} else {
 						if (nextStep) {
-							((PCChoiceGenerator) cg).select(0);
+							cg.select(0);
 						} else {
-							((PCChoiceGenerator) cg).select(1);
+							cg.select(1);
 						}
 					}
 				}
-				return;
 			}
 		}
-		// System.out.println("NOT BACKTRACKED");
 	}
 
-	private final Boolean computeIFBranchPC(Instruction instruction, ThreadInfo threadInfo, ChoiceGenerator<?> currentChoiceGenerator) {
+	private Boolean computeIFBranchPC(Instruction instruction, ThreadInfo threadInfo, ChoiceGenerator<?> currentChoiceGenerator) {
 		StackFrame sf = threadInfo.getTopFrame();
 		PathCondition pathConditionIFBranch = null;
 		PathCondition pathConditionELSEBranch = null;
@@ -197,7 +177,6 @@ public class VisualiserListener extends PropertyListenerAdapter {
 		pathConditionIFBranch = previousPathCondition.make_copy();
 		pathConditionELSEBranch = previousPathCondition.make_copy();
 
-		// TODO this is quite inefficient
 		List<String> choicesTraceIF = new LinkedList<>(this.choicesTrace);
 		List<String> choicesTraceELSE = new LinkedList<>(this.choicesTrace);
 
@@ -240,23 +219,19 @@ public class VisualiserListener extends PropertyListenerAdapter {
 			}
 		}
 
-		System.out.println("IF: ");
-		choicesTraceIF.forEach(System.out::print);
-
-		System.out.println("else: ");
-		choicesTraceELSE.forEach(System.out::print);
-
-
-		String previousPCClean = (previousPathCondition != null && previousPathCondition.header != null) ? cleanConstraint(previousPathCondition.header
-				.toString()) : null;
+		// The code above returns the PCs swapped around for some reason...
+		String ifPC = choicesTraceELSE.get(choicesTraceELSE.size() - 1);
+		String elsePC = choicesTraceIF.get(choicesTraceIF.size() - 1);
 
 		// Direction.LEFT or RIGHT
-		boolean switchCondition = true;
-		// Trivial cases
-		if (!switchCondition) {
-			this.choicesTrace = choicesTraceIF;
-		} else {
+		// switchCondition = false => else branch
+		// switchCondition = true => if branch
+		boolean switchCondition = false;
+
+		if (switchCondition) {
 			this.choicesTrace = choicesTraceELSE;
+		} else {
+			this.choicesTrace = choicesTraceIF;
 		}
 		return switchCondition;
 
