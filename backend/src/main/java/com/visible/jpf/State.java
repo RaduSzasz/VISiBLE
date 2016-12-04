@@ -1,7 +1,5 @@
 package com.visible.jpf;
 
-import gov.nasa.jpf.symbc.numeric.PathCondition;
-
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -11,8 +9,12 @@ public class State {
   private static final String DELIM = ",";
   private State parent;
   List<State> children;
-  private PathCondition pc;
+  private String pc;
   int id;
+
+  public void setPc(String pc) {
+    this.pc = pc;
+  }
 
   public int getId() {
     return id;
@@ -26,11 +28,11 @@ public class State {
     return children;
   }
 
-  public PathCondition getPc() {
+  public String getPc() {
     return pc;
   }
 
-  State(int id, State parent, PathCondition pc) {
+  State(int id, State parent, String pc) {
     this.id = id;
     this.children = new LinkedList<>();
     this.parent = parent;
@@ -43,21 +45,12 @@ public class State {
     int id = getId();
     sb.append("{");
     sb.append("\"id\":" + (id == -1 ? "root" : id) + DELIM);
-    sb.append("\"parent_\":" + getParent().getId() + DELIM);
+    int parentId = getParent() == null ? -1 : getParent().getId();
+    sb.append("\"parent_\":" + parentId + DELIM);
     sb.append("\"children\": " + TreeInfo.stringWithDelim(children.stream().map(State::getId).collect(Collectors.toList()), DELIM) + DELIM);
-    PathCondition pc = getPc();
-    String pathCondition;
-    if (pc == null) {
-        pathCondition = "true";
-    } else {
-        pathCondition = pc.stringPC();
-        pathCondition = pathCondition.substring(pathCondition.indexOf('_') - 1, pathCondition.length());
-    }
+    String pathCondition = (pc.equals("true")) ? pc : pc.substring(pc.indexOf('_') - 1, pc.length());
     sb.append("\"pc\" : \"" + pathCondition + "\"");
     sb.append("}\n");
     return sb.toString();
   }
-
-
-
 }

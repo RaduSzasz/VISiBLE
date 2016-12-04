@@ -9,15 +9,14 @@ public class TreeInfo {
     private static final String DELIM = ",";
 
     private List<State> states;
+    private State currentState;
+    private String ifPC;
+    private String elsePC;
 
-    public TreeInfo() {
+    TreeInfo() {
         this.states = new ArrayList<>();
-    }
-
-    public void addState(State current, State left, State right) {
-        states.add(current);
-        states.add(left);
-        states.add(right);
+        this.currentState = new State(0, null, "true");
+        this.ifPC = this.elsePC = null;
     }
 
     @Override
@@ -36,7 +35,7 @@ public class TreeInfo {
         return stringWithDelim(states, DELIM);
     }
 
-    public static <T> String stringWithDelim(List<T> list, String delim) {
+    static <T> String stringWithDelim(List<T> list, String delim) {
         StringBuilder sb = new StringBuilder();
         sb.append("[");
         sb.append(list.stream()
@@ -46,4 +45,23 @@ public class TreeInfo {
         return sb.toString();
     }
 
+    public String getElsePC() {
+        return elsePC;
+    }
+
+    public String getIfPC() {
+        return ifPC;
+    }
+
+    public void setIfPC(String ifPC) {
+        this.ifPC = ifPC;
+    }
+
+    public void setElsePC(String elsePC) {
+        this.elsePC = elsePC;
+    }
+
+    public void setCurrentState(State currentState) {
+        this.currentState = currentState;
+    }
 }

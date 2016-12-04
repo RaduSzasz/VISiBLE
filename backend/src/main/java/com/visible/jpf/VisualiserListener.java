@@ -37,18 +37,22 @@ public class VisualiserListener extends PropertyListenerAdapter {
 	private List<String> choicesTrace;
 	private Direction direction;
 
-	public TreeInfo getTreeInfo() {
+	private static final Map<Class, Comparator> singleBranchComparators = singleBranchComparatorsBuilder();
+	private final Map<Class, Comparator> doubleBranchComparators = doubleBranchComparatorsBuilder();
+	private static final Map<Comparator, Comparator> comparatorsComplement = comparatorsComplementBuilder();
+
+	TreeInfo getTreeInfo() {
 		return treeInfo;
 	}
 
-	public boolean moveForward(Direction direction) {
+	boolean moveForward(Direction direction) {
 		this.shouldMoveForward = true;
 		threadInfo.setRunning();
 		this.direction = direction;
 		return searchHasFinished;
 	}
 
-	public VisualiserListener(Config config, JPF jpf, TreeInfo treeInfo) {
+	VisualiserListener(Config config, JPF jpf, TreeInfo treeInfo) {
 		this(config, jpf);
 		this.treeInfo = treeInfo;
 		this.shouldMoveForward = false;
@@ -56,8 +60,8 @@ public class VisualiserListener extends PropertyListenerAdapter {
 		this.choicesTrace = initializeChoicesTrace();
 	}
 
-	public VisualiserListener(Config conf, JPF jpf) {
-		prev = new State(-1, null, null);
+	private VisualiserListener(Config conf, JPF jpf) {
+		prev = null;
 		stateById = new HashMap<>();
 		this.treeInfo = new TreeInfo();
 	}
@@ -77,7 +81,8 @@ public class VisualiserListener extends PropertyListenerAdapter {
 			s = stateById.get(search.getStateId());
 		}
 
-		System.out.println("[advanced]\n" + s);
+		System.out.println("[advanced]\n" + (s == null ? "null" : s));
+		treeInfo.setCurrentState(s);
 		prev = s;
 
 		while (!shouldMoveForward) {
@@ -96,8 +101,10 @@ public class VisualiserListener extends PropertyListenerAdapter {
 			pc = ((PCChoiceGenerator) cg).getCurrentPC();
 		}
 
-		State s = new State(search.getStateId(), prev, pc);
-		prev.children.add(s);
+		State s = new State(search.getStateId(), prev, (pc == null ? "true" : pc.stringPC()));
+		if (prev != null) {
+			prev.children.add(s);
+		}
 		return s;
 	}
 
@@ -119,13 +126,11 @@ public class VisualiserListener extends PropertyListenerAdapter {
 		System.out.println("[backtracked]");
 		prev = s;
 	}
-
 	@Override
 	public void searchFinished(Search search) {
 		System.out.println("[finished]");
 		this.searchHasFinished = true;
 	}
-	boolean nextStep = true;
 
 	private List<String> initializeChoicesTrace() {
 		List<String> newTrace = new LinkedList<String>();
@@ -221,12 +226,12 @@ public class VisualiserListener extends PropertyListenerAdapter {
 
 		// The code above returns the PCs swapped around for some reason...
 		String ifPC = choicesTraceELSE.get(choicesTraceELSE.size() - 1);
-		String elsePC = choicesTraceIF.get(choicesTraceIF.size() - 1);
+		treeInfo.setIfPC(ifPC);
 
-		// Direction.LEFT or RIGHT
-		// switchCondition = false => else branch
-		// switchCondition = true => if branch
-		boolean switchCondition = false;
+		String elsePC = choicesTraceIF.get(choicesTraceIF.size() - 1);
+		treeInfo.setElsePC(elsePC);
+
+		boolean switchCondition = this.direction == Direction.LEFT;
 
 		if (switchCondition) {
 			this.choicesTrace = choicesTraceELSE;
@@ -244,30 +249,29 @@ public class VisualiserListener extends PropertyListenerAdapter {
 		return clean;
 	}
 
-	private final void addClause(List<String> choicesTrace, Comparator comparator, int v1, IntegerExpression sym_v2) {
+	private void addClause(List<String> choicesTrace, Comparator comparator, int v1, IntegerExpression sym_v2) {
 		PathCondition emptyPC = new PathCondition();
 		emptyPC._addDet(comparator, v1, sym_v2);
 		String representation = cleanConstraint(emptyPC.header.toString());
 		choicesTrace.add(representation);
 	}
 
-	private final void addClause(List<String> choicesTrace, Comparator comparator, IntegerExpression sym_v1, IntegerExpression sym_v2) {
+	private void addClause(List<String> choicesTrace, Comparator comparator, IntegerExpression sym_v1, IntegerExpression sym_v2) {
 		PathCondition emptyPC = new PathCondition();
 		emptyPC._addDet(comparator, sym_v1, sym_v2);
 		String representation = cleanConstraint(emptyPC.header.toString());
 		choicesTrace.add(representation);
 	}
 
-	private final void addClause(List<String> choicesTrace, Comparator comparator, IntegerExpression sym_v, int i) {
+	private void addClause(List<String> choicesTrace, Comparator comparator, IntegerExpression sym_v, int i) {
 		PathCondition emptyPC = new PathCondition();
 		emptyPC._addDet(comparator, sym_v, i);
 		String representation = cleanConstraint(emptyPC.header.toString());
 		choicesTrace.add(representation);
 	}
 
-
 	@SuppressWarnings("rawtypes")
-	private static final Map<Class, Comparator> singleBranchComparatorsBuilder() {
+	private static Map<Class, Comparator> singleBranchComparatorsBuilder() {
 		Map<Class, Comparator> map = new HashMap<>();
 		map.put(IFEQ.class, Comparator.EQ);
 		map.put(IFGE.class, Comparator.GE);
@@ -277,12 +281,8 @@ public class VisualiserListener extends PropertyListenerAdapter {
 		map.put(IFNE.class, Comparator.NE);
 		return map;
 	}
-
 	@SuppressWarnings("rawtypes")
-	private static final Map<Class, Comparator> singleBranchComparators = singleBranchComparatorsBuilder();
-
-	@SuppressWarnings("rawtypes")
-	private static final Map<Class, Comparator> doubleBranchComparatorsBuilder() {
+	private static Map<Class, Comparator> doubleBranchComparatorsBuilder() {
 		Map<Class, Comparator> map = new HashMap<>();
 		map.put(IF_ICMPEQ.class, Comparator.EQ);
 		map.put(IF_ICMPGE.class, Comparator.GE);
@@ -293,9 +293,8 @@ public class VisualiserListener extends PropertyListenerAdapter {
 		return map;
 	}
 
-	private static final Map<Comparator, Comparator> comparatorsComplement = comparatorsComplementBuilder();
-
-	private static final Map<Comparator, Comparator> comparatorsComplementBuilder() {
+	@SuppressWarnings("rawtypes")
+	private static Map<Comparator, Comparator> comparatorsComplementBuilder() {
 		Map<Comparator, Comparator> map = new HashMap<>();
 		map.put(Comparator.EQ, Comparator.NE);
 		map.put(Comparator.GE, Comparator.LT);
@@ -305,8 +304,4 @@ public class VisualiserListener extends PropertyListenerAdapter {
 		map.put(Comparator.NE, Comparator.EQ);
 		return map;
 	}
-
-	@SuppressWarnings("rawtypes")
-	private final Map<Class, Comparator> doubleBranchComparators = doubleBranchComparatorsBuilder();
-
 }
