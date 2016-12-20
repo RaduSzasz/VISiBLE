@@ -16,7 +16,7 @@ public class JavaProgram {
   private byte[] code;
   private boolean compilationSuccessful;
 
-  public JavaProgram(String fileName, byte[] code) {
+  JavaProgram(String fileName, byte[] code) {
 
     // Constructor takes filename without file extension
     this.fileName = fileName + JAVA_EXTENSION;
@@ -43,14 +43,12 @@ public class JavaProgram {
       Process process = Runtime.getRuntime().exec(JAVAC + PATH_TO_INPUT + fileName);
       int exitCode = process.waitFor();
       this.compilationSuccessful = exitCode == 0;
-    } catch (IOException e) {
-      e.printStackTrace();
-    } catch (InterruptedException e) {
+    } catch (IOException | InterruptedException e) {
       e.printStackTrace();
     }
   }
 
-  public boolean isCompilationSuccessful() {
+  boolean isCompilationSuccessful() {
     return compilationSuccessful;
   }
 

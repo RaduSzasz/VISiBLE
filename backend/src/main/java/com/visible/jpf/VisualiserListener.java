@@ -28,280 +28,275 @@ import java.util.*;
 
 public class VisualiserListener extends PropertyListenerAdapter {
 
-	private TreeInfo treeInfo;
-	private boolean shouldMoveForward;
-	private ThreadInfo threadInfo;
-	private State prev;
-	private Map<Integer, State> stateById;
-	private boolean searchHasFinished;
-	private List<String> choicesTrace;
-	private Direction direction;
+    private boolean shouldMoveForward;
+    private ThreadInfo threadInfo;
+    private State prev;
+    private Map<Integer, State> stateById;
+    private boolean searchHasFinished;
+    private List<String> choicesTrace;
+    private Direction direction;
+    private State currentState;
 
-	private static final Map<Class, Comparator> singleBranchComparators = singleBranchComparatorsBuilder();
-	private final Map<Class, Comparator> doubleBranchComparators = doubleBranchComparatorsBuilder();
-	private static final Map<Comparator, Comparator> comparatorsComplement = comparatorsComplementBuilder();
+    private static final Map<Class, Comparator> singleBranchComparators = singleBranchComparatorsBuilder();
+    private final Map<Class, Comparator> doubleBranchComparators = doubleBranchComparatorsBuilder();
+    private static final Map<Comparator, Comparator> comparatorsComplement = comparatorsComplementBuilder();
 
-	TreeInfo getTreeInfo() {
-		return treeInfo;
-	}
+    boolean moveForward(Direction direction) {
+        this.shouldMoveForward = true;
+        threadInfo.setRunning();
+        this.direction = direction;
+        return searchHasFinished;
+    }
 
-	boolean moveForward(Direction direction) {
-		this.shouldMoveForward = true;
-		threadInfo.setRunning();
-		this.direction = direction;
-		return searchHasFinished;
-	}
+    VisualiserListener(Config config, JPF jpf) {
+        prev = null;
+        stateById = new HashMap<>();
+        this.shouldMoveForward = false;
+        this.searchHasFinished = false;
+        this.choicesTrace = initializeChoicesTrace();
+        this.currentState = null;
+    }
 
-	VisualiserListener(Config config, JPF jpf, TreeInfo treeInfo) {
-		this(config, jpf);
-		this.treeInfo = treeInfo;
-		this.shouldMoveForward = false;
-		this.searchHasFinished = false;
-		this.choicesTrace = initializeChoicesTrace();
-	}
+    public void stateAdvanced(Search search) {
+        if (search.isIgnoredState()) {
+            System.out.println("[advanced] ignored state");
+            return;
+        }
 
-	private VisualiserListener(Config conf, JPF jpf) {
-		prev = null;
-		stateById = new HashMap<>();
-		this.treeInfo = new TreeInfo();
-	}
+        boolean isNew = search.isNewState();
+        State s;
+        if (isNew) {
+            s = createNewState(search);
+            stateById.put(s.id, s);
+        } else {
+            s = stateById.get(search.getStateId());
+        }
 
-	public void stateAdvanced(Search search) {
-		if (search.isIgnoredState()) {
-			System.out.println("[advanced] ignored state");
-			return;
-		}
+        System.out.println("[advanced]\n" + (s == null ? "null" : s));
+        prev = s;
 
-		boolean isNew = search.isNewState();
-		State s;
-		if (isNew) {
-			s = createNewState(search);
-			stateById.put(s.id, s);
-		} else {
-			s = stateById.get(search.getStateId());
-		}
+        while (!this.shouldMoveForward) {
+            ThreadInfo threadInfo = search.getVM().getCurrentThread();
+            this.threadInfo = threadInfo;
+            threadInfo.setSleeping();
+        }
+        this.shouldMoveForward = false;
+        this.currentState = s;
+    }
 
-		System.out.println("[advanced]\n" + (s == null ? "null" : s));
-		treeInfo.setCurrentState(s);
-		prev = s;
+    private State createNewState(Search search) {
+        PathCondition pc = null;
+        ChoiceGenerator<?> cg = search.getVM().getLastChoiceGeneratorOfType(PCChoiceGenerator.class);
+        if (cg != null) {
+            pc = ((PCChoiceGenerator) cg).getCurrentPC();
+        }
 
-		while (!shouldMoveForward) {
-				ThreadInfo threadInfo = search.getVM().getCurrentThread();
-				this.threadInfo = threadInfo;
-				threadInfo.setSleeping();
-		}
+        State s = new State(search.getStateId(), prev);
+        if (prev != null) {
+            prev.children.add(s);
+        }
+        return s;
+    }
 
-		shouldMoveForward = false;
-	}
+    @Override
+    public void stateProcessed(Search search) {
+        System.out.println("Finished with State " + search.getStateId());
+    }
 
-	private State createNewState(Search search) {
-		PathCondition pc = null;
-		ChoiceGenerator<?> cg = search.getVM().getLastChoiceGeneratorOfType(PCChoiceGenerator.class);
-		if (cg != null) {
-			pc = ((PCChoiceGenerator) cg).getCurrentPC();
-		}
+    @Override
+    public void stateRestored(Search search) {
+        State s = stateById.get(search.getStateId());
+        System.out.println("[restored]");
+        prev = s;
+    }
 
-		State s = new State(search.getStateId(), prev, (pc == null ? "true" : pc.stringPC()));
-		if (prev != null) {
-			prev.children.add(s);
-		}
-		return s;
-	}
+    @Override
+    public void stateBacktracked(Search search) {
+        State s = stateById.get(search.getStateId());
+        System.out.println("[backtracked]");
+        prev = s;
+    }
+    @Override
+    public void searchFinished(Search search) {
+        System.out.println("[finished]");
+        this.searchHasFinished = true;
+    }
 
-	@Override
-	public void stateProcessed(Search search) {
-		System.out.println("Finished with State " + search.getStateId());
-	}
+    private List<String> initializeChoicesTrace() {
+        List<String> newTrace = new LinkedList<String>();
+        newTrace.add("TRUE");
+        BytecodeUtils.clearSymVarCounter();
+        return newTrace;
+    }
 
-	@Override
-	public void stateRestored(Search search) {
-		State s = stateById.get(search.getStateId());
-		System.out.println("[restored]");
-		prev = s;
-	}
+    @Override
+    public void choiceGeneratorAdvanced(VM vm, ChoiceGenerator<?> currentCG) {
+        ChoiceGenerator<?> cg = vm.getChoiceGenerator();
 
-	@Override
-	public void stateBacktracked(Search search) {
-		State s = stateById.get(search.getStateId());
-		System.out.println("[backtracked]");
-		prev = s;
-	}
-	@Override
-	public void searchFinished(Search search) {
-		System.out.println("[finished]");
-		this.searchHasFinished = true;
-	}
+        if (cg instanceof PCChoiceGenerator) {
+            if (cg.getTotalNumberOfChoices() > 1) {
+                Instruction instruction = vm.getInstruction();
+                ThreadInfo threadInfo = vm.getCurrentThread();
+                if (instruction instanceof IfInstruction) {
+                    Boolean nextStep = null;
+                    nextStep = computeIFBranchPC(instruction, threadInfo, cg);
 
-	private List<String> initializeChoicesTrace() {
-		List<String> newTrace = new LinkedList<String>();
-		newTrace.add("TRUE");
-		BytecodeUtils.clearSymVarCounter();
-		return newTrace;
-	}
+                    if (nextStep == null) {
+                        if (this.choicesTrace.size() > 1) {
+                            this.choicesTrace.remove(this.choicesTrace.size() - 1);
+                        }
+                        vm.ignoreState();
+                    } else {
+                        if (nextStep) {
+                            cg.select(0);
+                        } else {
+                            cg.select(1);
+                        }
+                    }
+                }
+            }
+        }
+    }
 
-	@Override
-	public void choiceGeneratorAdvanced(VM vm, ChoiceGenerator<?> currentCG) {
-		ChoiceGenerator<?> cg = vm.getChoiceGenerator();
+    private Boolean computeIFBranchPC(Instruction instruction, ThreadInfo threadInfo, ChoiceGenerator<?> currentChoiceGenerator) {
+        StackFrame sf = threadInfo.getTopFrame();
+        PathCondition pathConditionIFBranch = null;
+        PathCondition pathConditionELSEBranch = null;
+        PathCondition previousPathCondition = null;
 
-			if (cg instanceof PCChoiceGenerator) {
-			if (cg.getTotalNumberOfChoices() > 1) {
-				Instruction instruction = vm.getInstruction();
-				ThreadInfo threadInfo = vm.getCurrentThread();
-				if (instruction instanceof IfInstruction) {
-					Boolean nextStep = null;
-					nextStep = computeIFBranchPC(instruction, threadInfo, cg);
-					if (nextStep == null) {
-						if (this.choicesTrace.size() > 1) {
-							this.choicesTrace.remove(this.choicesTrace.size() - 1);
-						}
-						vm.ignoreState();
-					} else {
-						if (nextStep) {
-							cg.select(0);
-						} else {
-							cg.select(1);
-						}
-					}
-				}
-			}
-		}
-	}
+        ChoiceGenerator<?> previousChoiceGenerator = currentChoiceGenerator.getPreviousChoiceGenerator();
+        while (!((previousChoiceGenerator == null) || (previousChoiceGenerator instanceof PCChoiceGenerator))) {
+            previousChoiceGenerator = previousChoiceGenerator.getPreviousChoiceGenerator();
+        }
+        previousPathCondition = (previousChoiceGenerator == null) ? new PathCondition() : ((PCChoiceGenerator) previousChoiceGenerator).getCurrentPC();
 
-	private Boolean computeIFBranchPC(Instruction instruction, ThreadInfo threadInfo, ChoiceGenerator<?> currentChoiceGenerator) {
-		StackFrame sf = threadInfo.getTopFrame();
-		PathCondition pathConditionIFBranch = null;
-		PathCondition pathConditionELSEBranch = null;
-		PathCondition previousPathCondition = null;
+        pathConditionIFBranch = previousPathCondition.make_copy();
+        pathConditionELSEBranch = previousPathCondition.make_copy();
 
-		ChoiceGenerator<?> previousChoiceGenerator = currentChoiceGenerator.getPreviousChoiceGenerator();
-		while (!((previousChoiceGenerator == null) || (previousChoiceGenerator instanceof PCChoiceGenerator))) {
-			previousChoiceGenerator = previousChoiceGenerator.getPreviousChoiceGenerator();
-		}
-		previousPathCondition = (previousChoiceGenerator == null) ? new PathCondition() : ((PCChoiceGenerator) previousChoiceGenerator).getCurrentPC();
+        List<String> choicesTraceIF = new LinkedList<>(this.choicesTrace);
+        List<String> choicesTraceELSE = new LinkedList<>(this.choicesTrace);
 
-		pathConditionIFBranch = previousPathCondition.make_copy();
-		pathConditionELSEBranch = previousPathCondition.make_copy();
+        if (singleBranchComparators.containsKey(instruction.getClass())) {
+            // Single operand
+            IntegerExpression sym_v = (IntegerExpression) sf.getOperandAttr();
+            Comparator comparator = singleBranchComparators.get(instruction.getClass());
+            pathConditionIFBranch._addDet(comparator, sym_v, 0);
+            pathConditionELSEBranch._addDet(comparatorsComplement.get(comparator), sym_v, 0);
 
-		List<String> choicesTraceIF = new LinkedList<>(this.choicesTrace);
-		List<String> choicesTraceELSE = new LinkedList<>(this.choicesTrace);
+            addClause(choicesTraceIF, comparator, sym_v, 0);
+            addClause(choicesTraceELSE, comparatorsComplement.get(comparator), sym_v, 0);
 
-		if (singleBranchComparators.containsKey(instruction.getClass())) {
-			// Single operand
-			IntegerExpression sym_v = (IntegerExpression) sf.getOperandAttr();
-			Comparator comparator = singleBranchComparators.get(instruction.getClass());
-			pathConditionIFBranch._addDet(comparator, sym_v, 0);
-			pathConditionELSEBranch._addDet(comparatorsComplement.get(comparator), sym_v, 0);
+        } else if (doubleBranchComparators.containsKey(instruction.getClass())) {
+            int v2 = threadInfo.getModifiableTopFrame().peek();
+            int v1 = threadInfo.getModifiableTopFrame().peek(1);
+            IntegerExpression sym_v1 = (IntegerExpression) sf.getOperandAttr(1);
+            IntegerExpression sym_v2 = (IntegerExpression) sf.getOperandAttr(0);
+            Comparator comparator = doubleBranchComparators.get(instruction.getClass());
+            if (sym_v1 != null) {
+                if (sym_v2 != null) { // both are symbolic values
+                    pathConditionIFBranch._addDet(comparator, sym_v1, sym_v2);
+                    pathConditionELSEBranch._addDet(comparatorsComplement.get(comparator), sym_v1, sym_v2);
 
-			addClause(choicesTraceIF, comparator, sym_v, 0);
-			addClause(choicesTraceELSE, comparatorsComplement.get(comparator), sym_v, 0);
+                    addClause(choicesTraceIF, comparator, sym_v1, sym_v2);
+                    addClause(choicesTraceELSE, comparatorsComplement.get(comparator), sym_v1, sym_v2);
+                } else {
+                    pathConditionIFBranch._addDet(comparator, sym_v1, v2);
+                    pathConditionELSEBranch._addDet(comparatorsComplement.get(comparator), sym_v1, v2);
 
-		} else if (doubleBranchComparators.containsKey(instruction.getClass())) {
-			int v2 = threadInfo.getModifiableTopFrame().peek();
-			int v1 = threadInfo.getModifiableTopFrame().peek(1);
-			IntegerExpression sym_v1 = (IntegerExpression) sf.getOperandAttr(1);
-			IntegerExpression sym_v2 = (IntegerExpression) sf.getOperandAttr(0);
-			Comparator comparator = doubleBranchComparators.get(instruction.getClass());
-			if (sym_v1 != null) {
-				if (sym_v2 != null) { // both are symbolic values
-					pathConditionIFBranch._addDet(comparator, sym_v1, sym_v2);
-					pathConditionELSEBranch._addDet(comparatorsComplement.get(comparator), sym_v1, sym_v2);
+                    addClause(choicesTraceIF, comparator, sym_v1, v2);
+                    addClause(choicesTraceELSE, comparatorsComplement.get(comparator), sym_v1, v2);
+                }
+            } else {
+                pathConditionIFBranch._addDet(comparator, v1, sym_v2);
+                pathConditionELSEBranch._addDet(comparatorsComplement.get(comparator), v1, sym_v2);
 
-					addClause(choicesTraceIF, comparator, sym_v1, sym_v2);
-					addClause(choicesTraceELSE, comparatorsComplement.get(comparator), sym_v1, sym_v2);
-				} else {
-					pathConditionIFBranch._addDet(comparator, sym_v1, v2);
-					pathConditionELSEBranch._addDet(comparatorsComplement.get(comparator), sym_v1, v2);
+                addClause(choicesTraceIF, comparator, v1, sym_v2);
+                addClause(choicesTraceELSE, comparatorsComplement.get(comparator), v1, sym_v2);
+            }
+        }
 
-					addClause(choicesTraceIF, comparator, sym_v1, v2);
-					addClause(choicesTraceELSE, comparatorsComplement.get(comparator), sym_v1, v2);
-				}
-			} else {
-				pathConditionIFBranch._addDet(comparator, v1, sym_v2);
-				pathConditionELSEBranch._addDet(comparatorsComplement.get(comparator), v1, sym_v2);
+        // The code above returns the PCs swapped around for some reason...
+        String ifPC = choicesTraceELSE.get(choicesTraceELSE.size() - 1);
+        this.currentState.setIfPC(ifPC);
 
-				addClause(choicesTraceIF, comparator, v1, sym_v2);
-				addClause(choicesTraceELSE, comparatorsComplement.get(comparator), v1, sym_v2);
-			}
-		}
+        String elsePC = choicesTraceIF.get(choicesTraceIF.size() - 1);
+        this.currentState.setElsePC(elsePC);
 
-		// The code above returns the PCs swapped around for some reason...
-		String ifPC = choicesTraceELSE.get(choicesTraceELSE.size() - 1);
-		treeInfo.setIfPC(ifPC);
+        boolean switchCondition = this.direction == Direction.LEFT;
 
-		String elsePC = choicesTraceIF.get(choicesTraceIF.size() - 1);
-		treeInfo.setElsePC(elsePC);
+        if (switchCondition) {
+            this.choicesTrace = choicesTraceELSE;
+        } else {
+            this.choicesTrace = choicesTraceIF;
+        }
+        return switchCondition;
 
-		boolean switchCondition = this.direction == Direction.LEFT;
+    }
 
-		if (switchCondition) {
-			this.choicesTrace = choicesTraceELSE;
-		} else {
-			this.choicesTrace = choicesTraceIF;
-		}
-		return switchCondition;
+    private String cleanConstraint(String constraint) {
+        String clean = constraint.replaceAll("\\s+", "");
+        clean = clean.replaceAll("CONST_(\\d+)", "$1");
+        clean = clean.replaceAll("CONST_-(\\d+)", "-$1");
+        return clean;
+    }
 
-	}
+    private void addClause(List<String> choicesTrace, Comparator comparator, int v1, IntegerExpression sym_v2) {
+        PathCondition emptyPC = new PathCondition();
+        emptyPC._addDet(comparator, v1, sym_v2);
+        String representation = cleanConstraint(emptyPC.header.toString());
+        choicesTrace.add(representation);
+    }
 
-	private String cleanConstraint(String constraint) {
-		String clean = constraint.replaceAll("\\s+", "");
-		clean = clean.replaceAll("CONST_(\\d+)", "$1");
-		clean = clean.replaceAll("CONST_-(\\d+)", "-$1");
-		return clean;
-	}
+    private void addClause(List<String> choicesTrace, Comparator comparator, IntegerExpression sym_v1, IntegerExpression sym_v2) {
+        PathCondition emptyPC = new PathCondition();
+        emptyPC._addDet(comparator, sym_v1, sym_v2);
+        String representation = cleanConstraint(emptyPC.header.toString());
+        choicesTrace.add(representation);
+    }
 
-	private void addClause(List<String> choicesTrace, Comparator comparator, int v1, IntegerExpression sym_v2) {
-		PathCondition emptyPC = new PathCondition();
-		emptyPC._addDet(comparator, v1, sym_v2);
-		String representation = cleanConstraint(emptyPC.header.toString());
-		choicesTrace.add(representation);
-	}
+    private void addClause(List<String> choicesTrace, Comparator comparator, IntegerExpression sym_v, int i) {
+        PathCondition emptyPC = new PathCondition();
+        emptyPC._addDet(comparator, sym_v, i);
+        String representation = cleanConstraint(emptyPC.header.toString());
+        choicesTrace.add(representation);
+    }
 
-	private void addClause(List<String> choicesTrace, Comparator comparator, IntegerExpression sym_v1, IntegerExpression sym_v2) {
-		PathCondition emptyPC = new PathCondition();
-		emptyPC._addDet(comparator, sym_v1, sym_v2);
-		String representation = cleanConstraint(emptyPC.header.toString());
-		choicesTrace.add(representation);
-	}
+    @SuppressWarnings("rawtypes")
+    private static Map<Class, Comparator> singleBranchComparatorsBuilder() {
+        Map<Class, Comparator> map = new HashMap<>();
+        map.put(IFEQ.class, Comparator.EQ);
+        map.put(IFGE.class, Comparator.GE);
+        map.put(IFGT.class, Comparator.GT);
+        map.put(IFLE.class, Comparator.LE);
+        map.put(IFLT.class, Comparator.LT);
+        map.put(IFNE.class, Comparator.NE);
+        return map;
+    }
+    @SuppressWarnings("rawtypes")
+    private static Map<Class, Comparator> doubleBranchComparatorsBuilder() {
+        Map<Class, Comparator> map = new HashMap<>();
+        map.put(IF_ICMPEQ.class, Comparator.EQ);
+        map.put(IF_ICMPGE.class, Comparator.GE);
+        map.put(IF_ICMPGT.class, Comparator.GT);
+        map.put(IF_ICMPLE.class, Comparator.LE);
+        map.put(IF_ICMPLT.class, Comparator.LT);
+        map.put(IF_ICMPNE.class, Comparator.NE);
+        return map;
+    }
 
-	private void addClause(List<String> choicesTrace, Comparator comparator, IntegerExpression sym_v, int i) {
-		PathCondition emptyPC = new PathCondition();
-		emptyPC._addDet(comparator, sym_v, i);
-		String representation = cleanConstraint(emptyPC.header.toString());
-		choicesTrace.add(representation);
-	}
+    @SuppressWarnings("rawtypes")
+    private static Map<Comparator, Comparator> comparatorsComplementBuilder() {
+        Map<Comparator, Comparator> map = new HashMap<>();
+        map.put(Comparator.EQ, Comparator.NE);
+        map.put(Comparator.GE, Comparator.LT);
+        map.put(Comparator.GT, Comparator.LE);
+        map.put(Comparator.LE, Comparator.GT);
+        map.put(Comparator.LT, Comparator.GE);
+        map.put(Comparator.NE, Comparator.EQ);
+        return map;
+    }
 
-	@SuppressWarnings("rawtypes")
-	private static Map<Class, Comparator> singleBranchComparatorsBuilder() {
-		Map<Class, Comparator> map = new HashMap<>();
-		map.put(IFEQ.class, Comparator.EQ);
-		map.put(IFGE.class, Comparator.GE);
-		map.put(IFGT.class, Comparator.GT);
-		map.put(IFLE.class, Comparator.LE);
-		map.put(IFLT.class, Comparator.LT);
-		map.put(IFNE.class, Comparator.NE);
-		return map;
-	}
-	@SuppressWarnings("rawtypes")
-	private static Map<Class, Comparator> doubleBranchComparatorsBuilder() {
-		Map<Class, Comparator> map = new HashMap<>();
-		map.put(IF_ICMPEQ.class, Comparator.EQ);
-		map.put(IF_ICMPGE.class, Comparator.GE);
-		map.put(IF_ICMPGT.class, Comparator.GT);
-		map.put(IF_ICMPLE.class, Comparator.LE);
-		map.put(IF_ICMPLT.class, Comparator.LT);
-		map.put(IF_ICMPNE.class, Comparator.NE);
-		return map;
-	}
-
-	@SuppressWarnings("rawtypes")
-	private static Map<Comparator, Comparator> comparatorsComplementBuilder() {
-		Map<Comparator, Comparator> map = new HashMap<>();
-		map.put(Comparator.EQ, Comparator.NE);
-		map.put(Comparator.GE, Comparator.LT);
-		map.put(Comparator.GT, Comparator.LE);
-		map.put(Comparator.LE, Comparator.GT);
-		map.put(Comparator.LT, Comparator.GE);
-		map.put(Comparator.NE, Comparator.EQ);
-		return map;
-	}
+    State getCurrentState() {
+        return currentState;
+    }
 }

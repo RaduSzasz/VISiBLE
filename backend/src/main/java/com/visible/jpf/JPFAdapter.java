@@ -8,10 +8,6 @@ import java.io.IOException;
 
 public class JPFAdapter implements Runnable {
 
-    public static VisualiserListener getVisualiser() {
-        return visualiser;
-    }
-
     private static VisualiserListener visualiser;
     private String name;
     private String method;
@@ -27,7 +23,7 @@ public class JPFAdapter implements Runnable {
         this.argNum = argNum;
     }
 
-    public static void runJPF(String mainClassName, String method, int argNum) {
+    private static void runJPF(String mainClassName, String method, int argNum) {
         String[] args = new String[2];
         String path = System.getProperty("user.dir") + "/" + PATH_TO_INPUT;
         File jpfFile = new File(path + mainClassName + JPF_EXTENSION);
@@ -48,8 +44,7 @@ public class JPFAdapter implements Runnable {
         config.setProperty("symbolic.method", symbolicMethod);
 
         JPF jpf = new JPF(config);
-        TreeInfo treeInfo = new TreeInfo();
-        visualiser = new VisualiserListener(config, jpf, treeInfo);
+        visualiser = new VisualiserListener(config, jpf);
 
         jpf.addListener(visualiser);
 
@@ -65,12 +60,12 @@ public class JPFAdapter implements Runnable {
         return sb.toString();
     }
 
-    public static TreeInfo getListenerTreeInfo() {
-     try {
-         return visualiser.getTreeInfo();
-     } catch (Exception e) {
-         return null;
-     }
+    public static State getListenerState() {
+        try {
+            return visualiser.getCurrentState();
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public static boolean moveForward(Direction direction) {
