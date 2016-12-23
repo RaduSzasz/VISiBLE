@@ -72,7 +72,7 @@ public class VisualiserListener extends PropertyListenerAdapter {
             s = stateById.get(search.getStateId());
         }
 
-        System.out.println("[advanced]\n" + (s == null ? "null" : s));
+//        System.out.println("[advanced]\n" + (s == null ? "null" : s));
         prev = s;
 
         while (!this.shouldMoveForward) {

@@ -15,6 +15,7 @@ public class JPFStateController {
 		State state = JPFAdapter.getListenerState();
 		String json = (state == null) ? "null" : state.toJSON();
 		boolean finished = JPFAdapter.moveForward(Direction.LEFT);
+		System.out.println(json);
 		return finished ? "Finished" : json;
 	}
 
@@ -23,6 +24,7 @@ public class JPFStateController {
 		State state = JPFAdapter.getListenerState();
 		String json = (state == null) ? "null" : state.toJSON();
 		boolean finished = JPFAdapter.moveForward(Direction.RIGHT);
+		System.out.println(json);
 		return finished ? "Finished" : json;
 	}
 }
