@@ -1,5 +1,6 @@
 package com.visible.jpf;
 
+import com.visible.State;
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
 

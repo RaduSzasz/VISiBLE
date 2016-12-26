@@ -1,5 +1,6 @@
 package com.visible.jpf;
 
+import com.visible.State;
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
 import gov.nasa.jpf.PropertyListenerAdapter;
@@ -67,7 +68,7 @@ public class VisualiserListener extends PropertyListenerAdapter {
         State s;
         if (isNew) {
             s = createNewState(search);
-            stateById.put(s.id, s);
+            stateById.put(s.getId(), s);
         } else {
             s = stateById.get(search.getStateId());
         }

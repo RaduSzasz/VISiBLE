@@ -1,4 +1,4 @@
-package com.visible.jpf;
+package com.visible;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -7,24 +7,24 @@ public class State {
 
     private static final String DELIM = ",";
     private State parent;
-    List<State> children;
+    public List<State> children;
     private String ifPC;
     private String elsePC;
     int id;
 
-    void setIfPC(String ifPC) {
+    public void setIfPC(String ifPC) {
         this.ifPC = ifPC;
     }
 
-    void setElsePC(String elsePC) {
+    public void setElsePC(String elsePC) {
         this.elsePC = elsePC;
     }
 
-    private int getId() {
+    public int getId() {
         return id;
     }
 
-    State(int id, State parent) {
+    public State(int id, State parent) {
         this.id = id;
         this.children = new LinkedList<>();
         this.parent = parent;
