@@ -1,4 +1,4 @@
-package com.visible.jpf;
+package com.visible.symbolic;
 
 public enum Direction {
     LEFT,

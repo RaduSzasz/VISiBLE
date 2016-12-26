@@ -1,9 +1,9 @@
 package com.visible;
 
-import com.visible.jpf.JPFAdapter;
+import com.visible.symbolic.jpf.JPFAdapter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import java.util.concurrent.Executor;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -16,15 +16,6 @@ public class VisibleServerApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(VisibleServerApplication.class, args);
-	}
-
-	public static void restartJPF() {
-		executor.shutdownNow();
-		while (!executor.isTerminated()) {
-			// Do Nothing
-		}
-		executor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
-		executor.execute(adapter);
 	}
 
 	public static void setupJPF(String fileName, String symMethod, int numArgs) {

@@ -1,6 +1,7 @@
-package com.visible.jpf;
+package com.visible.symbolic.jpf;
 
-import com.visible.State;
+import com.visible.symbolic.Direction;
+import com.visible.symbolic.State;
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
 import gov.nasa.jpf.PropertyListenerAdapter;

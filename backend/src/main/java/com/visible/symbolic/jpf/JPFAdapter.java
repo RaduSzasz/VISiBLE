@@ -1,13 +1,15 @@
-package com.visible.jpf;
+package com.visible.symbolic.jpf;
 
-import com.visible.State;
+import com.visible.symbolic.Direction;
+import com.visible.symbolic.State;
+import com.visible.symbolic.SymbolicExecutor;
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
 
 import java.io.File;
 import java.io.IOException;
 
-public class JPFAdapter implements Runnable {
+public class JPFAdapter implements SymbolicExecutor {
 
     private static VisualiserListener visualiser;
     private String name;
@@ -61,14 +63,6 @@ public class JPFAdapter implements Runnable {
         return sb.toString();
     }
 
-    public static State getListenerState() {
-        try {
-            return visualiser.getCurrentState();
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
     public static boolean moveForward(Direction direction) {
         return visualiser.moveForward(direction);
     }
@@ -76,5 +70,22 @@ public class JPFAdapter implements Runnable {
     @Override
     public void run() {
         JPFAdapter.runJPF(name, method, argNum);
+    }
+
+
+    private State makeStep(Direction direction) {
+        State state = visualiser.getCurrentState();
+        boolean finished = JPFAdapter.moveForward(direction);
+        return finished ? null : state;
+    }
+
+    @Override
+    public State stepLeft() {
+        return makeStep(Direction.LEFT);
+    }
+
+    @Override
+    public State stepRight() {
+        return makeStep(Direction.RIGHT);
     }
 }
