@@ -1,62 +1,62 @@
 package com.visible.jpf;
 
-import gov.nasa.jpf.symbc.numeric.PathCondition;
-
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class State {
 
-  private static final String DELIM = ",";
-  private State parent;
-  List<State> children;
-  private PathCondition pc;
-  int id;
+    private static final String DELIM = ",";
+    private State parent;
+    List<State> children;
+    private String ifPC;
+    private String elsePC;
+    int id;
 
-  public int getId() {
-    return id;
-  }
-
-  public State getParent() {
-    return parent;
-  }
-
-  public List<State> getChildren() {
-    return children;
-  }
-
-  public PathCondition getPc() {
-    return pc;
-  }
-
-  State(int id, State parent, PathCondition pc) {
-    this.id = id;
-    this.children = new LinkedList<>();
-    this.parent = parent;
-    this.pc = pc;
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("{");
-    sb.append("\"id\":" + getId() + DELIM);
-    sb.append("\"parent_\":" + getParent().getId() + DELIM);
-    sb.append("\"children\": " + TreeInfo.stringWithDelim(children.stream().map(State::getId).collect(Collectors.toList()), DELIM) + DELIM);
-    PathCondition pc = getPc();
-    String pathCondition = "";
-    if (pc == null) {
-        pathCondition = "true";
-    } else {
-        pathCondition = pc.stringPC();
-        pathCondition = pathCondition.substring(pathCondition.indexOf('_') - 1, pathCondition.length());
+    void setIfPC(String ifPC) {
+        this.ifPC = ifPC;
     }
-    sb.append("\"pc\" : \"" + pathCondition + "\"");
-    sb.append("}\n");
-    return sb.toString();
-  }
 
+    void setElsePC(String elsePC) {
+        this.elsePC = elsePC;
+    }
 
+    private int getId() {
+        return id;
+    }
 
+    State(int id, State parent) {
+        this.id = id;
+        this.children = new LinkedList<>();
+        this.parent = parent;
+        this.ifPC = null;
+        this.elsePC = null;
+    }
+
+//  static <T> String stringWithDelim(List<T> list, String delim) {
+//        StringBuilder sb = new StringBuilder();
+//        sb.append("[");
+//        sb.append(list.stream()
+//                      .map(Object::toString)
+//                      .collect(Collectors.joining(delim)));
+//        sb.append("]");
+//        return sb.toString();
+//    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{");
+        sb.append("\"id\":" + (id == -1 ? "root" : id) + DELIM);
+        int parentId = parent == null ? -1 : parent.getId();
+        sb.append("\"parent_\":" + parentId + DELIM);
+//    sb.append("\"children\": " + stringWithDelim(children.stream().map(State::getId).collect(Collectors.toList()), DELIM) + DELIM);
+        sb.append("\"IfPC\":" + ifPC + DELIM);
+        sb.append("\"ElsePC\":" + elsePC);
+        sb.append("}\n");
+        return sb.toString();
+    }
+
+    public String toJSON() {
+        return toString();
+    }
 }

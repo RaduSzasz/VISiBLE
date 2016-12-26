@@ -14,8 +14,9 @@ public class JavaProgram {
   private String path;
   private String fileName;
   private byte[] code;
+  private boolean compilationSuccessful;
 
-  public JavaProgram(String fileName, byte[] code) {
+  JavaProgram(String fileName, byte[] code) {
 
     // Constructor takes filename without file extension
     this.fileName = fileName + JAVA_EXTENSION;
@@ -41,17 +42,14 @@ public class JavaProgram {
     try {
       Process process = Runtime.getRuntime().exec(JAVAC + PATH_TO_INPUT + fileName);
       int exitCode = process.waitFor();
-      if (exitCode != 0) {
-        //TODO Inform frontend that code doesn't compile
-        System.err.print(fileName + JAVA_EXTENSION + " does not compile.");
-        return;
-      }
-      return;
-    } catch (IOException e) {
-      e.printStackTrace();
-    } catch (InterruptedException e) {
+      this.compilationSuccessful = exitCode == 0;
+    } catch (IOException | InterruptedException e) {
       e.printStackTrace();
     }
+  }
+
+  boolean isCompilationSuccessful() {
+    return compilationSuccessful;
   }
 
 }

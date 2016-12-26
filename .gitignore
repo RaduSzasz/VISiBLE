@@ -12,6 +12,7 @@
 *.jar
 *.sw*
 build/
+backend/input/
 
 # Gradle useless stuff
 .gradle
