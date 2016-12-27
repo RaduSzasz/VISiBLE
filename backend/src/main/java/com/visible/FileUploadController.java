@@ -26,7 +26,7 @@ public class FileUploadController {
 
     // TODO Get Symbolic Method name and number of arguments from frontend
     VisibleServerApplication.setupJPF(name, "symVis", 4);
-    return fileName + " uploaded " + (javaProgram.isCompilationSuccessful() ?
-            "and compiled successfully." : "but could not be compiled.");
+
+    return JPFAdapter.getListenerState().toJSON();
   }
 }
