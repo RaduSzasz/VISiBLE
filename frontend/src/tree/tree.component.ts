@@ -72,7 +72,7 @@ export class TreeComponent implements OnInit, OnChanges {
         if(d.id == max_index) {
           steer_promise = this.treeService.stepRight();
         }
-       
+
         if(d.id >= max_index -1) {
             console.log('bye');
           steer_promise.then(tree => {
