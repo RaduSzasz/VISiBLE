@@ -14,7 +14,7 @@ export class AppComponent {
   public initialTree = null;
   title = 'VISiBLE';
   options: Object = {
-    url: 'http://localhost:5000/upload'
+    url: 'http://localhost:8080/upload'
   };
 
   constructor(private treeService: TreeService){ }
