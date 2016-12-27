@@ -1,7 +1,5 @@
 package com.visible.symbolic;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.LinkedList;
 import java.util.List;
 
@@ -27,7 +25,7 @@ public class State {
 
     public State(int id, State parent) {
         this.id = id;
-        this.children = new LinkedList<>();
+        this.children = new LinkedList<State>();
         this.parent = parent;
         this.ifPC = null;
         this.elsePC = null;

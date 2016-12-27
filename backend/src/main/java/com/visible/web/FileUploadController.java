@@ -1,5 +1,7 @@
-package com.visible;
+package com.visible.web;
 
+import com.visible.JavaProgram;
+import com.visible.VisibleServerApplication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 

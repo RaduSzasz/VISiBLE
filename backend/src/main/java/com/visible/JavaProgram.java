@@ -16,7 +16,7 @@ public class JavaProgram {
   private byte[] code;
   private boolean compilationSuccessful;
 
-  JavaProgram(String fileName, byte[] code) {
+  public JavaProgram(String fileName, byte[] code) {
 
     // Constructor takes filename without file extension
     this.fileName = fileName + JAVA_EXTENSION;
@@ -48,7 +48,7 @@ public class JavaProgram {
     }
   }
 
-  boolean isCompilationSuccessful() {
+  public boolean isCompilationSuccessful() {
     return compilationSuccessful;
   }
 
