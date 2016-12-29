@@ -1,12 +1,16 @@
-package com.visible.symbolic;
+package com.visible.symbolic.state;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.util.LinkedList;
 import java.util.List;
 
 public class State {
 
+    @JsonSerialize(using = ParentSerializer.class)
     private State parent;
-    public List<State> children;
+    @JsonIgnore public List<State> children;
     private String ifPC;
     private String elsePC;
     private int id;
@@ -21,6 +25,18 @@ public class State {
 
     public int getId() {
         return id;
+    }
+
+    public State getParent() {
+        return parent;
+    }
+
+    public String getIfPC() {
+        return ifPC;
+    }
+
+    public String getElsePC() {
+        return elsePC;
     }
 
     public State(int id, State parent) {

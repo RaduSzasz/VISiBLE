@@ -1,6 +1,6 @@
 package com.visible.web;
 
-import com.visible.symbolic.State;
+import com.visible.symbolic.state.State;
 import com.visible.symbolic.SymbolicExecutor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
