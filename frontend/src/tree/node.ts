@@ -17,17 +17,30 @@ export class Node_ {
     }
   }
 
-  public addLeftChild = (leftNode: Node_) => {
+  public addLeft= (leftNode: Node_) => {
     const [_, rightNode] = this.children;
     this.children = [leftNode, rightNode];
   };
 
-  public addRightChild = (rightNode: Node_) => {
+  public addRight= (rightNode: Node_) => {
     const [leftNode, _] = this.children;
     this.children = [leftNode, rightNode];
   };
 
+  public getLeft = () => {
+    const [left, _] = this.children;
+    return left;
+  }
+
+  public getRight = () => {
+    const [_, right] = this.children;
+    return right;
+  }
+
   public getSize = () => {
+    if (this.children == undefined) {
+      return 0;
+    }
     return 1 + this.children.map(child => child.getSize()).reduce((a, b) => a + b, 0);
   }
 }
