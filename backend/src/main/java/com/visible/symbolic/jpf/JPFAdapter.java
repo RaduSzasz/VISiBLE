@@ -26,7 +26,7 @@ public class JPFAdapter implements SymbolicExecutor {
         this.argNum = argNum;
     }
 
-    private static void runJPF(String mainClassName, String method, int argNum) {
+    private void runJPF(String mainClassName, String method, int argNum) {
         String[] args = new String[2];
         String path = System.getProperty("user.dir") + "/" + PATH_TO_INPUT;
         File jpfFile = new File(path + mainClassName + JPF_EXTENSION);
@@ -54,7 +54,7 @@ public class JPFAdapter implements SymbolicExecutor {
         jpf.run();
     }
 
-    private static String getSymbArgs(int n) {
+    private String getSymbArgs(int n) {
         StringBuilder sb = new StringBuilder("(");
         for (int i = 0; i < n - 1; i++) {
             sb.append("sym#");
@@ -63,19 +63,19 @@ public class JPFAdapter implements SymbolicExecutor {
         return sb.toString();
     }
 
-    public static boolean moveForward(Direction direction) {
+    public boolean moveForward(Direction direction) {
         return visualiser.moveForward(direction);
     }
 
     @Override
     public void run() {
-        JPFAdapter.runJPF(name, method, argNum);
+        runJPF(name, method, argNum);
     }
 
 
     private State makeStep(Direction direction) {
         State state = visualiser.getCurrentState();
-        boolean finished = JPFAdapter.moveForward(direction);
+        boolean finished = moveForward(direction);
         return finished ? null : state;
     }
 
