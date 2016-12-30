@@ -37,11 +37,19 @@ export class Node_ {
     const [_, right] = this.children;
     return right;
   }
- 
+
   public getID = () => {
     return this.id;
   }
-  
+
+  public getIfPC = () => {
+    return this.ifPC;
+  }
+
+  public getElsePC = () => {
+    return this.elsePC;
+  }
+
   public getParent = () => {
     return this.parent_;
   }

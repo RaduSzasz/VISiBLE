@@ -79,13 +79,16 @@ export class TreeComponent implements OnInit, OnChanges {
             console.log(steer_promise);
             // TODO : change the currNode
             steer_promise.then(res => {
+              console.log("Updating current node (left)");
               this.currNode = this.currNode.getLeft();
+              console.log(this.currNode);
             });
           }
           
           if(clickedID == rightID) {
             steer_promise = this.treeService.stepRight(this.currNode);
             steer_promise.then(res => {
+              console.log("Updating current node (right)");
               this.currNode = this.currNode.getRight();
             });
           }

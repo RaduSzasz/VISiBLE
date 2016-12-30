@@ -30,11 +30,25 @@ export class TreeService {
   }
 
   addNewLeft(currNode, node) {
+    console.log("Adding new left");
+    node = new Node_(node.id,
+                    currNode.getID(),
+                    currNode.getIfPC(),
+                    node.IfPC,
+                    node.ElsePC);
+    console.log(node);
     currNode.addLeft(node);
+    console.log(currNode);
     return currNode;
   }
 
   addNewRight(currNode, node) {
+    console.log("Adding new right");
+    node = new Node_(node.id,
+                    currNode.getID(),
+                    currNode.getElsePC(),
+                    node.IfPC,
+                    node.ElsePC);
     currNode.addRight(node);
     return currNode;
   }
