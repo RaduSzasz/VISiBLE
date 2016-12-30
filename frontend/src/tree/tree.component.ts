@@ -49,8 +49,6 @@ export class TreeComponent implements OnInit, OnChanges {
     var svg = this._d3_svg;
     var diagonal = this._d3_diagonal;
 
-    var max_index = this.tree.getRoot().getSize() - 1;
-
     // Compute the new tree layout.
     var nodes = tree.nodes(this.currNode);
     console.log(this.currNode);
@@ -66,24 +64,34 @@ export class TreeComponent implements OnInit, OnChanges {
       .attr('transform', (d) => `translate(${d.x}, ${d.y})`)
       .on('click', (d) => {
         var steer_promise;
-
-        if(d.id == max_index - 1) {
-          steer_promise = this.treeService.stepLeft(this.currNode);
-          console.log(steer_promise);
-          // TODO : change the currNode
-          steer_promise.then(res => {
-            this.currNode = this.currNode.getLeft();
-          });
+        
+        var clickedID = d.getID();
+        console.log(clickedID);
+        var currID = this.currNode.getID();
+        console.log(currID);
+        if(clickedID < 0 && d.getParent() == currID) {
+          // you are in the currNode's virtual node
+          var leftID = -2 * currID - 1;
+          var rightID = leftID - 1;
+         
+          if(clickedID == leftID) {
+            steer_promise = this.treeService.stepLeft(this.currNode);
+            console.log(steer_promise);
+            // TODO : change the currNode
+            steer_promise.then(res => {
+              this.currNode = this.currNode.getLeft();
+            });
+          }
+          
+          if(clickedID == rightID) {
+            steer_promise = this.treeService.stepRight(this.currNode);
+            steer_promise.then(res => {
+              this.currNode = this.currNode.getRight();
+            });
+          }
         }
-
-        if(d.id == max_index) {
-          steer_promise = this.treeService.stepRight(this.currNode);
-          steer_promise.then(res => {
-            this.currNode = this.currNode.getRight();
-          });
-        }
-/*
-        if(d.id >= max_index -1) {
+        
+/* if(d.id >= max_index -1) {
             console.log('bye');
           steer_promise.then(tree => {
             console.log('hello');

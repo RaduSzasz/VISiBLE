@@ -10,13 +10,13 @@ export class TreeService {
 
   constructor(private api: ApiService) {}
 
-  stepLeft(currNode): Promise<Tree> {
+  stepLeft(currNode : Node_): Promise<Tree> {
     return new Promise((resolve, reject) => {
       this.api.get(`stepleft`).then(node => resolve(this.addNewLeft(currNode, node)));
     });
   }
 
-  stepRight(currNode): Promise<Tree> {
+  stepRight(currNode : Node_): Promise<Tree> {
     return new Promise((resolve, reject) => {
       this.api.get(`stepright`).then(node => resolve(this.addNewRight(currNode, node)));
     });
@@ -26,7 +26,7 @@ export class TreeService {
     // parseTree :: Node] -> Tree
 
     // construct the trees from the node
-    return new Tree(new Node_(n.id, n.parent_, n.IfPC, n.ElsePC));
+    return new Tree(new Node_(n.id, n.parent_, null, n.IfPC, n.ElsePC));
   }
 
   addNewLeft(currNode, node) {
