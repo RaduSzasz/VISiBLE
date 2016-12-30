@@ -1,16 +1,13 @@
 package com.visible;
 
+import com.visible.jpf.Direction;
 import com.visible.jpf.JPFAdapter;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.tools.JavaFileObject;
-import java.io.File;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @RestController
 @RequestMapping("/upload")
@@ -26,6 +23,15 @@ public class FileUploadController {
 
     // TODO Get Symbolic Method name and number of arguments from frontend
     VisibleServerApplication.setupJPF(name, "symVis", 4);
+
+    JPFAdapter.moveForward(Direction.LEFT).map(latch -> {
+      try {
+        latch.await();
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+      return true;
+    });
 
     return JPFAdapter.getListenerState().toJSON();
   }

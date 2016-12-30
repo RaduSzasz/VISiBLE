@@ -5,25 +5,32 @@ import gov.nasa.jpf.JPF;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
 
 public class JPFAdapter implements Runnable {
 
     private static VisualiserListener visualiser;
     private String name;
     private String method;
+    private CountDownLatch latch;
     private int argNum;
     private static final String PATH_TO_INPUT = "backend/input/";
     private static final String JPF_EXTENSION = ".jpf";
     private static final String SITE_PROPERTIES = "+site=backend/site.properties";
     private static final String SOLVER = "no_solver";
 
-    public JPFAdapter(String name, String method, int argNum) {
+    public JPFAdapter(String name, String method, int argNum, CountDownLatch latch) {
         this.name = name;
         this.method = method;
         this.argNum = argNum;
+	this.latch = latch;
     }
 
-    private static void runJPF(String mainClassName, String method, int argNum) {
+    private static void runJPF(String mainClassName,
+		    	       String method,
+			       int argNum,
+			       CountDownLatch latch) {
         String[] args = new String[2];
         String path = System.getProperty("user.dir") + "/" + PATH_TO_INPUT;
         File jpfFile = new File(path + mainClassName + JPF_EXTENSION);
@@ -44,7 +51,7 @@ public class JPFAdapter implements Runnable {
         config.setProperty("symbolic.method", symbolicMethod);
 
         JPF jpf = new JPF(config);
-        visualiser = new VisualiserListener(config, jpf);
+        visualiser = new VisualiserListener(config, jpf, latch);
 
         jpf.addListener(visualiser);
 
@@ -68,12 +75,13 @@ public class JPFAdapter implements Runnable {
         }
     }
 
-    public static boolean moveForward(Direction direction) {
+    public static Optional<CountDownLatch> moveForward(Direction direction) {
+        System.out.println("Entered function");
         return visualiser.moveForward(direction);
     }
 
     @Override
     public void run() {
-        JPFAdapter.runJPF(name, method, argNum);
+        JPFAdapter.runJPF(name, method, argNum, latch);
     }
 }
