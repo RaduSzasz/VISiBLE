@@ -16,6 +16,7 @@ export class TreeComponent implements OnInit, OnChanges {
   private _d3_tree;
   private _d3_diagonal;;
   private currNode;
+  private rootNode;
   @Input() tree;
 
   constructor(private treeService: TreeService,
@@ -38,7 +39,8 @@ export class TreeComponent implements OnInit, OnChanges {
   ngOnChanges(changes) {
     if(changes['tree'].currentValue){
       if (!this.currNode) {
-        this.currNode = this.tree.getRoot();
+        this.rootNode = this.tree.getRoot();
+        this.currNode = this.rootNode;
       }
       this.drawTree();
     }
@@ -50,7 +52,7 @@ export class TreeComponent implements OnInit, OnChanges {
     var diagonal = this._d3_diagonal;
 
     // Compute the new tree layout.
-    var nodes = tree.nodes(this.currNode);
+    var nodes = tree.nodes(this.rootNode);
     console.log(this.currNode);
     console.log(nodes);
     var links = tree.links(nodes);
@@ -81,6 +83,7 @@ export class TreeComponent implements OnInit, OnChanges {
             steer_promise.then(res => {
               console.log("Updating current node (left)");
               this.currNode = this.currNode.getLeft();
+              this.drawTree();
               console.log(this.currNode);
             });
           }
@@ -90,6 +93,7 @@ export class TreeComponent implements OnInit, OnChanges {
             steer_promise.then(res => {
               console.log("Updating current node (right)");
               this.currNode = this.currNode.getRight();
+              this.drawTree();
             });
           }
         }
