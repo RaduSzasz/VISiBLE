@@ -14,7 +14,8 @@ import { TreeService } from './tree.service';
 export class TreeComponent implements OnInit, OnChanges {
   private _d3_svg;
   private _d3_tree;
-  private _d3_diagonal;
+  private _d3_diagonal;;
+  private currNode;
   @Input() tree;
 
   constructor(private treeService: TreeService,
@@ -36,6 +37,9 @@ export class TreeComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes) {
     if(changes['tree'].currentValue){
+      if (!this.currNode) {
+        this.currNode = this.tree.getRoot();
+      }
       this.drawTree();
     }
   }
@@ -45,12 +49,11 @@ export class TreeComponent implements OnInit, OnChanges {
     var svg = this._d3_svg;
     var diagonal = this._d3_diagonal;
 
-    var root = this.tree;
-    var max_index = root.getSize() - 1;
+    var max_index = this.tree.getRoot().getSize() - 1;
 
     // Compute the new tree layout.
-    var nodes = tree.nodes(root);
-    console.log(root);
+    var nodes = tree.nodes(this.currNode);
+    console.log(this.currNode);
     console.log(nodes);
     var links = tree.links(nodes);
 
@@ -65,14 +68,21 @@ export class TreeComponent implements OnInit, OnChanges {
         var steer_promise;
 
         if(d.id == max_index - 1) {
-          steer_promise = this.treeService.stepLeft();
+          steer_promise = this.treeService.stepLeft(this.currNode);
           console.log(steer_promise);
+          // TODO : change the currNode
+          steer_promise.then(res => {
+            this.currNode = this.currNode.getLeft();
+          });
         }
 
         if(d.id == max_index) {
-          steer_promise = this.treeService.stepRight();
+          steer_promise = this.treeService.stepRight(this.currNode);
+          steer_promise.then(res => {
+            this.currNode = this.currNode.getRight();
+          });
         }
-
+/*
         if(d.id >= max_index -1) {
             console.log('bye');
           steer_promise.then(tree => {
@@ -81,6 +91,7 @@ export class TreeComponent implements OnInit, OnChanges {
             this.drawTree();
           });
         }
+        */
       }) ;
 
     nodeEnter.append('circle')
