@@ -27,6 +27,7 @@ import gov.nasa.jpf.symbc.numeric.PathCondition;
 import gov.nasa.jpf.vm.*;
 
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
 
 public class VisualiserListener extends PropertyListenerAdapter {
 
@@ -39,27 +40,39 @@ public class VisualiserListener extends PropertyListenerAdapter {
     private Direction direction;
     private State currentState;
 
+    private CountDownLatch jpfInitialised;
+    private boolean jpfInitialisedLatchDown = false;
+
+    private CountDownLatch movedForwardLatch;
+
     private static final Map<Class, Comparator> singleBranchComparators = singleBranchComparatorsBuilder();
     private final Map<Class, Comparator> doubleBranchComparators = doubleBranchComparatorsBuilder();
     private static final Map<Comparator, Comparator> comparatorsComplement = comparatorsComplementBuilder();
 
-    boolean moveForward(Direction direction) {
+    Optional<CountDownLatch> moveForward(Direction direction) {
         this.shouldMoveForward = true;
         threadInfo.setRunning();
         this.direction = direction;
-        return searchHasFinished;
+        movedForwardLatch = new CountDownLatch(1);
+        return searchHasFinished ? Optional.empty() : Optional.of(movedForwardLatch);
     }
 
-    VisualiserListener(Config config, JPF jpf) {
+    VisualiserListener(Config config, JPF jpf, CountDownLatch jpfInitialised) {
+        System.out.println("Initialising listener");
         prev = null;
         stateById = new HashMap<>();
-        this.shouldMoveForward = false;
+        this.shouldMoveForward = true;
         this.searchHasFinished = false;
         this.choicesTrace = initializeChoicesTrace();
         this.currentState = null;
+        this.jpfInitialised = jpfInitialised;
     }
 
     public void stateAdvanced(Search search) {
+        System.out.println("STATE ADVANCED");
+        if (this.threadInfo == null) {
+            this.threadInfo = search.getVM().getCurrentThread();
+        }
         if (search.isIgnoredState()) {
             System.out.println("[advanced] ignored state");
             return;
@@ -78,12 +91,19 @@ public class VisualiserListener extends PropertyListenerAdapter {
         prev = s;
 
         while (!this.shouldMoveForward) {
-            ThreadInfo threadInfo = search.getVM().getCurrentThread();
-            this.threadInfo = threadInfo;
             threadInfo.setSleeping();
         }
         this.shouldMoveForward = false;
         this.currentState = s;
+
+        System.out.println("Right before entering the latch countdown");
+
+        if (!jpfInitialisedLatchDown && jpfInitialised != null) {
+            System.out.println("Entered the if");
+            jpfInitialised.countDown();
+            System.out.println("Latch down");
+            jpfInitialisedLatchDown = true;
+        }
     }
 
     private State createNewState(Search search) {
@@ -156,6 +176,10 @@ public class VisualiserListener extends PropertyListenerAdapter {
                         }
                     }
                 }
+            }
+
+            if (this.movedForwardLatch != null) {
+                this.movedForwardLatch.countDown();
             }
         }
     }

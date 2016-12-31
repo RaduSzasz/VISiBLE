@@ -1,13 +1,15 @@
 package com.visible.symbolic.jpf;
 
 import com.visible.symbolic.Direction;
-import com.visible.symbolic.state.State;
 import com.visible.symbolic.SymbolicExecutor;
+import com.visible.symbolic.state.State;
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
 
 public class JPFAdapter implements SymbolicExecutor {
 
@@ -26,7 +28,7 @@ public class JPFAdapter implements SymbolicExecutor {
         this.argNum = argNum;
     }
 
-    private void runJPF(String mainClassName, String method, int argNum) {
+    private void runJPF(String mainClassName, String method, int argNum, CountDownLatch jpfInitialised) {
         String[] args = new String[2];
         String path = System.getProperty("user.dir") + "/" + PATH_TO_INPUT;
         File jpfFile = new File(path + mainClassName + JPF_EXTENSION);
@@ -47,7 +49,7 @@ public class JPFAdapter implements SymbolicExecutor {
         config.setProperty("symbolic.method", symbolicMethod);
 
         JPF jpf = new JPF(config);
-        visualiser = new VisualiserListener(config, jpf);
+        visualiser = new VisualiserListener(config, jpf, jpfInitialised);
 
         jpf.addListener(visualiser);
 
@@ -63,20 +65,27 @@ public class JPFAdapter implements SymbolicExecutor {
         return sb.toString();
     }
 
-    public boolean moveForward(Direction direction) {
+    public Optional<CountDownLatch> moveForward(Direction direction) {
         return visualiser.moveForward(direction);
     }
 
     @Override
-    public void run() {
-        runJPF(name, method, argNum);
+    public CountDownLatch call() {
+        CountDownLatch jpfInitialised = new CountDownLatch(1);
+        runJPF(name, method, argNum, jpfInitialised);
+        return jpfInitialised;
     }
-
 
     private State makeStep(Direction direction) {
         State state = visualiser.getCurrentState();
-        boolean finished = moveForward(direction);
-        return finished ? null : state;
+        moveForward(direction).ifPresent(latch -> {
+            try {
+                latch.await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
+        return state;
     }
 
     @Override
