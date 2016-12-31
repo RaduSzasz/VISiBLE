@@ -14,7 +14,9 @@ import { TreeService } from './tree.service';
 export class TreeComponent implements OnInit, OnChanges {
   private _d3_svg;
   private _d3_tree;
-  private _d3_diagonal;
+  private _d3_diagonal;;
+  private currNode;
+  private rootNode;
   @Input() tree;
 
   constructor(private treeService: TreeService,
@@ -36,6 +38,10 @@ export class TreeComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes) {
     if(changes['tree'].currentValue){
+      if (!this.currNode) {
+        this.rootNode = this.tree.getRoot();
+        this.currNode = this.rootNode;
+      }
       this.drawTree();
     }
   }
@@ -45,12 +51,9 @@ export class TreeComponent implements OnInit, OnChanges {
     var svg = this._d3_svg;
     var diagonal = this._d3_diagonal;
 
-    var root = this.tree;
-    var max_index = root.getSize() - 1;
-
     // Compute the new tree layout.
-    var nodes = tree.nodes(root);
-    console.log(root);
+    var nodes = tree.nodes(this.rootNode);
+    console.log(this.currNode);
     console.log(nodes);
     var links = tree.links(nodes);
 
@@ -63,17 +66,43 @@ export class TreeComponent implements OnInit, OnChanges {
       .attr('transform', (d) => `translate(${d.x}, ${d.y})`)
       .on('click', (d) => {
         var steer_promise;
+        
+        var clickedID = d.getID();
+        console.log(clickedID);
+        var currID = this.currNode.getID();
+        console.log(currID);
+        if(clickedID < 0 && d.getParent() == currID) {
+          // you are in the currNode's virtual node
+          var leftID = -2 * currID - 1;
+          var rightID = leftID - 1;
+         
+          if(clickedID == leftID) {
+            steer_promise = this.treeService.stepLeft(this.currNode);
+            console.log(steer_promise);
+            // TODO : change the currNode
+            steer_promise.then(res => {
+              console.log("Updating current node (left)");
+              this.currNode = this.currNode.getLeft();
+              if(!this.currNode.isLeaf()) {
+                this.drawTree();
+                console.log(this.currNode);
+              }
+            });
+          }
 
-        if(d.id == max_index - 1) {
-          steer_promise = this.treeService.stepLeft();
-          console.log(steer_promise);
+          if(clickedID == rightID) {
+            steer_promise = this.treeService.stepRight(this.currNode);
+            steer_promise.then(res => {
+              console.log("Updating current node (right)");
+              this.currNode = this.currNode.getRight();
+              if(!this.currNode.isLeaf()) {
+                this.drawTree();
+              }
+            });
+          }
         }
-
-        if(d.id == max_index) {
-          steer_promise = this.treeService.stepRight();
-        }
-       
-        if(d.id >= max_index -1) {
+        
+/* if(d.id >= max_index -1) {
             console.log('bye');
           steer_promise.then(tree => {
             console.log('hello');
@@ -81,6 +110,7 @@ export class TreeComponent implements OnInit, OnChanges {
             this.drawTree();
           });
         }
+        */
       }) ;
 
     nodeEnter.append('circle')

@@ -50,8 +50,8 @@ public class State {
         int parentId = parent == null ? -1 : parent.getId();
         sb.append("\"parent_\":" + parentId + DELIM);
 //    sb.append("\"children\": " + stringWithDelim(children.stream().map(State::getId).collect(Collectors.toList()), DELIM) + DELIM);
-        sb.append("\"IfPC\":" + ifPC + DELIM);
-        sb.append("\"ElsePC\":" + elsePC);
+        sb.append("\"IfPC\":" + "\"" + ifPC + "\"" + DELIM);
+        sb.append("\"ElsePC\":" + "\"" + elsePC + "\"");
         sb.append("}\n");
         return sb.toString();
     }

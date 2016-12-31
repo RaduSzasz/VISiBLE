@@ -3,7 +3,8 @@ package com.visible;
 import com.visible.jpf.JPFAdapter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import java.util.concurrent.Executor;
+
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -27,9 +28,12 @@ public class VisibleServerApplication {
 		executor.execute(adapter);
 	}
 
-	public static void setupJPF(String fileName, String symMethod, int numArgs) {
+	public static void setupJPF(String fileName, String symMethod, int numArgs) throws InterruptedException {
 		executor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
-		adapter = new JPFAdapter(fileName, symMethod, numArgs);
+		CountDownLatch latch = new CountDownLatch(1);
+		adapter = new JPFAdapter(fileName, symMethod, numArgs, latch);
 		executor.execute(adapter);
+
+		latch.await();
 	}
 }
