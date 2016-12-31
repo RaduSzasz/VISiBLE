@@ -18,47 +18,47 @@ export class Node_ {
     }
   }
 
-  public addLeft = (leftNode: Node_) => {
+  public addLeft(leftNode: Node_) {
     const [_, rightNode] = this.children;
     this.children = [leftNode, rightNode];
   };
 
-  public addRight = (rightNode: Node_) => {
+  public addRight(rightNode: Node_) {
     const [leftNode, _] = this.children;
     this.children = [leftNode, rightNode];
   };
 
-  public getLeft = () => {
+  public getLeft() {
     const [left, _] = this.children;
     return left;
   }
 
-  public getRight = () => {
+  public getRight() {
     const [_, right] = this.children;
     return right;
   }
 
-  public getID = () => {
+  public getID() {
     return this.id;
   }
 
-  public getIfPC = () => {
+  public getIfPC() {
     return this.ifPC;
   }
 
-  public getElsePC = () => {
+  public getElsePC() {
     return this.elsePC;
   }
 
-  public getParent = () => {
+  public getParent() {
     return this.parent_;
   }
 
-  public isLeaf = () => {
+  public isLeaf() {
     return this.ifPC == "null" && this.elsePC == "null";
   }
 
-  public getSize = () => {
+  public getSize() {
     if (this.children == undefined) {
       return 0;
     }
