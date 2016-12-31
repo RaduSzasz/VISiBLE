@@ -1,11 +1,10 @@
 package com.visible;
 
-import com.visible.symbolic.SymbolicExecutor;
 import com.visible.symbolic.jpf.JPFAdapter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
 
 @SpringBootApplication
 public class VisibleServerApplication {
@@ -16,14 +15,5 @@ public class VisibleServerApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(VisibleServerApplication.class, args);
-	}
-
-	public static SymbolicExecutor setupJPF(String fileName, String symMethod, int numArgs)
-								throws ExecutionException, InterruptedException {
-		executor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
-		adapter = new JPFAdapter(fileName, symMethod, numArgs);
-		Future<CountDownLatch> jpfInitialised = executor.submit(adapter);
-		jpfInitialised.get().await();
-		return adapter;
 	}
 }

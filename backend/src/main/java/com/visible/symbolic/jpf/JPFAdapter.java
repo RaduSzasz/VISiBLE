@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
 
 public class JPFAdapter implements SymbolicExecutor {
 
@@ -22,10 +23,13 @@ public class JPFAdapter implements SymbolicExecutor {
     private static final String SITE_PROPERTIES = "+site=backend/site.properties";
     private static final String SOLVER = "no_solver";
 
-    public JPFAdapter(String name, String method, int argNum) {
+    private ExecutorService service;
+
+    public JPFAdapter(String name, String method, int argNum, ExecutorService service) {
         this.name = name;
         this.method = method;
         this.argNum = argNum;
+        this.service = service;
     }
 
     private void runJPF(String mainClassName, String method, int argNum, CountDownLatch jpfInitialised) {
@@ -53,7 +57,7 @@ public class JPFAdapter implements SymbolicExecutor {
 
         jpf.addListener(visualiser);
 
-        jpf.run();
+        service.submit(jpf);
     }
 
     private String getSymbArgs(int n) {

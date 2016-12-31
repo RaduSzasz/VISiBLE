@@ -51,7 +51,7 @@ public class FileUploadController {
   @Scope("session")
   public SymbolicExecutor symbolicExecutor() {
     ExecutorService service = Executors.newFixedThreadPool(1);
-    JPFAdapter adapter = new JPFAdapter(name, method, argNumber);
+    JPFAdapter adapter = new JPFAdapter(name, method, argNumber, service);
     System.out.println("Created JPF and preparing to wait for it to initialize");
     try {
       service.submit(adapter).get().await();
