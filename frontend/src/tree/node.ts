@@ -54,6 +54,10 @@ export class Node_ {
     return this.parent_;
   }
 
+  public isLeaf = () => {
+    return this.ifPC == "null" && this.elsePC == "null";
+  }
+
   public getSize = () => {
     if (this.children == undefined) {
       return 0;
