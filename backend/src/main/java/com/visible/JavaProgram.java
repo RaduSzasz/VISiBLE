@@ -9,6 +9,7 @@ public class JavaProgram {
 
   private static final String JAVAC = "javac -g ";
   private static final String PATH_TO_INPUT = "backend/input/";
+  private static final String JAVA_EXTENSION = ".java";
 
   private static String path;
   private static String fileName;
@@ -24,8 +25,12 @@ public class JavaProgram {
 
   private static void saveToDirectory() {
     try {
-      File file = new File(path + fileName);
-      file.createNewFile();
+      System.out.println(path + fileName);
+      File file = new File(path + fileName + JAVA_EXTENSION);
+      if (!file.getParentFile().exists())
+        file.getParentFile().mkdirs();
+      if (!file.exists())
+        file.createNewFile();
 
       PrintStream stream = new PrintStream(file);
       stream.println(new String(code, "UTF-8"));
@@ -36,8 +41,10 @@ public class JavaProgram {
 
   private static boolean compile() {
     try {
-      Process process = Runtime.getRuntime().exec(JAVAC + PATH_TO_INPUT + fileName);
+      System.out.println(JAVAC + path + fileName + JAVA_EXTENSION);
+      Process process = Runtime.getRuntime().exec(JAVAC + path + fileName + JAVA_EXTENSION);
       int exitCode = process.waitFor();
+      System.out.println(exitCode);
       return (exitCode == 0);
     } catch (IOException | InterruptedException e) {
       e.printStackTrace();
