@@ -41,18 +41,18 @@ public class VisualiserListener extends PropertyListenerAdapter {
     private State currentState;
 
     private CountDownLatch jpfInitialised;
-    private boolean jpfInitialisedLatchDown = false;
-
     private CountDownLatch movedForwardLatch;
+    private CountDownLatch canMakeSelection;
 
     private static final Map<Class, Comparator> singleBranchComparators = singleBranchComparatorsBuilder();
     private final Map<Class, Comparator> doubleBranchComparators = doubleBranchComparatorsBuilder();
     private static final Map<Comparator, Comparator> comparatorsComplement = comparatorsComplementBuilder();
 
     Optional<CountDownLatch> moveForward(Direction direction) {
-        this.shouldMoveForward = true;
-        threadInfo.setRunning();
         this.direction = direction;
+        this.shouldMoveForward = true;
+        canMakeSelection.countDown();
+        threadInfo.setRunning();
         movedForwardLatch = new CountDownLatch(1);
         return searchHasFinished ? Optional.empty() : Optional.of(movedForwardLatch);
     }
@@ -66,6 +66,7 @@ public class VisualiserListener extends PropertyListenerAdapter {
         this.choicesTrace = initializeChoicesTrace();
         this.currentState = null;
         this.jpfInitialised = jpfInitialised;
+        this.canMakeSelection = new CountDownLatch(1);
     }
 
     public void stateAdvanced(Search search) {
@@ -95,14 +96,6 @@ public class VisualiserListener extends PropertyListenerAdapter {
         this.shouldMoveForward = false;
         this.currentState = s;
 
-        System.out.println("Right before entering the latch countdown");
-
-        if (!jpfInitialisedLatchDown && jpfInitialised != null) {
-            System.out.println("Entered the if");
-            jpfInitialised.countDown();
-            System.out.println("Latch down");
-            jpfInitialisedLatchDown = true;
-        }
     }
 
     private State createNewState(Search search) {
@@ -156,11 +149,23 @@ public class VisualiserListener extends PropertyListenerAdapter {
 
         if (cg instanceof PCChoiceGenerator) {
             if (cg.getTotalNumberOfChoices() > 1) {
+                System.out.println("CG ADVANCED");
                 Instruction instruction = vm.getInstruction();
                 ThreadInfo threadInfo = vm.getCurrentThread();
                 if (instruction instanceof IfInstruction) {
                     Boolean nextStep = null;
                     nextStep = computeIFBranchPC(instruction, threadInfo, cg);
+
+                    if (jpfInitialised != null) {
+                        jpfInitialised.countDown();
+                        jpfInitialised = null;
+                    }
+
+                    try {
+                        canMakeSelection.await();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
 
                     if (nextStep == null) {
                         if (this.choicesTrace.size() > 1) {
@@ -168,7 +173,7 @@ public class VisualiserListener extends PropertyListenerAdapter {
                         }
                         vm.ignoreState();
                     } else {
-                        if (nextStep) {
+                        if (direction == Direction.LEFT) {
                             cg.select(0);
                         } else {
                             cg.select(1);
