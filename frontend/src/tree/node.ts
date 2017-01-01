@@ -2,15 +2,15 @@ export class Node_ {
   private children: [Node_, Node_];
 
   constructor(private id: number,
-              private parent_: number,
+              private parent_: Node_,
               private pc: string,
               private ifPC?: string,
               private elsePC?: string) {
     if (ifPC && elsePC) {
       // Then this is an actual node and will have
       // two virtual nodes as children
-      this.children = [new Node_((-2) * id - 1, id, ifPC), 
-                       new Node_((-2) * id - 2, id, elsePC)];
+      this.children = [new Node_((-2) * id - 1, this, ifPC), 
+                       new Node_((-2) * id - 2, this, elsePC)];
     } else {
       // Then this is a virtual node and it has
       // no children
@@ -27,6 +27,16 @@ export class Node_ {
     const [leftNode, _] = this.children;
     this.children = [leftNode, rightNode];
   };
+
+  public isLeft() {
+    if(!this.parent_) return false;
+    return this == this.getParent().getLeft();
+  }
+
+  public isRight() {
+    if(!this.parent_) return false;
+    return this == this.getParent().getRight();
+  }
 
   public getLeft() {
     const [left, _] = this.children;

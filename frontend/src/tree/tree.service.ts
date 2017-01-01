@@ -39,7 +39,7 @@ export class TreeService {
   addNewLeft(currNode, node) {
     console.log("Adding new left");
     node = new Node_(node.id,
-                    currNode.getID(),
+                    currNode,
                     currNode.getIfPC(),
                     node.IfPC,
                     node.ElsePC);
@@ -52,7 +52,7 @@ export class TreeService {
   addNewRight(currNode, node) {
     console.log("Adding new right");
     node = new Node_(node.id,
-                    currNode.getID(),
+                    currNode,
                     currNode.getElsePC(),
                     node.IfPC,
                     node.ElsePC);
