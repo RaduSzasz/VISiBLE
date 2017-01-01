@@ -90,7 +90,6 @@ public class JPFAdapter implements SymbolicExecutor {
     }
 
     private State makeStep(Direction direction) {
-        State state = visualiser.getCurrentState();
         moveForward(direction).ifPresent(latch -> {
             try {
                 latch.await();
@@ -98,7 +97,7 @@ public class JPFAdapter implements SymbolicExecutor {
                 e.printStackTrace();
             }
         });
-        return state;
+        return visualiser.getCurrentState();
     }
 
     @Override
