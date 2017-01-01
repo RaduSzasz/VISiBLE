@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.annotation.ApplicationScope;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -27,11 +28,9 @@ public class FileUploadController {
   private String method;
   private int argNumber;
 
-  private SymbolicExecutor symbolicExecutor;
-
   @PostMapping
-  public String handleFileUpload(@RequestParam("file") MultipartFile file,
-      RedirectAttributes redirectAttributes) throws java.io.IOException, InterruptedException, ExecutionException {
+  public State handleFileUpload(@RequestParam("file") MultipartFile file,
+                                RedirectAttributes redirectAttributes) throws java.io.IOException, InterruptedException, ExecutionException {
 
     String fileName = file.getOriginalFilename();
     String name = fileName.substring(0, fileName.lastIndexOf("."));
@@ -41,26 +40,21 @@ public class FileUploadController {
     this.method = "symVis";
     this.argNumber = 4;
 
-    this.symbolicExecutor = symbolicExecutor();
-    this.symbolicExecutor.stepLeft();
-
-    return fileName + " uploaded " + (success ?
-            "and compiled successfully." : "but could not be compiled.");
+    SymbolicExecutor symbolicExecutor = symbolicExecutor();
+    return executorService().submit(symbolicExecutor).get();
   }
 
   @Bean
   @Scope("session")
   public SymbolicExecutor symbolicExecutor() {
-    ExecutorService service = Executors.newFixedThreadPool(1);
-    JPFAdapter adapter = new JPFAdapter(name, method, argNumber, service);
-    System.out.println("Created JPF and preparing to wait for it to initialize");
-    try {
-      service.submit(adapter).get().await();
-    } catch (InterruptedException | ExecutionException e) {
-      e.printStackTrace();
-    }
-    System.out.println("Done waiting");
+    JPFAdapter adapter = new JPFAdapter(name, method, argNumber, executorService());
     return adapter;
+  }
+
+  @Bean
+  @ApplicationScope
+  public ExecutorService executorService() {
+    return Executors.newFixedThreadPool(8);
   }
 
 }

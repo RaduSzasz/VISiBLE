@@ -5,6 +5,8 @@ import com.visible.symbolic.SymbolicExecutor;
 import com.visible.symbolic.state.State;
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.annotation.SessionScope;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,6 +14,7 @@ import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 
+@SessionScope
 public class JPFAdapter implements SymbolicExecutor {
 
     private static VisualiserListener visualiser;
@@ -23,6 +26,7 @@ public class JPFAdapter implements SymbolicExecutor {
     private static final String SITE_PROPERTIES = "+site=backend/site.properties";
     private static final String SOLVER = "no_solver";
 
+    @Autowired
     private ExecutorService service;
 
     public JPFAdapter(String name, String method, int argNum, ExecutorService service) {
@@ -74,10 +78,15 @@ public class JPFAdapter implements SymbolicExecutor {
     }
 
     @Override
-    public CountDownLatch call() {
+    public State call() {
         CountDownLatch jpfInitialised = new CountDownLatch(1);
         runJPF(name, method, argNum, jpfInitialised);
-        return jpfInitialised;
+        try {
+            jpfInitialised.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return visualiser.getCurrentState();
     }
 
     private State makeStep(Direction direction) {

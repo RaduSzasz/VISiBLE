@@ -3,9 +3,8 @@ package com.visible.symbolic;
 import com.visible.symbolic.state.State;
 
 import java.util.concurrent.Callable;
-import java.util.concurrent.CountDownLatch;
 
-public interface SymbolicExecutor extends Callable<CountDownLatch> {
+public interface SymbolicExecutor extends Callable<State> {
     State stepLeft();
     State stepRight();
 }
