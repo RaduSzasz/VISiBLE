@@ -39,6 +39,7 @@ public class VisualiserListener extends PropertyListenerAdapter {
     private List<String> choicesTrace;
     private Direction direction;
     private State currentState;
+    private boolean firstCG = true;
 
     private CountDownLatch jpfInitialised;
     private CountDownLatch movedForwardLatch;
@@ -70,6 +71,11 @@ public class VisualiserListener extends PropertyListenerAdapter {
 
     public void stateAdvanced(Search search) {
         System.out.println("STATE ADVANCED");
+        if (currentState == null) {
+            System.out.println("Current state was null");
+        } else {
+            System.out.println(currentState.toString());
+        }
         if (this.threadInfo == null) {
             this.threadInfo = search.getVM().getCurrentThread();
         }
@@ -168,6 +174,8 @@ public class VisualiserListener extends PropertyListenerAdapter {
                         e.printStackTrace();
                     }
 
+                    System.out.println("Before selecting next destination");
+                    System.out.println(currentState);
                     if (direction == Direction.LEFT) {
                         cg.select(0);
                     } else {
@@ -176,9 +184,10 @@ public class VisualiserListener extends PropertyListenerAdapter {
                 }
             }
 
-            if (this.movedForwardLatch != null) {
+            if (!firstCG && this.movedForwardLatch != null) {
                 this.movedForwardLatch.countDown();
             }
+            firstCG = false;
         }
     }
 
