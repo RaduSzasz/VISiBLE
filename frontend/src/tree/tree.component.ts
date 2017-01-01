@@ -71,7 +71,7 @@ export class TreeComponent implements OnInit, OnChanges {
         console.log(clickedID);
         var currID = this.currNode.getID();
         console.log(currID);
-        if(clickedID < 0 && d.getParent() == currID) {
+        if(clickedID < 0 && d.getParent().getID() == currID) {
           // you are in the currNode's virtual node
           var leftID = -2 * currID - 1;
           var rightID = leftID - 1;
@@ -121,6 +121,7 @@ export class TreeComponent implements OnInit, OnChanges {
     node.exit().remove();
 
     // Update the links…
+    svg.selectAll('g.link').remove();
     var link = svg.selectAll('g.link').data(links);
 
     // Enter any new links at the parent's previous position.
@@ -133,9 +134,9 @@ export class TreeComponent implements OnInit, OnChanges {
       .attr('d', diagonal);
 
     link.selectAll('text')
-    .attr('x', d => 0.5*d.source.x + 0.5*d.target.x - 15)
+    .attr('x', d => 0.5*d.source.x + 0.5*d.target.x + ((d.target.isRight())? 20: -20))
     .attr('y', d => 0.5*d.source.y + 0.5*d.target.y)
-    .attr('text-anchor', d => d.children? 'end' : 'start')
+    .attr('text-anchor', d => (d.target.isRight())? 'start' : 'end')
     .text((d:any) => d.target.pc);
 
     link.attr('class', 'link');
