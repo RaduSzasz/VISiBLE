@@ -4,14 +4,15 @@ import { ApiService } from '../shared/api.service';
 
 import { Tree } from './tree';
 import { Node_ } from './node';
+import { Method, Arg } from '../app/method';
 
 @Injectable()
 export class TreeService {
 
   constructor(private api: ApiService) {}
 
-  drawTree(symbolicMethod : string) : Promise<Tree> {
-    let json : Object = {name: symbolicMethod};
+  drawTree(symbolicMethod : Method) : Promise<Tree> {
+    let json : Object = {name: symbolicMethod.methodName, no_args: symbolicMethod.args.length};
     return new Promise((resolve, reject) => {
       this.api.post(`symbolicmethod`, null, json).then(node => resolve(this.parseTree(node)));
     });

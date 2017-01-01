@@ -2,10 +2,11 @@
 
 <input type="file"
   ngFileSelect 
-  [option]="options"
+  [options]="options"
   (onUpload)="selectSymbolic($event)">
-<select type="string" [(ngModel)]="symbolicMethod" (ngModelChange)="setInitialTree()">
-  <option *ngFor="let method of methods" [ngValue]="method.name"> {{method.name}} </option>
+
+<select [(ngModel)]="symbolicMethod" (ngModelChange)="setInitialTree()">
+  <option *ngFor="let method of methods" [ngValue]="method.methodName"> {{method.methodname}} </option>
 </select>
 
 <tree-container [tree]="initialTree"></tree-container>

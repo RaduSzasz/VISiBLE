@@ -4,6 +4,8 @@ import { TreeService }   from '../tree/tree.service';
 import { Tree } from '../tree/tree';
 import { TreeComponent } from '../tree/tree.component';
 
+import { Method, Arg } from './method';
+
 @Component({
   selector: 'my-app',
   styleUrls: ['src/app/app.component.css'],
@@ -16,14 +18,16 @@ export class AppComponent {
   options: Object = {
     url: 'http://localhost:8080/upload'
   };
-  symbolicMethod : string = null;
-  methods:Array<Object>; 
+  symbolicMethod : Method = null;
+  methods: Method[] = [];
   constructor(private treeService: TreeService){ }
 
   selectSymbolic(data) {
     if (data && data.response) {
-      this.methods = [ {num: 0, name: "method1", args: [{type: "int", name: "num"}]},
-        {num: 1, name: "method2", args: [{type: "string", name: "letter"}]} ];
+      this.methods = [
+        new Method("symVis", [new Arg("int", "num"), new Arg("int", "num2"), new Arg("int", "num3"), new Arg("int", "num4")]),
+        new Method("method1", [])
+      ];
       //this.methods = JSON.parse(data.response);
     }
   }
