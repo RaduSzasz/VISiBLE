@@ -3,6 +3,7 @@ package com.visible.web;
 import com.visible.JavaProgram;
 import com.visible.symbolic.SymbolicExecutor;
 import com.visible.symbolic.jpf.JPFAdapter;
+import com.visible.symbolic.state.State;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
@@ -34,14 +35,14 @@ public class FileUploadController {
 
     String fileName = file.getOriginalFilename();
     String name = fileName.substring(0, fileName.lastIndexOf("."));
-    boolean success = JavaProgram.saveAndCompile(name, file.getBytes());
+    boolean success = JavaProgram.saveAndCompile(fileName, file.getBytes());
 
     this.name = name;
     this.method = "symVis";
     this.argNumber = 4;
 
     this.symbolicExecutor = symbolicExecutor();
-//    this.symbolicExecutor.stepLeft();
+    this.symbolicExecutor.stepLeft();
 
     return fileName + " uploaded " + (success ?
             "and compiled successfully." : "but could not be compiled.");

@@ -7,17 +7,15 @@ import java.io.PrintStream;
 
 public class JavaProgram {
 
-  private static final String JAVA_EXTENSION = ".java";
   private static final String JAVAC = "javac -g ";
   private static final String PATH_TO_INPUT = "backend/input/";
 
   private static String path;
-  private static String fileNameWithExt;
+  private static String fileName;
   private static byte[] code;
 
-  public static boolean saveAndCompile(String fileName, byte[] data) {
-    // Method takes filename without file extension
-    fileNameWithExt = fileName + JAVA_EXTENSION;
+  public static boolean saveAndCompile(String name, byte[] data) {
+    fileName = name;
     code = data;
     path = System.getProperty("user.dir") + "/" + PATH_TO_INPUT;
     saveToDirectory();
@@ -26,7 +24,7 @@ public class JavaProgram {
 
   private static void saveToDirectory() {
     try {
-      File file = new File(path + fileNameWithExt);
+      File file = new File(path + fileName);
       file.createNewFile();
 
       PrintStream stream = new PrintStream(file);
@@ -38,7 +36,7 @@ public class JavaProgram {
 
   private static boolean compile() {
     try {
-      Process process = Runtime.getRuntime().exec(JAVAC + PATH_TO_INPUT + fileNameWithExt);
+      Process process = Runtime.getRuntime().exec(JAVAC + PATH_TO_INPUT + fileName);
       int exitCode = process.waitFor();
       return (exitCode == 0);
     } catch (IOException | InterruptedException e) {
