@@ -10,19 +10,29 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @RestController
-@RequestMapping("/upload")
 public class FileUploadController {
 
+  private String fileName;
+
   @PostMapping
+  @RequestMapping("/upload")
   public String handleFileUpload(@RequestParam("file") MultipartFile file,
       RedirectAttributes redirectAttributes) throws java.io.IOException, java.io.UnsupportedEncodingException, InterruptedException {
 
     String fileName = file.getOriginalFilename();
-    String name = fileName.substring(0, fileName.lastIndexOf("."));
-    JavaProgram javaProgram = new JavaProgram(name, file.getBytes());
+    this.fileName= fileName.substring(0, fileName.lastIndexOf("."));
+    JavaProgram javaProgram = new JavaProgram(this.fileName, file.getBytes());
 
-    // TODO Get Symbolic Method name and number of arguments from frontend
-    VisibleServerApplication.setupJPF(name, "symVis", 4);
+    // TODO: Return the methods that are contained within the jar file provided
+    return null;
+  }
+
+  @PostMapping
+  @RequestMapping("/symbolicmethod")
+  public String handleSymbolicMethodSelection(@RequestParam("name") String methodName,
+                                              @RequestParam("no_args") int noArgs,
+                                               RedirectAttributes redirectAttributes) throws InterruptedException {
+    VisibleServerApplication.setupJPF(fileName, methodName, noArgs);
 
     JPFAdapter.moveForward(Direction.LEFT).map(latch -> {
       try {
