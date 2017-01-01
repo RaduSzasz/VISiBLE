@@ -132,6 +132,9 @@ public class VisualiserListener extends PropertyListenerAdapter {
     @Override
     public void searchFinished(Search search) {
         System.out.println("[finished]");
+        if (this.movedForwardLatch != null) {
+            this.movedForwardLatch.countDown();
+        }
         this.searchHasFinished = true;
     }
 
