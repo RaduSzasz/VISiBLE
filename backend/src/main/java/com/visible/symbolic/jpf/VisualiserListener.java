@@ -58,7 +58,6 @@ public class VisualiserListener extends PropertyListenerAdapter {
     }
 
     VisualiserListener(Config config, JPF jpf, CountDownLatch jpfInitialised) {
-        System.out.println("Initialising listener");
         prev = null;
         stateById = new HashMap<>();
         this.shouldMoveForward = true;
@@ -153,8 +152,7 @@ public class VisualiserListener extends PropertyListenerAdapter {
                 Instruction instruction = vm.getInstruction();
                 ThreadInfo threadInfo = vm.getCurrentThread();
                 if (instruction instanceof IfInstruction) {
-                    Boolean nextStep = null;
-                    nextStep = computeIFBranchPC(instruction, threadInfo, cg);
+                    computeIFBranchPC(instruction, threadInfo, cg);
 
                     if (jpfInitialised != null) {
                         jpfInitialised.countDown();
@@ -167,17 +165,10 @@ public class VisualiserListener extends PropertyListenerAdapter {
                         e.printStackTrace();
                     }
 
-                    if (nextStep == null) {
-                        if (this.choicesTrace.size() > 1) {
-                            this.choicesTrace.remove(this.choicesTrace.size() - 1);
-                        }
-                        vm.ignoreState();
+                    if (direction == Direction.LEFT) {
+                        cg.select(0);
                     } else {
-                        if (direction == Direction.LEFT) {
-                            cg.select(0);
-                        } else {
-                            cg.select(1);
-                        }
+                        cg.select(1);
                     }
                 }
             }
@@ -188,7 +179,7 @@ public class VisualiserListener extends PropertyListenerAdapter {
         }
     }
 
-    private Boolean computeIFBranchPC(Instruction instruction, ThreadInfo threadInfo, ChoiceGenerator<?> currentChoiceGenerator) {
+    private void computeIFBranchPC(Instruction instruction, ThreadInfo threadInfo, ChoiceGenerator<?> currentChoiceGenerator) {
         StackFrame sf = threadInfo.getTopFrame();
         PathCondition pathConditionIFBranch = null;
         PathCondition pathConditionELSEBranch = null;
@@ -252,15 +243,7 @@ public class VisualiserListener extends PropertyListenerAdapter {
         String elsePC = choicesTraceIF.get(choicesTraceIF.size() - 1);
         this.currentState.setElsePC(elsePC);
 
-        boolean switchCondition = this.direction == Direction.LEFT;
-
-        if (switchCondition) {
-            this.choicesTrace = choicesTraceELSE;
-        } else {
-            this.choicesTrace = choicesTraceIF;
-        }
-        return switchCondition;
-
+        this.choicesTrace = this.direction == Direction.LEFT ? choicesTraceELSE : choicesTraceIF;
     }
 
     private String cleanConstraint(String constraint) {
