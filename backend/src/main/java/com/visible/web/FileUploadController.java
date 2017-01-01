@@ -34,16 +34,16 @@ public class FileUploadController {
 
     String fileName = file.getOriginalFilename();
     String name = fileName.substring(0, fileName.lastIndexOf("."));
-    JavaProgram javaProgram = new JavaProgram(name, file.getBytes());
+    boolean success = JavaProgram.saveAndCompile(name, file.getBytes());
 
     this.name = name;
     this.method = "symVis";
     this.argNumber = 4;
 
     this.symbolicExecutor = symbolicExecutor();
-    this.symbolicExecutor.stepLeft();
+//    this.symbolicExecutor.stepLeft();
 
-    return fileName + " uploaded " + (javaProgram.isCompilationSuccessful() ?
+    return fileName + " uploaded " + (success ?
             "and compiled successfully." : "but could not be compiled.");
   }
 
