@@ -16,14 +16,22 @@ export class AppComponent {
   options: Object = {
     url: 'http://localhost:8080/upload'
   };
-
+  symbolicMethod : string = null;
+  methods:Array<Object>; 
   constructor(private treeService: TreeService){ }
 
-  setInitialTree(data){
+  selectSymbolic(data) {
     if (data && data.response) {
-      // this.filename = data.originalName;
-      // this.uploadSuccess = true;
-      this.initialTree = this.treeService.parseTree(JSON.parse(data.response));
+      this.methods = [ {num: 0, name: "method1", args: [{type: "int", name: "num"}]},
+        {num: 1, name: "method2", args: [{type: "string", name: "letter"}]} ];
+      //this.methods = JSON.parse(data.response);
     }
+  }
+
+  setInitialTree(){
+    let steer_promise : Promise<Tree> = this.treeService.drawTree(this.symbolicMethod);
+    steer_promise.then(tree => {
+      this.initialTree = tree;
+    });
   }
 }

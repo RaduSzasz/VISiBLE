@@ -10,6 +10,13 @@ export class TreeService {
 
   constructor(private api: ApiService) {}
 
+  drawTree(symbolicMethod : string) : Promise<Tree> {
+    let json : Object = {name: symbolicMethod};
+    return new Promise((resolve, reject) => {
+      this.api.post(`symbolicmethod`, null, json).then(node => resolve(this.parseTree(node)));
+    });
+  }
+
   stepLeft(currNode : Node_): Promise<Tree> {
     return new Promise((resolve, reject) => {
       this.api.get(`stepleft`).then(node => resolve(this.addNewLeft(currNode, node)));
