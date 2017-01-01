@@ -4,8 +4,7 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 
 @Injectable()
-export class ApiService {
-  private api_base = `http://${window.location.hostname}:8080/`;
+export class ApiService { private api_base = `http://${window.location.hostname}:5050/`;
   constructor(private http: Http) { }
 
   private parseQuery(query) {
