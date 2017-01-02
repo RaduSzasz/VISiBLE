@@ -22,7 +22,7 @@ public class JPFAdapter implements SymbolicExecutor {
     private String name;
     private String method;
     private int argNum;
-    private static final String PATH_TO_INPUT = "backend/input/";
+    private static final String PATH_TO_INPUT = "input/";
     private static final String JPF_EXTENSION = ".jpf";
     private static final String SITE_PROPERTIES_PRE_PATH = "+site=";
     private static final String SITE_PROPERTIES = "site.properties";
@@ -41,6 +41,7 @@ public class JPFAdapter implements SymbolicExecutor {
     private void runJPF(String mainClassName, String method, int argNum, CountDownLatch jpfInitialised) {
         String[] args = new String[2];
         String path = System.getProperty("user.dir") + "/" + PATH_TO_INPUT;
+        System.out.println(path);
         File jpfFile = new File(path + mainClassName + JPF_EXTENSION);
         try {
             jpfFile.createNewFile();
