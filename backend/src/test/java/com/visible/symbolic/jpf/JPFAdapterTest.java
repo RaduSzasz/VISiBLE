@@ -27,7 +27,7 @@ public class JPFAdapterTest {
     public static void setUpJavaProgram() throws Exception {
         System.setProperty("user.dir", "/Users/rsz/Programming/VISiBLE");
         Path pathToFile = Paths.get(PATH_TO_JAVA_FILE);
-        boolean success = JavaProgram.saveAndCompile(JAVA_FILE_NAME, Files.readAllBytes(pathToFile));
+        boolean success = JavaProgram.saveAndCompile(JAVA_FILE_NAME + JAVA_EXTENSION, Files.readAllBytes(pathToFile));
         assertTrue(success);
     }
 
