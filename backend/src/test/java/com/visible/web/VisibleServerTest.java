@@ -53,45 +53,24 @@ public class VisibleServerTest {
 	
 	@Test
 	public void testUploadFileSuccess() throws java.io.IOException, InterruptedException, ExecutionException {
-		String filePath = "src/test/resources/CannotCompile.java";
+		String filePath = "src/test/resources/MaxOfFour.java";
 		//byte[] data = Files.readAllBytes(Paths.get(filePath));
 		//given(this.javaProgram.saveAndCompile("MaxOfFour.java", data)).willReturn(true);
-		State expectedState = new State(-1, null);
-		
-		/* Create mock POST request. */
-		// Define headers.
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+		State expectedState = new State(5, null);
 	
-		// Convert file to multipart form.
+		// Convert file to multipart form
 		MultiValueMap<String, Object> parts = new LinkedMultiValueMap<String, Object>();
-		// ClassPathResource
-		FileSystemResource fsr = new FileSystemResource(filePath);
-		parts.add("file", fsr);
-		InputStream stream = fsr.getInputStream();
-		for (int i = 0; i < 100; i++) {
-			System.out.println((char) stream.read());
-		}
-		
-		// Create POST request.
-		HttpEntity<MultiValueMap<String, Object>> request = 
-				new HttpEntity<MultiValueMap<String, Object>>(parts, headers);
-		
-		System.out.println("Http Headers" + request.getHeaders());
-		System.out.println("Http Body" + request.getBody());
-		// Send request and recieve respose.
+		parts.add("file", new FileSystemResource(filePath));
 	
 		// Specifying return values of mock objects
-		//given(this.service.submit(executor)).willReturn(future);
-		//given(this.future.get()).willReturn(expectedState);
-		
-		ResponseEntity<String> response = restTemplate.postForEntity("/upload", request, String.class);
-	
-		//	String response = this.restTemplate.postForObject("/upload", parts, String.class);
+		given(this.service.submit(executor)).willReturn(future);
+		given(this.future.get()).willReturn(expectedState);
+			
+		String response = this.restTemplate.postForObject("/upload", parts, String.class);
 		
 		// Assert that both JSON objects are equivalent
 		assertEquals(om.readValue(expectedState.toString(), Map.class),
-				     om.readValue(response.getBody(), Map.class));
+				     om.readValue(response, Map.class));
 	}
 	
 	
@@ -109,7 +88,6 @@ public class VisibleServerTest {
 		System.out.println("RESPONSE: " + response);
 		
 		// Assert that both JSON objects are equivalent
-		
 		assertEquals(om.readValue(expectedState.toString(), Map.class),
 				     om.readValue(response, Map.class));
 		
