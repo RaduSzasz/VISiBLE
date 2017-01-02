@@ -33,6 +33,7 @@ dependencies {
   // end::jetty[]
   // tag::actuator[]
   compile("org.springframework.boot:spring-boot-starter-actuator")
+  compile("org.springframework.boot:spring-boot-starter-test")
 
   compile files('jpf-core/build/jpf.jar')
   compile files('jpf-symbc/build/jpf-symbc.jar')

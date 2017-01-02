@@ -7,49 +7,63 @@ import java.io.PrintStream;
 
 public class JavaProgram {
 
-  private static final String JAVA_EXTENSION = ".java";
   private static final String JAVAC = "javac -g ";
-  private static final String PATH_TO_INPUT = "backend/input/";
+  private static String PATH_TO_INPUT = "backend/input/";
 
-  private String path;
-  private String fileName;
-  private byte[] code;
-  private boolean compilationSuccessful;
+  private static String path;
+  private static String fileName;
+  private static byte[] code;
 
-  JavaProgram(String fileName, byte[] code) {
-
-    // Constructor takes filename without file extension
-    this.fileName = fileName + JAVA_EXTENSION;
-    this.code = code;
-    this.path = System.getProperty("user.dir") + "/" + PATH_TO_INPUT;
-    saveToDirectory();
-    compile();
+  public static boolean saveAndCompile(String name, byte[] data) {
+    fileName = name;
+    if (!fileName.contains(".jar")) {
+      return false;
+    }
+    code = data;
+    String pwd = System.getProperty("user.dir");
+    // Hack to make Spring tests work
+    if (pwd.endsWith("backend")) {
+    	PATH_TO_INPUT = "input/";
+    }
+    path = pwd + "/" + PATH_TO_INPUT;
+    return saveToDirectory() && compile();
   }
 
-  private void saveToDirectory() {
+  private static boolean saveToDirectory() {
     try {
       File file = new File(path + fileName);
-      file.createNewFile();
+      boolean success = true;
+      if (!file.getParentFile().exists()) {
+         success = file.getParentFile().mkdirs();
+      }
+      if (!file.exists()) {
+        success &= file.createNewFile();
+      }
 
       PrintStream stream = new PrintStream(file);
-      stream.println(new String(code, "UTF-8"));
+      stream.write(code);
+      stream.close();
+
+      return success;
     } catch (IOException e) {
       e.printStackTrace();
+      return false;
     }
   }
 
-  private void compile() {
+  private static boolean compile() {
     try {
-      Process process = Runtime.getRuntime().exec(JAVAC + PATH_TO_INPUT + fileName);
+      // Hack to make jar file uploads work
+      if (fileName.contains(".jar")) {
+        return true;
+      }
+      Process process = Runtime.getRuntime().exec(JAVAC + path + fileName);
       int exitCode = process.waitFor();
-      this.compilationSuccessful = exitCode == 0;
+      return (exitCode == 0);
     } catch (IOException | InterruptedException e) {
       e.printStackTrace();
+      return false;
     }
-  }
-
-  boolean isCompilationSuccessful() {
-    return compilationSuccessful;
   }
 
 }
