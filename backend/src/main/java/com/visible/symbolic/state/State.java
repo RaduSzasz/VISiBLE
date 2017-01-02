@@ -99,16 +99,18 @@ public final class State {
         return type;
     }
 
-    public void setType(String type) {
+    public State setType(String type) {
         this.type = type;
+        return this;
     }
 
     public String getErrorMsg() {
         return errorMsg;
     }
 
-    public void setError(String errorMsg) {
+    public State setError(String errorMsg) {
         this.type = ERROR;
         this.errorMsg = errorMsg;
+        return this;
     }
 }

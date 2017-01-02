@@ -10,6 +10,7 @@ import org.springframework.web.context.annotation.SessionScope;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -23,7 +24,8 @@ public class JPFAdapter implements SymbolicExecutor {
     private int argNum;
     private static final String PATH_TO_INPUT = "backend/input/";
     private static final String JPF_EXTENSION = ".jpf";
-    private static final String SITE_PROPERTIES = "+site=backend/site.properties";
+    private static final String SITE_PROPERTIES_PRE_PATH = "+site=";
+    private static final String SITE_PROPERTIES = "site.properties";
     private static final String SOLVER = "no_solver";
 
     @Autowired
@@ -48,7 +50,13 @@ public class JPFAdapter implements SymbolicExecutor {
         }
 
         args[0] = PATH_TO_INPUT + mainClassName + JPF_EXTENSION;
-        args[1] = SITE_PROPERTIES;
+        try {
+            File f = new File(JPFAdapter.class.getResource(SITE_PROPERTIES).toURI());
+            System.out.println(f.toPath().toString());
+            args[1] = SITE_PROPERTIES_PRE_PATH + f.toPath().toString();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
 
         Config config = JPF.createConfig(args);
         config.setProperty("symbolic.dp", SOLVER);
