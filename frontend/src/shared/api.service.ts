@@ -5,7 +5,7 @@ import 'rxjs/add/operator/map';
 
 @Injectable()
 export class ApiService {
-  private api_base = `http://${window.location.hostname}:5000/`;
+  private api_base = `http://${window.location.hostname}:8080/`;
   constructor(private http: Http) { }
 
   private parseQuery(query) {
