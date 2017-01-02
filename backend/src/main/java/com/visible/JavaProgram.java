@@ -8,16 +8,21 @@ import java.io.PrintStream;
 public class JavaProgram {
 
   private static final String JAVAC = "javac -g ";
-  private static final String PATH_TO_INPUT = "backend/input/";
-  private static final String JAVA_EXTENSION = ".java";
+  private static String PATH_TO_INPUT = "backend/input/";
 
   private static String path;
   private static String fileName;
   private static byte[] code;
 
   public static boolean saveAndCompile(String name, byte[] data) {
+	System.out.println("Filename: " + name);
     fileName = name;
     code = data;
+    String pwd = System.getProperty("user.dir");
+    // Hack to make Spring tests work
+    if (pwd.endsWith("backend")) {
+    	PATH_TO_INPUT = "input/";
+    }
     path = System.getProperty("user.dir") + "/" + PATH_TO_INPUT;
     saveToDirectory();
     return compile();
@@ -26,7 +31,7 @@ public class JavaProgram {
   private static void saveToDirectory() {
     try {
       System.out.println(path + fileName);
-      File file = new File(path + fileName + JAVA_EXTENSION);
+      File file = new File(path + fileName);
       if (!file.getParentFile().exists())
         file.getParentFile().mkdirs();
       if (!file.exists())
@@ -41,8 +46,8 @@ public class JavaProgram {
 
   private static boolean compile() {
     try {
-      System.out.println(JAVAC + path + fileName + JAVA_EXTENSION);
-      Process process = Runtime.getRuntime().exec(JAVAC + path + fileName + JAVA_EXTENSION);
+      System.out.println(JAVAC + path + fileName);
+      Process process = Runtime.getRuntime().exec(JAVAC + path + fileName);
       int exitCode = process.waitFor();
       System.out.println(exitCode);
       return (exitCode == 0);
