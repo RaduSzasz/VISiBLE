@@ -46,7 +46,6 @@ public class JavaProgram {
     try {
       Process process = Runtime.getRuntime().exec(JAVAC + path + fileName);
       int exitCode = process.waitFor();
-      System.out.println(exitCode);
       return (exitCode == 0);
     } catch (IOException | InterruptedException e) {
       e.printStackTrace();

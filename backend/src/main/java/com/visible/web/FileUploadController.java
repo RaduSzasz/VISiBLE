@@ -4,6 +4,7 @@ import com.visible.JavaProgram;
 import com.visible.symbolic.SymbolicExecutor;
 import com.visible.symbolic.jpf.JPFAdapter;
 import com.visible.symbolic.state.State;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
@@ -15,6 +16,8 @@ import org.springframework.web.context.annotation.ApplicationScope;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -33,9 +36,15 @@ public class FileUploadController {
                                 RedirectAttributes redirectAttributes) throws java.io.IOException, InterruptedException, ExecutionException {
 
     String fileName = file.getOriginalFilename();
-    String name = fileName.substring(0, fileName.lastIndexOf("."));
     boolean success = JavaProgram.saveAndCompile(fileName, file.getBytes());
+        
+    if (!success) {
+    	return new State(-1, null);
+    }
 
+    System.out.println("SHOULD NOT REACH HERE");
+    
+    String name = fileName.substring(0, fileName.lastIndexOf("."));
     this.name = name;
     this.method = "symVis";
     this.argNumber = 4;
