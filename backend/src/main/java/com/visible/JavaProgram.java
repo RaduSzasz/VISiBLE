@@ -29,7 +29,6 @@ public class JavaProgram {
 
   private static void saveToDirectory() {
     try {
-      System.out.println(path + fileName);
       File file = new File(path + fileName);
       if (!file.getParentFile().exists())
         file.getParentFile().mkdirs();
@@ -45,7 +44,6 @@ public class JavaProgram {
 
   private static boolean compile() {
     try {
-      System.out.println(JAVAC + path + fileName);
       Process process = Runtime.getRuntime().exec(JAVAC + path + fileName);
       int exitCode = process.waitFor();
       System.out.println(exitCode);
