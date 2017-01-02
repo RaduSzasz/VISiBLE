@@ -10,9 +10,8 @@ import { Method, Arg } from '../app/method';
 export class TreeService {
 
   constructor(private api: ApiService) {}
-
   drawTree(symbolicMethod : Method) : Promise<Tree> {
-    let json : Object = {name: symbolicMethod.methodName, no_args: symbolicMethod.args.length};
+    let json : Object = {name: symbolicMethod.name, no_args: symbolicMethod.args.length};
     return new Promise((resolve, reject) => {
       this.api.post(`symbolicmethod`, null, json).then(node => resolve(this.parseTree(node)));
     });

@@ -20,16 +20,23 @@ export class AppComponent {
   };
   symbolicMethod : Method = null;
   methods: Method[] = [];
+
+  /* Example starter.  */
+  /*methods: Method[] = [new Method("f", [new Arg("int", "num")]), 
+                       new Method("g", []),
+                       new Method("h", [new Arg("int", "num1"), new Arg("int", "num2")])];*/
+
   constructor(private treeService: TreeService){ }
 
   selectSymbolic(data) {
-    if (data && data.response) {
+    /* TODO: Get methods from data.response */
+    //if (data && data.response) {
       this.methods = [
         new Method("symVis", [new Arg("int", "num"), new Arg("int", "num2"), new Arg("int", "num3"), new Arg("int", "num4")]),
         new Method("method1", [])
       ];
       //this.methods = JSON.parse(data.response);
-    }
+    //}
   }
 
   setInitialTree(){

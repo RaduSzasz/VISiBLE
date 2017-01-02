@@ -6,7 +6,7 @@
   (onUpload)="selectSymbolic($event)">
 
 <select [(ngModel)]="symbolicMethod" (ngModelChange)="setInitialTree()">
-  <option *ngFor="let method of methods" [ngValue]="method.methodName"> {{method.methodname}} </option>
+  <option *ngFor="let method of methods" [ngValue]="method.name"> {{method.toString()}} </option>
 </select>
 
 <tree-container [tree]="initialTree"></tree-container>
