@@ -44,6 +44,10 @@ public class JavaProgram {
 
   private static boolean compile() {
     try {
+      // Hack to make jar file uploads work
+      if (fileName.contains(".jar")) {
+        return true;
+      }
       Process process = Runtime.getRuntime().exec(JAVAC + path + fileName);
       int exitCode = process.waitFor();
       return (exitCode == 0);
