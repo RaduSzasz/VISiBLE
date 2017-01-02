@@ -2,55 +2,54 @@ public class MaxOfFour {
 	
 
 	public static void main(String[] args) {
-		int x = -12345;
-		int y = 2345;
-		int z = 12345;
-    int t = 0;
-		int max = Integer.MIN_VALUE;
+		int x = 123;
+		int y = 234;
+		int z = 345;
+   	int t = 0;
 
-		// Function logic for maxOfThree()
+		// Function logic for maxOfFour()
 		// PC: true
-	  max = symVis(x, y, z, t);	
-
-		System.out.println(max);
+		System.out.println(symVis(x, y, z, t));
 	}
 
-  private static int symVis(int x, int y, int z, int t) {
+  private static String symVis(int x, int y, int z, int t) {
 
-    int max;
+    String max;
     if (x >= y) {
 			
-			if (x >= z) {
+		if (x >= z) {
 
 				// PC: x >= y && x >= z
-        if (x >= t) {
-          // PC: x >= y && x >= z && x >= t
-  				max = x;
-        }
-        else {
-          max = 321; 
-        } 
-			}
-
-			else {
-				// PC: z > x >=
-				max = z;
-			}
+        	if (x >= t) {
+          		// PC: x >= y && x >= z && x >= t
+  				max = "000";
+        	} 
+        	else {
+        		max = "001";
+        	}
+        
 		}
 
-		// PC: y >= x
 		else {
-		
-			if (y >= z) {
-				// PC: y >= x && y > z
-				max = y;
-			}
-
-			else {
-				// PC: z > y > x 
-				max = z;
-			}
+			// PC: z > x >=
+			max = "01";
 		}
+	}
+
+	// PC: y >= x
+	else {
+		
+		if (y >= z) {
+			// PC: y >= x && y > z
+			max = "10";
+		}
+
+		else {
+			// PC: z > y > x 
+			max = "11";
+		}
+	}
+
     return max;
   }
 }

@@ -13,7 +13,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static org.junit.Assert.assertTrue;
+import static gov.nasa.jpf.util.test.TestJPF.assertTrue;
 
 public class JPFAdapterTest {
     private final static String JAVA_EXTENSION = ".java";
@@ -25,7 +25,7 @@ public class JPFAdapterTest {
 
     @BeforeClass
     public static void setUpJavaProgram() throws Exception {
-        System.setProperty("user.dir", "/Users/rsz/Programming/VISiBLE");
+        System.setProperty("user.dir", "/home/vaibhav/Documents/VISiBLE");
         Path pathToFile = Paths.get(PATH_TO_JAVA_FILE);
         boolean success = JavaProgram.saveAndCompile(JAVA_FILE_NAME + JAVA_EXTENSION, Files.readAllBytes(pathToFile));
         assertTrue(success);

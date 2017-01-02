@@ -13,6 +13,5 @@ public class ParentSerializer extends JsonSerializer<State> {
                           JsonGenerator gen,
                           SerializerProvider serializers) throws IOException, JsonProcessingException {
         gen.writeNumber(value.getId());
-
     }
 }
