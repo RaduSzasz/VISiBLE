@@ -39,6 +39,7 @@ public class JPFAdapterTest {
         State expectedResult = new State(0, null)
                                 .setIfPC("x_1_SYMINT>=y_2_SYMINT")
                                 .setElsePC("x_1_SYMINT<y_2_SYMINT");
+        expectedResult.setType("normal");
         // assertEquals(service.submit(jpfAdapter).get(), expectedResult);
         assertTrue(true);
     }

@@ -46,7 +46,26 @@ public class VisibleServerTest {
 	
 	@MockBean 
 	private ExecutorService service;
-	
+
+	@Test
+	public void testUploadJARSuccess() throws java.io.IOException, InterruptedException, ExecutionException {
+		String filePath = "src/test/resources/MaxOfFour.jar";
+		State expectedState = new State(5, null);
+
+		// Convert file to multipart form
+		MultiValueMap<String, Object> parts = new LinkedMultiValueMap<String, Object>();
+		parts.add("file", new FileSystemResource(filePath));
+
+		// Specifying return values of mock objects
+		given(this.service.submit(executor)).willReturn(future);
+		given(this.future.get()).willReturn(expectedState);
+
+		String response = this.restTemplate.postForObject("/upload", parts, String.class);
+
+		// Assert that both JSON objects are equivalent
+		assertEquals(om.readValue(expectedState.toString(), Map.class),
+				om.readValue(response, Map.class));
+	}
 	
 	@Test
 	public void testUploadFileSuccess() throws java.io.IOException, InterruptedException, ExecutionException {
