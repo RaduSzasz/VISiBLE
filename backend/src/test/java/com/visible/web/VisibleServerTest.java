@@ -66,30 +66,8 @@ public class VisibleServerTest {
 		assertEquals(om.readValue(expectedState.toString(), Map.class),
 				om.readValue(response, Map.class));
 	}
-	
-	@Test
-	public void testUploadFileSuccess() throws java.io.IOException, InterruptedException, ExecutionException {
-		String filePath = "src/test/resources/MaxOfFour.java";
-		//byte[] data = Files.readAllBytes(Paths.get(filePath));
-		//given(this.javaProgram.saveAndCompile("MaxOfFour.java", data)).willReturn(true);
-		State expectedState = new State(5, null);
-	
-		// Convert file to multipart form
-		MultiValueMap<String, Object> parts = new LinkedMultiValueMap<String, Object>();
-		parts.add("file", new FileSystemResource(filePath));
-	
-		// Specifying return values of mock objects
-		given(this.service.submit(executor)).willReturn(future);
-		given(this.future.get()).willReturn(expectedState);
-			
-		String response = this.restTemplate.postForObject("/upload", parts, String.class);
-		
-		// Assert that both JSON objects are equivalent
-		assertEquals(om.readValue(expectedState.toString(), Map.class),
-				     om.readValue(response, Map.class));
-	}
 
-	private static final String COMPILE_ERROR_MSG = " could not be compiled.";
+	private static final String ERROR_MSG = " is invalid.";
 	
 	@Test
 	public void testUploadFileCannotCompile() throws java.io.IOException {
@@ -97,7 +75,7 @@ public class VisibleServerTest {
 		
 		// State for invalid upload file
 		State expectedState = new State(-1, null);
-		expectedState.setError("CannotCompile.java" + COMPILE_ERROR_MSG);
+		expectedState.setError("CannotCompile.java" + ERROR_MSG);
 		MultiValueMap<String, Object> parts = new LinkedMultiValueMap<String, Object>();
 		parts.add("file", new FileSystemResource(filePath));
 		
