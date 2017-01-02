@@ -16,29 +16,38 @@ public class JavaProgram {
 
   public static boolean saveAndCompile(String name, byte[] data) {
     fileName = name;
+    if (!fileName.contains(".jar")) {
+      return false;
+    }
     code = data;
     String pwd = System.getProperty("user.dir");
     // Hack to make Spring tests work
     if (pwd.endsWith("backend")) {
     	PATH_TO_INPUT = "input/";
     }
-    path = System.getProperty("user.dir") + "/" + PATH_TO_INPUT;
-    saveToDirectory();
-    return compile();
+    path = pwd + "/" + PATH_TO_INPUT;
+    return saveToDirectory() && compile();
   }
 
-  private static void saveToDirectory() {
+  private static boolean saveToDirectory() {
     try {
       File file = new File(path + fileName);
-      if (!file.getParentFile().exists())
-        file.getParentFile().mkdirs();
-      if (!file.exists())
-        file.createNewFile();
+      boolean success = true;
+      if (!file.getParentFile().exists()) {
+         success = file.getParentFile().mkdirs();
+      }
+      if (!file.exists()) {
+        success &= file.createNewFile();
+      }
 
       PrintStream stream = new PrintStream(file);
-      stream.println(new String(code, "UTF-8"));
+      stream.write(code);
+      stream.close();
+
+      return success;
     } catch (IOException e) {
       e.printStackTrace();
+      return false;
     }
   }
 

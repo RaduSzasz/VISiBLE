@@ -28,7 +28,7 @@ public class FileUploadController {
   private String name;
   private String method;
   private int argNumber;
-  private static final String COMPILE_ERROR_MSG = " could not be compiled.";
+  private static final String ERROR_MSG = " is invalid.";
 
   @PostMapping
   public State handleFileUpload(@RequestParam("file") MultipartFile file,
@@ -39,7 +39,7 @@ public class FileUploadController {
         
     if (!success) {
         State errorState = new State(-1, null);
-        errorState.setError(fileName + COMPILE_ERROR_MSG);
+        errorState.setError(fileName + ERROR_MSG);
     	return errorState;
     }
     
