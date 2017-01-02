@@ -1,4 +1,4 @@
-package com.visible;
+package com.visible.web;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,16 +20,22 @@ import com.visible.JavaProgram;
 import com.visible.symbolic.SymbolicExecutor;
 import com.visible.symbolic.state.State;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.concurrent.*;
 import java.nio.file.*;
+import java.util.Map;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class VisibleServerTest {
 	
+	private ObjectMapper om = new ObjectMapper();
+	
 	@Autowired
 	private TestRestTemplate restTemplate;
 	
+	// TODO: Figure out mocking problem for JavaProgram
 	//@MockBean
 	//private JavaProgram javaProgram;
 	
@@ -43,24 +49,23 @@ public class VisibleServerTest {
 	private ExecutorService service;
 	
 	@Test
-	public void testUploadFile() throws java.io.IOException, InterruptedException, ExecutionException {
+	public void testUploadFileSuccess() throws java.io.IOException, InterruptedException, ExecutionException {
 		String filePath = "backend/src/test/resources/MaxOfFour.java";
 		//byte[] data = Files.readAllBytes(Paths.get(filePath));
 		//given(this.javaProgram.saveAndCompile("MaxOfFour.java", data)).willReturn(true);
-		State returnState = new State(5, null);
+		State expectedState = new State(5, null);
+		MultiValueMap<String, Object> parts = new LinkedMultiValueMap<String, Object>();
+		parts.add("file", new FileSystemResource(filePath));
 		
 		// Specifying return values of mock objects
 		given(this.service.submit(executor)).willReturn(future);
-		given(this.future.get()).willReturn(returnState);
+		given(this.future.get()).willReturn(expectedState);
 		
-		MultiValueMap<String, Object> parts = new LinkedMultiValueMap<String, Object>();
-		parts.add("file", new FileSystemResource(filePath));
 		String response = this.restTemplate.postForObject("/upload", parts, String.class);
-		System.out.println("Response from server: " + response);
-		//String body = this.restTemplate.getForObject("/stepleft", String.class);
-		//System.out.println(body);
-		//assertEquals("Hello World", body);
-		assertEquals(5, 10);
+		
+		// Assert that both JSON objects are equivalent
+		assertEquals(om.readValue(expectedState.toString(), Map.class),
+				     om.readValue(response, Map.class));
 	}
 
 }
