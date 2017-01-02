@@ -70,22 +70,21 @@ public class VisibleServerTest {
 	private static final String ERROR_MSG = " is invalid.";
 	
 	@Test
-	public void testUploadFileCannotCompile() throws java.io.IOException {
-		String filePath = "src/test/resources/CannotCompile.java";
-		
+	public void testUploadedFileIsJAR() throws java.io.IOException {
+		String filePath = "src/test/resources/WouldIUseJPFAgain.java";
+
 		// State for invalid upload file
 		State expectedState = new State(-1, null);
-		expectedState.setError("CannotCompile.java" + ERROR_MSG);
+		expectedState.setError("WouldIUseJPFAgain.java" + ERROR_MSG);
 		MultiValueMap<String, Object> parts = new LinkedMultiValueMap<String, Object>();
 		parts.add("file", new FileSystemResource(filePath));
-		
+
 		String response = this.restTemplate.postForObject("/upload", parts, String.class);
-		System.out.println("RESPONSE: " + response);
-		
+
 		// Assert that both JSON objects are equivalent
 		assertEquals(om.readValue(expectedState.toString(), Map.class),
-				     om.readValue(response, Map.class));
-		
+				om.readValue(response, Map.class));
+
 	}
 	
 }
