@@ -15,7 +15,6 @@ public class JavaProgram {
   private static byte[] code;
 
   public static boolean saveAndCompile(String name, byte[] data) {
-	System.out.println("Filename: " + name);
     fileName = name;
     code = data;
     String pwd = System.getProperty("user.dir");
