@@ -16,8 +16,6 @@ import org.springframework.web.context.annotation.ApplicationScope;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -30,6 +28,7 @@ public class FileUploadController {
   private String name;
   private String method;
   private int argNumber;
+  private static final String COMPILE_ERROR_MSG = " could not be compiled.";
 
   @PostMapping
   public State handleFileUpload(@RequestParam("file") MultipartFile file,
@@ -39,13 +38,12 @@ public class FileUploadController {
     boolean success = JavaProgram.saveAndCompile(fileName, file.getBytes());
         
     if (!success) {
-    	return new State(-1, null);
+        State errorState = new State(-1, null);
+        errorState.setError(fileName + COMPILE_ERROR_MSG);
+    	return errorState;
     }
-
-    System.out.println("SHOULD NOT REACH HERE");
     
-    String name = fileName.substring(0, fileName.lastIndexOf("."));
-    this.name = name;
+    this.name = fileName.substring(0, fileName.lastIndexOf("."));
     this.method = "symVis";
     this.argNumber = 4;
 

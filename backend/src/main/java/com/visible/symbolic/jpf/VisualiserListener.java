@@ -31,6 +31,9 @@ import java.util.concurrent.CountDownLatch;
 
 public class VisualiserListener extends PropertyListenerAdapter {
 
+    private static final String MIDDLE_NODE = "normal";
+    private static final String END_NODE = "leaf";
+
     private boolean shouldMoveForward;
     private ThreadInfo threadInfo;
     private State prev;
@@ -138,6 +141,7 @@ public class VisualiserListener extends PropertyListenerAdapter {
     @Override
     public void searchFinished(Search search) {
         System.out.println("[finished]");
+        this.currentState.setType(END_NODE);
         if (this.movedForwardLatch != null) {
             this.movedForwardLatch.countDown();
         }
@@ -254,6 +258,7 @@ public class VisualiserListener extends PropertyListenerAdapter {
 
         String elsePC = choicesTraceIF.get(choicesTraceIF.size() - 1);
         this.currentState.setElsePC(elsePC);
+        this.currentState.setType(MIDDLE_NODE);
 
         this.choicesTrace = this.direction == Direction.LEFT ? choicesTraceELSE : choicesTraceIF;
     }

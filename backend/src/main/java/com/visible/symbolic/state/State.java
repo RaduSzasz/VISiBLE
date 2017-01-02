@@ -1,6 +1,7 @@
 package com.visible.symbolic.state;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -10,11 +11,14 @@ import java.util.List;
 
 public final class State {
 
+    private static final String ERROR = "error";
     @JsonSerialize(using = ParentSerializer.class)
     private State parent;
     @JsonIgnore public List<State> children;
     private String ifPC;
     private String elsePC;
+    private String type;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY) private String errorMsg;
     private int id;
 
     public State setIfPC(String ifPC) {
@@ -89,5 +93,22 @@ public final class State {
         } catch (JsonProcessingException e) {
             return null;
         }
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getErrorMsg() {
+        return errorMsg;
+    }
+
+    public void setError(String errorMsg) {
+        this.type = ERROR;
+        this.errorMsg = errorMsg;
     }
 }

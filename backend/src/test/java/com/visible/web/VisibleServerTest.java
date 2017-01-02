@@ -17,16 +17,13 @@ import org.springframework.http.*;
 
 import static org.mockito.BDDMockito.*;
 
-import com.visible.JavaProgram;
 import com.visible.symbolic.SymbolicExecutor;
 import com.visible.symbolic.state.State;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.concurrent.*;
-import java.nio.file.*;
 import java.util.Map;
-import java.io.InputStream;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -72,8 +69,8 @@ public class VisibleServerTest {
 		assertEquals(om.readValue(expectedState.toString(), Map.class),
 				     om.readValue(response, Map.class));
 	}
-	
-	
+
+	private static final String COMPILE_ERROR_MSG = " could not be compiled.";
 	
 	@Test
 	public void testUploadFileCannotCompile() throws java.io.IOException {
@@ -81,6 +78,7 @@ public class VisibleServerTest {
 		
 		// State for invalid upload file
 		State expectedState = new State(-1, null);
+		expectedState.setError("CannotCompile.java" + COMPILE_ERROR_MSG);
 		MultiValueMap<String, Object> parts = new LinkedMultiValueMap<String, Object>();
 		parts.add("file", new FileSystemResource(filePath));
 		
