@@ -31,7 +31,7 @@ public class JPFAdapterTest {
     @BeforeClass
     public static void setUpJavaProgram() throws Exception {
         File f = new File(JPFAdapterTest.class.getResource(PACKAGE_LEVEL + JAR_NAME + JAR_EXTENSION).toURI());
-        boolean success = JavaProgram.saveAndCompile(JAR_NAME + JAR_EXTENSION, Files.readAllBytes(f.toPath()));
+        boolean success = JavaProgram.storeFile(JAR_NAME + JAR_EXTENSION, Files.readAllBytes(f.toPath()));
         clearInputs();
         assertTrue(success);
     }

@@ -22,7 +22,7 @@ public class JPFAdapter implements SymbolicExecutor {
     private String name;
     private String method;
     private int argNum;
-    private static final String PATH_TO_INPUT = "input/";
+    private static final String PATH_TO_INPUT = "backend/input/";
     private static final String JPF_EXTENSION = ".jpf";
     private static final String SITE_PROPERTIES_PRE_PATH = "+site=";
     private static final String SITE_PROPERTIES = "site.properties";

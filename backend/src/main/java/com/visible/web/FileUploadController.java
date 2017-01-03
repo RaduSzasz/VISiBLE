@@ -35,8 +35,8 @@ public class FileUploadController {
                                 RedirectAttributes redirectAttributes) throws java.io.IOException, InterruptedException, ExecutionException {
 
     String fileName = file.getOriginalFilename();
-    boolean success = JavaProgram.saveAndCompile(fileName, file.getBytes());
-        
+    boolean success = JavaProgram.storeFile(fileName, file.getBytes());
+
     if (!success) {
         State errorState = new State(-1, null);
         errorState.setError(fileName + ERROR_MSG);
