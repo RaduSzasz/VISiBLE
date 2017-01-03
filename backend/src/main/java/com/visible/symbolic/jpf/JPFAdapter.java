@@ -36,8 +36,9 @@ public class JPFAdapter implements SymbolicExecutor {
         this.service = service;
     }
 
-    private void runJPF(String mainClassName, String method, int argNum, CountDownLatch jpfInitialised) {
+    private void runJPF(String jarName, String method, int argNum, CountDownLatch jpfInitialised) {
         String[] args = new String[2];
+        String mainClassName = "max.Max";
         String path = System.getProperty("user.dir") + "/" + PATH_TO_INPUT;
         File jpfFile = new File(path + mainClassName + JPF_EXTENSION);
         try {
