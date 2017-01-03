@@ -1,5 +1,6 @@
 package com.visible;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -13,6 +14,7 @@ import java.util.Map;
 public class ClassMethods {
 
     private final Map<String, List<MethodData>> classes = new HashMap<>();
+    @JsonInclude(JsonInclude.Include.NON_EMPTY) private String errorMsg;
 
 	void addMethodToClass(String className, String methodName,
                           int numArgs, String signature) {
@@ -29,15 +31,22 @@ public class ClassMethods {
 		return classes;
 	}
 
-	@Override
+    public String getErrorMsg() {
+        return errorMsg;
+    }
+
+    public void setError() {
+        this.errorMsg = "Invalid JAR file.";
+    }
+
+    @Override
 	public String toString() {
-		System.out.println(classes.size());
 		try {
 			return new ObjectMapper().writer()
 					                 .withDefaultPrettyPrinter()
 					                 .writeValueAsString(this);
         } catch (JsonProcessingException e) {
-        	System.out.println("Unable to serialise ClassMethods");
+        	System.err.println("Unable to serialise ClassMethods");
             return null;
         }
 	}

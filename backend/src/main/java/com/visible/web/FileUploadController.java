@@ -1,5 +1,6 @@
 package com.visible.web;
 
+import com.visible.ClassMethods;
 import com.visible.JavaProgram;
 import com.visible.symbolic.SymbolicExecutor;
 import com.visible.symbolic.jpf.JPFAdapter;
@@ -31,37 +32,20 @@ public class FileUploadController {
   private static final String ERROR_MSG = " is invalid.";
 
   @PostMapping
-  public State handleFileUpload(@RequestParam("file") MultipartFile file,
-                                RedirectAttributes redirectAttributes) throws java.io.IOException, InterruptedException, ExecutionException {
+  public ClassMethods handleFileUpload(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes)
+          throws java.io.IOException, InterruptedException, ExecutionException, ClassNotFoundException {
 
     String fileName = file.getOriginalFilename();
-    boolean success = JavaProgram.saveAndCompile(fileName, file.getBytes());
-        
-    if (!success) {
-        State errorState = new State(-1, null);
-        errorState.setError(fileName + ERROR_MSG);
-    	return errorState;
+    JavaProgram javaProgram = new JavaProgram(fileName, file.getBytes());
+    boolean success = javaProgram.saveToDirectory();
+
+    if (success) {
+      return javaProgram.getClassMethods();
+    } else {
+      ClassMethods classMethods = new ClassMethods();
+      classMethods.setError();
+      return classMethods;
     }
-    
-    this.name = fileName.substring(0, fileName.lastIndexOf("."));
-    this.method = "symVis";
-    this.argNumber = 4;
 
-    SymbolicExecutor symbolicExecutor = symbolicExecutor();
-    return executorService().submit(symbolicExecutor).get();
   }
-
-  @Bean
-  @Scope("session")
-  public SymbolicExecutor symbolicExecutor() {
-    JPFAdapter adapter = new JPFAdapter(name, method, argNumber, executorService());
-    return adapter;
-  }
-
-  @Bean
-  @ApplicationScope
-  public ExecutorService executorService() {
-    return Executors.newFixedThreadPool(8);
-  }
-
 }

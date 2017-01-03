@@ -1,17 +1,12 @@
 package com.visible.symbolic.jpf;
 
 import com.visible.JavaProgram;
-import com.visible.symbolic.state.State;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Test;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import static gov.nasa.jpf.util.test.TestJPF.assertEquals;
 import static gov.nasa.jpf.util.test.TestJPF.assertTrue;
@@ -28,7 +23,8 @@ public class JPFAdapterTest {
     public static void setUpJavaProgram() throws Exception {
         System.setProperty("user.dir", "/Users/ameykusurkar/softeng/VISiBLE");
         Path pathToFile = Paths.get(PATH_TO_JAR);
-        boolean success = JavaProgram.saveAndCompile(JAR_NAME + JAR_EXTENSION, Files.readAllBytes(pathToFile));
+        JavaProgram javaProgram = new JavaProgram(JAR_NAME + JAR_EXTENSION, Files.readAllBytes(pathToFile));
+        boolean success = javaProgram.saveToDirectory();
         assertTrue(success);
     }
 

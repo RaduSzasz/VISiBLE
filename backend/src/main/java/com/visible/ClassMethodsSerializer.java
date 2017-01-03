@@ -20,6 +20,8 @@ class ClassMethodsSerializer extends JsonSerializer<ClassMethods> {
             gen.writeFieldName("methods");
             gen.writeObject(value.getClasses().get(className));
         }
+        gen.writeFieldName("error");
+        gen.writeString(value.getErrorMsg());
         gen.writeEndObject();
     }
 }
