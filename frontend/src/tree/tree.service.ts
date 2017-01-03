@@ -4,7 +4,7 @@ import { ApiService } from '../shared/api.service';
 
 import { Tree } from './tree';
 import { Node_ } from './node';
-import { Method, Arg } from '../app/method';
+import { Method, Arg } from '../upload/method';
 
 @Injectable()
 export class TreeService {
