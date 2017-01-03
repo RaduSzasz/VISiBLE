@@ -50,8 +50,8 @@ public class JPFAdapter implements SymbolicExecutor {
         }
 
         args[0] = PATH_TO_INPUT + mainClassName + JPF_EXTENSION;
-        System.out.println(JPFAdapter.class.getResource(SITE_PROPERTIES).toExternalForm());
-        args[1] = SITE_PROPERTIES_PRE_PATH + JPFAdapter.class.getResource(SITE_PROPERTIES).toExternalForm();
+        args[1] = SITE_PROPERTIES_PRE_PATH + System.getProperty("home.dir") + "/site.properties";
+        System.out.println(args[1]);
 
         Config config = JPF.createConfig(args);
         config.setProperty("symbolic.dp", SOLVER);
