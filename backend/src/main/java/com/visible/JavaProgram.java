@@ -77,8 +77,9 @@ public class JavaProgram {
     }
   }
   
-  private static void javaMethodNames() throws IOException, ClassNotFoundException, InterruptedException {
+  private static ClassMethods javaMethodNames() throws IOException, ClassNotFoundException, InterruptedException {
 	  
+	  ClassMethods classMethods = new ClassMethods();
 	  String pathToJar = path + fileName;
 	  
 	  JarFile jarFile = new JarFile(pathToJar);
@@ -100,15 +101,17 @@ public class JavaProgram {
 			  
 			  Class<?> cls = cl.loadClass(className);
 			  
-			  Method[] methods = cls.getDeclaredMethods();
-			  for (Method m : methods) {
-				  System.out.println("Method name: " + m.getName());
-				  System.out.println(m.getParameterTypes().length);
-				  System.out.println(m+"\n");
+			  for (Method m : cls.getDeclaredMethods()) {
+				  System.out.println(className + " " + m.getName());
+				  classMethods.addMethodToClass(className, m.getName(), 
+						  m.getParameterTypes().length, m.toString());
 			  }
 		  }
 	  }
+	  
 	  jarFile.close();
+	  System.out.println(classMethods);
+	  return classMethods;
   }
 
 }

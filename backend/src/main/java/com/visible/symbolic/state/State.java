@@ -69,7 +69,6 @@ public final class State {
         if (o == null || getClass() != o.getClass()) return false;
 
         State state = (State) o;
-
         if (id != state.id) return false;
         if (parent != null ? !parent.equals(state.parent) : state.parent != null) return false;
         if (ifPC != null ? !ifPC.equals(state.ifPC) : state.ifPC != null) return false;
