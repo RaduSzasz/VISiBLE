@@ -5,12 +5,14 @@
 (function(global) {
   // map tells the System loader where to look for things
   var map = {
-    'app':                        'dist/src',
+    'app':                        'dist',
     '@angular':                   'node_modules/@angular',
     'ng2-uploader':               'node_modules/ng2-uploader',
     'angular-in-memory-web-api':  'node_modules/angular-in-memory-web-api',
     'd3':                         'node_modules/d3',
-    'rxjs':                       'node_modules/rxjs'
+    'rxjs':                       'node_modules/rxjs',
+    'moment':                     'node_modules/moment',
+    'ng2-bootstrap':              'node_modules/ng2-bootstrap',
   };
   // packages tells the System loader how to load when no filename and/or no extension
   var packages = {
@@ -18,7 +20,9 @@
     'ng2-uploader':               { defaultExtension: 'js' },
     'rxjs':                       { defaultExtension: 'js' },
     'angular-in-memory-web-api':  { main: 'index.js', defaultExtension: 'js' },
-    'd3':                         { main: 'd3.js', defaultExtension: 'js' }
+    'd3':                         { main: 'd3.js', defaultExtension: 'js' },
+    'ng2-bootstrap':              { format: 'cjs', main: 'bundles/ng2-bootstrap.umd.js', defaultExtension: 'js' },
+    'moment':                     { main: 'moment.js', defaultExtension: 'js' },
   };
   var ngPackageNames = [
     'common',

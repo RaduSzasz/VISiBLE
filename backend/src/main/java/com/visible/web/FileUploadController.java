@@ -26,35 +26,40 @@ import java.util.concurrent.Executors;
 @RequestMapping("/upload")
 public class FileUploadController {
   private String name;
-  private String method;
-  private int argNumber;
+  private String methodName;
+  private int noArgs;
   private static final String ERROR_MSG = " is invalid.";
 
   @PostMapping
-  public State handleFileUpload(@RequestParam("file") MultipartFile file,
+  public String handleFileUpload(@RequestParam("file") MultipartFile file,
                                 RedirectAttributes redirectAttributes) throws java.io.IOException, InterruptedException, ExecutionException {
 
     String fileName = file.getOriginalFilename();
     boolean success = JavaProgram.saveAndCompile(fileName, file.getBytes());
         
     if (!success) {
-        State errorState = new State(-1, null);
-        errorState.setError(fileName + ERROR_MSG);
-    	return errorState;
+    	return "Error";
     }
     
     this.name = fileName.substring(0, fileName.lastIndexOf("."));
-    this.method = "symVis";
-    this.argNumber = 4;
+    return "Yay";
+  }
 
-    SymbolicExecutor symbolicExecutor = symbolicExecutor();
-    return executorService().submit(symbolicExecutor).get();
+  @PostMapping
+  @RequestMapping("/symbolicmethod")
+  public State handleSymbolicMethodSelection(@RequestParam("name") String methodName,
+                                              @RequestParam("no_args") int noArgs,
+                                              RedirectAttributes redirectAttributes) throws InterruptedException, ExecutionException {
+    this.methodName = methodName;
+    this.noArgs = noArgs;
+
+    return executorService().submit(symbolicExecutor()).get();
   }
 
   @Bean
   @Scope("session")
   public SymbolicExecutor symbolicExecutor() {
-    JPFAdapter adapter = new JPFAdapter(name, method, argNumber, executorService());
+    JPFAdapter adapter = new JPFAdapter(name, methodName, noArgs, executorService());
     return adapter;
   }
 

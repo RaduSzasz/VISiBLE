@@ -2,10 +2,7 @@ package com.visible.symbolic.jpf;
 
 import com.visible.JavaProgram;
 import com.visible.symbolic.state.State;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,6 +11,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class JPFAdapterTest {
@@ -41,6 +39,7 @@ public class JPFAdapterTest {
         service = Executors.newFixedThreadPool(4);
     }
 
+    @Ignore
     @Test
     public void atStartFirstNodeIsReturned() throws IOException, ExecutionException, InterruptedException {
         JPFAdapter jpfAdapter =
@@ -51,8 +50,7 @@ public class JPFAdapterTest {
                                 .setElsePC("x_1_SYMINT<y_2_SYMINT")
                                 .setType("normal");
 
-        //assertEquals(service.submit(jpfAdapter).get(), expectedResult);
-        assertTrue(true);
+        assertEquals(service.submit(jpfAdapter).get(), expectedResult);
         clearInputs();
     }
 
