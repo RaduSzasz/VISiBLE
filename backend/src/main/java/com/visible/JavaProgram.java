@@ -78,21 +78,28 @@ public class JavaProgram {
   }
   
   private static void javaMethodNames() throws IOException, ClassNotFoundException, InterruptedException {
-	  File f = new File("JarData");
-	  f.mkdir();
-	  Process process = Runtime.getRuntime().exec("unzip " + path+fileName +" -d JarData");
-	  process.waitFor();
 	  
-	  System.out.println(path+fileName);
-	  JarFile jarFile = new JarFile(path+fileName);
+	  String pathToJar = path + fileName;
+	  
+	  JarFile jarFile = new JarFile(pathToJar);
 	  Enumeration<JarEntry> entries = jarFile.entries();
+
+	  URL[] urls = { new URL("file://" + pathToJar) };
+	  URLClassLoader cl = new URLClassLoader(urls);
+	  
 	  while (entries.hasMoreElements()) {
 		  JarEntry entry = entries.nextElement();
-		  if (entry.toString().endsWith(".class")) {
-			  File classFile = new File("JarData/");
-			  ClassLoader cl = new URLClassLoader(new URL[]{classFile.toURL()});
-			  String className = entry.toString().replace('/', '.');
-			  Class<?> cls = cl.loadClass(className.toString().substring(0, className.toString().lastIndexOf(".")));
+		  String entryName = entry.getName();
+		  if (entryName.endsWith(".class")) {
+			  
+			  // Remove ".class" extension
+			  String className = entryName.substring(0, entryName.lastIndexOf("."));
+			  
+			  // Get full class name from path
+			  className = className.replace('/', '.');
+			  
+			  Class<?> cls = cl.loadClass(className);
+			  
 			  Method[] methods = cls.getDeclaredMethods();
 			  for (Method m : methods) {
 				  System.out.println("Method name: " + m.getName());
@@ -102,9 +109,6 @@ public class JavaProgram {
 		  }
 	  }
 	  jarFile.close();
-	  
-	  Process processRM = Runtime.getRuntime().exec("rm -rf JarData");
-	  processRM.waitFor();
   }
 
 }
