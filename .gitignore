@@ -13,6 +13,7 @@
 *.sw*
 build/
 backend/input/
+out/
 
 # Gradle useless stuff
 .gradle

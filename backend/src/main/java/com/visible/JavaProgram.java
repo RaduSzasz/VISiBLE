@@ -4,54 +4,94 @@ package com.visible;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.Enumeration;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 public class JavaProgram {
 
-  private static String path;
-  private static String fileName;
-  private static byte[] code;
+    private static final String CLASS_EXT = ".class";
 
-  public static boolean storeFile(String name, byte[] data) {
-    fileName = name;
-    if (!fileName.contains(".jar")) {
-      return false;
+    private String pathToJar;
+    private String fileName;
+    private byte[] data;
+
+    public JavaProgram(String fileName, byte[] data) {
+        String pwd = System.getProperty("user.dir");
+        String pathToInput;
+        if (pwd.endsWith("backend")) {
+            // Spring tests run from VISiBLE/backend
+            pathToInput = "/input/";
+        } else {
+            // Server runs from VISiBLE/
+            pathToInput = "/backend/input/";
+        }
+        this.pathToJar = pwd + "/" + pathToInput + fileName;
+        this.fileName = fileName;
+        this.data = data;
     }
-    code = data;
-    String pwd = System.getProperty("user.dir");
 
-    String pathToInput;
-    if (pwd.endsWith("backend")) {
-      // Spring tests run from VISiBLE/backend
-      pathToInput = "/input/";
-    } else {
-      // Server runs from VISiBLE/
-      pathToInput = "/backend/input/";
+    public boolean saveToDirectory() {
+        if (!fileName.endsWith(".jar")) {
+            return false;
+        }
+
+        try {
+            File file = new File(pathToJar);
+            boolean success = true;
+            if (!file.getParentFile().exists()) {
+                success = file.getParentFile().mkdirs();
+            }
+            if (!file.exists()) {
+                success &= file.createNewFile();
+            }
+
+            PrintStream stream = new PrintStream(file);
+            stream.write(data);
+            stream.close();
+
+            return success;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
-    path = pwd + pathToInput;
-    return saveToDirectory();
-  }
+    public ClassMethods getClassMethods() throws IOException, ClassNotFoundException, InterruptedException {
 
-  private static boolean saveToDirectory() {
-    try {
-      File file = new File(path + fileName);
-      boolean success = true;
-      if (!file.getParentFile().exists()) {
-         success = file.getParentFile().mkdirs();
-      }
-      if (!file.exists()) {
-        success &= file.createNewFile();
-      }
+        ClassMethods classMethods = new ClassMethods();
 
-      PrintStream stream = new PrintStream(file);
-      stream.write(code);
-      stream.close();
+        JarFile jarFile = new JarFile(pathToJar);
+        Enumeration<JarEntry> entries = jarFile.entries();
 
-      return success;
-    } catch (IOException e) {
-      e.printStackTrace();
-      return false;
+        URL[] urls = {new URL("file://" + pathToJar)};
+        URLClassLoader cl = new URLClassLoader(urls);
+
+        while (entries.hasMoreElements()) {
+            JarEntry entry = entries.nextElement();
+            String entryName = entry.getName();
+            if (entryName.endsWith(CLASS_EXT)) {
+
+                // Remove ".class" extension
+                String className = entryName.substring(0, entryName.lastIndexOf("."));
+
+                // Get full class name from path
+                className = className.replace('/', '.');
+
+                Class<?> cls = cl.loadClass(className);
+
+                for (Method m : cls.getDeclaredMethods()) {
+                    classMethods.addMethodToClass(className, m.getName(),
+                            m.getParameterTypes().length, m.toString());
+                }
+            }
+        }
+
+        jarFile.close();
+        return classMethods;
     }
-  }
 
 }

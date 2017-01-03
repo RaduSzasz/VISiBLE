@@ -97,6 +97,7 @@ public class VisualiserListener extends PropertyListenerAdapter {
         }
         this.shouldMoveForward = false;
         this.currentState = s;
+
     }
 
     private State createNewState(Search search) {
