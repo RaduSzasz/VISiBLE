@@ -69,6 +69,7 @@ public final class State {
         if (o == null || getClass() != o.getClass()) return false;
 
         State state = (State) o;
+
         if (id != state.id) return false;
         if (parent != null ? !parent.equals(state.parent) : state.parent != null) return false;
         if (ifPC != null ? !ifPC.equals(state.ifPC) : state.ifPC != null) return false;
@@ -98,16 +99,18 @@ public final class State {
         return type;
     }
 
-    public void setType(String type) {
+    public State setType(String type) {
         this.type = type;
+        return this;
     }
 
     public String getErrorMsg() {
         return errorMsg;
     }
 
-    public void setError(String errorMsg) {
+    public State setError(String errorMsg) {
         this.type = ERROR;
         this.errorMsg = errorMsg;
+        return this;
     }
 }

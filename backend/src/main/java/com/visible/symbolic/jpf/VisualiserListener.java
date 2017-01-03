@@ -73,12 +73,6 @@ public class VisualiserListener extends PropertyListenerAdapter {
     }
 
     public void stateAdvanced(Search search) {
-        System.out.println("STATE ADVANCED");
-        if (currentState == null) {
-            System.out.println("Current state was null");
-        } else {
-            System.out.println(currentState.toString());
-        }
         if (this.threadInfo == null) {
             this.threadInfo = search.getVM().getCurrentThread();
         }

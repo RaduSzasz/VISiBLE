@@ -74,7 +74,7 @@ public class JPFAdapter implements SymbolicExecutor {
         return sb.toString();
     }
 
-    public Optional<CountDownLatch> moveForward(Direction direction) {
+    private Optional<CountDownLatch> moveForward(Direction direction) {
         return visualiser.moveForward(direction);
     }
 

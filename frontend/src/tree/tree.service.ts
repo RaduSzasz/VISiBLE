@@ -4,49 +4,59 @@ import { ApiService } from '../shared/api.service';
 
 import { Tree } from './tree';
 import { Node_ } from './node';
+import { Method, Arg } from '../app/method';
 
 @Injectable()
 export class TreeService {
 
   constructor(private api: ApiService) {}
-
-  stepLeft():Promise<Tree> {
+  drawTree(symbolicMethod : Method) : Promise<Tree> {
+    let json : Object = {name: symbolicMethod.name, no_args: symbolicMethod.args.length};
     return new Promise((resolve, reject) => {
-      this.api.get(`stepleft`).then(nodes => resolve(this.parseTree(nodes)));
+      this.api.post(`symbolicmethod`, null, json).then(node => resolve(this.parseTree(node)));
     });
   }
 
-  stepRight():Promise<Tree> {
+  stepLeft(currNode : Node_): Promise<Tree> {
     return new Promise((resolve, reject) => {
-      this.api.get(`stepright`).then(nodes => resolve(this.parseTree(nodes)));
+      this.api.get(`stepleft`).then(node => resolve(this.addNewLeft(currNode, node)));
     });
   }
 
-  parseTree(nodes) {
-    // parseTree :: [Node] -> Tree
-
-    // construct the trees from the nodes
-    var trees = {}; // map id to tree
-    nodes.forEach(n => {
-      trees[n.id] = new Tree(n.id).setPC(n.pc);
+  stepRight(currNode : Node_): Promise<Tree> {
+    return new Promise((resolve, reject) => {
+      this.api.get(`stepright`).then(node => resolve(this.addNewRight(currNode, node)));
     });
+  }
 
-    // look throgh the nodes again to construct the recursive tree
-    nodes.forEach(n => {
-      // `t` is the corresponding tree of `n`
-      var t = trees[n.id];
-      console.log(trees[n.parent_]);
-      t.setParent(trees[n.parent_] || null);
-      n.children.forEach(cn => {
-        t.addChild(trees[cn])
-      });
-    });
+  parseTree(n) {
+    // parseTree :: Node] -> Tree
 
-    // the first tree with null parent IS the root
-    var root;
-    nodes.forEach(n => {
-      if(!trees[n.id].parent_) return root = trees[n.id];
-    });
-    return root;
+    // construct the trees from the node
+    return new Tree(new Node_(n.id, n.parent_, null, n.IfPC, n.ElsePC));
+  }
+
+  addNewLeft(currNode, node) {
+    console.log("Adding new left");
+    node = new Node_(node.id,
+                    currNode,
+                    currNode.getIfPC(),
+                    node.IfPC,
+                    node.ElsePC);
+    console.log(node);
+    currNode.addLeft(node);
+    console.log(currNode);
+    return currNode;
+  }
+
+  addNewRight(currNode, node) {
+    console.log("Adding new right");
+    node = new Node_(node.id,
+                    currNode,
+                    currNode.getElsePC(),
+                    node.IfPC,
+                    node.ElsePC);
+    currNode.addRight(node);
+    return currNode;
   }
 }
