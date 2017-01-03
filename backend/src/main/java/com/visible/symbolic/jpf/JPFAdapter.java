@@ -13,45 +13,64 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
+import java.util.jar.JarFile;
+import java.util.jar.Manifest;
 
 @SessionScope
 public class JPFAdapter implements SymbolicExecutor {
 
     private static VisualiserListener visualiser;
-    private String name;
+    private String jarName;
     private String method;
     private int argNum;
-    private static final String PATH_TO_INPUT = "backend/input/";
+    private static final String RELATIVE_PATH_TO_INPUT = "backend/input/";
+    private static final String ABSOLUTE_PATH_TO_INPUT = System.getProperty("user.dir") + "/" + RELATIVE_PATH_TO_INPUT;
     private static final String JPF_EXTENSION = ".jpf";
-    private static final String SITE_PROPERTIES_PRE_PATH = "site=";
-    private static final String SITE_PROPERTIES = "site.properties";
+    private static final String SITE_PROPERTIES_PRE_PATH = "+site=";
+    private static final String SITE_PROPERTIES = "/site.properties";
     private static final String SOLVER = "no_solver";
 
     @Autowired
     private ExecutorService service;
 
-    public JPFAdapter(String name, String method, int argNum, ExecutorService service) {
-        this.name = name;
+    public JPFAdapter(String jarName, String method, int argNum, ExecutorService service) {
+        this.jarName = jarName;
         this.method = method;
         this.argNum = argNum;
         this.service = service;
     }
 
-    private void runJPF(String mainClassName, String method, int argNum, CountDownLatch jpfInitialised) {
+    private void runJPF(String jarName, String method, int argNum, CountDownLatch jpfInitialised) {
         String[] args = new String[2];
-        String path = System.getProperty("user.dir") + "/" + PATH_TO_INPUT;
-        System.out.println(path);
-        File jpfFile = new File(path + mainClassName + JPF_EXTENSION);
+        String mainClassName;
+
         try {
-            jpfFile.createNewFile();
+            Manifest manifest = new JarFile(RELATIVE_PATH_TO_INPUT + "/" + jarName).getManifest();
+            mainClassName = manifest.getMainAttributes().getValue("Main-Class");
         } catch (IOException e) {
-            System.err.println(mainClassName + JPF_EXTENSION + " could not be created");
+            System.err.println("Manifest file in " + jarName + " could not be read.");
             return;
         }
 
-        args[0] = PATH_TO_INPUT + mainClassName + JPF_EXTENSION;
-        args[1] = SITE_PROPERTIES_PRE_PATH + System.getProperty("home.dir") + "/site.properties";
-        System.out.println(args[1]);
+        int indexOfDot = mainClassName.lastIndexOf('.');
+        String jpfFileName = (indexOfDot == -1) ? mainClassName : mainClassName.substring(indexOfDot, mainClassName.length());
+        jpfFileName += JPF_EXTENSION;
+
+        System.out.println(ABSOLUTE_PATH_TO_INPUT + jpfFileName);
+        File jpfFile = new File(ABSOLUTE_PATH_TO_INPUT + jpfFileName);
+        try {
+            // This will fail if the file already exists in backend/input/
+            boolean jpfFileCreated = jpfFile.createNewFile();
+            if (!jpfFileCreated) {
+                throw new IOException();
+            }
+        } catch (IOException e) {
+            System.err.println(jpfFileName + " could not be created");
+            return;
+        }
+
+        args[0] = RELATIVE_PATH_TO_INPUT + jpfFileName;
+        args[1] = SITE_PROPERTIES_PRE_PATH + System.getProperty("user.dir") + SITE_PROPERTIES;
 
         Config config = JPF.createConfig(args);
         config.setProperty("symbolic.dp", SOLVER);
@@ -76,14 +95,14 @@ public class JPFAdapter implements SymbolicExecutor {
         return sb.toString();
     }
 
-    public Optional<CountDownLatch> moveForward(Direction direction) {
+    private Optional<CountDownLatch> moveForward(Direction direction) {
         return visualiser.moveForward(direction);
     }
 
     @Override
     public State call() {
         CountDownLatch jpfInitialised = new CountDownLatch(1);
-        runJPF(name, method, argNum, jpfInitialised);
+        runJPF(jarName, method, argNum, jpfInitialised);
         try {
             jpfInitialised.await();
         } catch (InterruptedException e) {

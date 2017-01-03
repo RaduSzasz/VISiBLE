@@ -34,18 +34,17 @@ public class FileUploadController {
     public State handleFileUpload(@RequestParam("file") MultipartFile file,
                                   RedirectAttributes redirectAttributes) throws java.io.IOException, InterruptedException, ExecutionException {
 
-        String fileName = file.getOriginalFilename();
-        boolean success = JavaProgram.storeFile(fileName, file.getBytes());
+        this.name = file.getOriginalFilename();
+        this.method = "symVis";
+        this.argNumber = 4;
+
+        boolean success = JavaProgram.storeFile(name, file.getBytes());
 
         if (!success) {
             State errorState = new State(-1, null);
-            errorState.setError(fileName + ERROR_MSG);
+            errorState.setError(name + ERROR_MSG);
             return errorState;
         }
-
-        this.name = fileName.substring(0, fileName.lastIndexOf("."));
-        this.method = "symVis";
-        this.argNumber = 4;
 
         SymbolicExecutor symbolicExecutor = symbolicExecutor();
         return executorService().submit(symbolicExecutor).get();
