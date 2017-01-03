@@ -1,10 +1,11 @@
-import { Component }     from '@angular/core';
+import { Component, ViewChild }     from '@angular/core';
 
 import { TreeService }   from '../tree/tree.service';
 import { Tree } from '../tree/tree';
 import { TreeComponent } from '../tree/tree.component';
 
 import { Method, Arg } from './method';
+import { ModalDirective } from 'ng2-bootstrap';
 
 @Component({
   selector: 'my-app',
@@ -13,6 +14,7 @@ import { Method, Arg } from './method';
 })
 
 export class AppComponent {
+  @ViewChild('staticModal') public staticModal : ModalDirective;
   public initialTree = null;
   title = 'VISiBLE';
   options: Object = {
@@ -21,22 +23,18 @@ export class AppComponent {
   symbolicMethod : Method = null;
   methods: Method[] = [];
 
-  /* Example starter.  */
-  /*methods: Method[] = [new Method("f", [new Arg("int", "num")]), 
-                       new Method("g", []),
-                       new Method("h", [new Arg("int", "num1"), new Arg("int", "num2")])];*/
-
   constructor(private treeService: TreeService){ }
 
   selectSymbolic(data) {
     /* TODO: Get methods from data.response */
-    //if (data && data.response) {
+    if (data && data.response) {
       this.methods = [
         new Method("symVis", [new Arg("int", "num"), new Arg("int", "num2"), new Arg("int", "num3"), new Arg("int", "num4")]),
         new Method("method1", [])
       ];
       //this.methods = JSON.parse(data.response);
-    //}
+      this.staticModal.show();
+    }
   }
 
   setInitialTree(){
@@ -45,4 +43,5 @@ export class AppComponent {
       this.initialTree = tree;
     });
   }
+  
 }
