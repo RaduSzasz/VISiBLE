@@ -25,48 +25,41 @@ import java.util.concurrent.Executors;
 @Scope("session")
 @RequestMapping("/upload")
 public class FileUploadController {
-  private String name;
-  private String methodName;
-  private int noArgs;
-  private static final String ERROR_MSG = " is invalid.";
+    private String name;
+    private String method;
+    private int argNumber;
+    private static final String ERROR_MSG = " is invalid.";
 
-  @PostMapping
-  public String handleFileUpload(@RequestParam("file") MultipartFile file,
-                                RedirectAttributes redirectAttributes) throws java.io.IOException, InterruptedException, ExecutionException {
+    @PostMapping
+    public State handleFileUpload(@RequestParam("file") MultipartFile file,
+                                  RedirectAttributes redirectAttributes) throws java.io.IOException, InterruptedException, ExecutionException {
 
-    String fileName = file.getOriginalFilename();
-    boolean success = JavaProgram.saveAndCompile(fileName, file.getBytes());
-        
-    if (!success) {
-    	return "Error";
+        this.name = file.getOriginalFilename();
+        this.method = "symVis";
+        this.argNumber = 4;
+
+        boolean success = JavaProgram.storeFile(name, file.getBytes());
+
+        if (!success) {
+            State errorState = new State(-1, null);
+            errorState.setError(name + ERROR_MSG);
+            return errorState;
+        }
+
+        SymbolicExecutor symbolicExecutor = symbolicExecutor();
+        return executorService().submit(symbolicExecutor).get();
     }
-    
-    this.name = fileName.substring(0, fileName.lastIndexOf("."));
-    return "Yay";
-  }
 
-  @PostMapping
-  @RequestMapping("/symbolicmethod")
-  public State handleSymbolicMethodSelection(@RequestParam("name") String methodName,
-                                              @RequestParam("no_args") int noArgs,
-                                              RedirectAttributes redirectAttributes) throws InterruptedException, ExecutionException {
-    this.methodName = methodName;
-    this.noArgs = noArgs;
+    @Bean
+    @Scope("session")
+    public SymbolicExecutor symbolicExecutor() {
+        return new JPFAdapter(name, method, argNumber, executorService());
+    }
 
-    return executorService().submit(symbolicExecutor()).get();
-  }
-
-  @Bean
-  @Scope("session")
-  public SymbolicExecutor symbolicExecutor() {
-    JPFAdapter adapter = new JPFAdapter(name, methodName, noArgs, executorService());
-    return adapter;
-  }
-
-  @Bean
-  @ApplicationScope
-  public ExecutorService executorService() {
-    return Executors.newFixedThreadPool(8);
-  }
+    @Bean
+    @ApplicationScope
+    public ExecutorService executorService() {
+        return Executors.newFixedThreadPool(8);
+    }
 
 }
