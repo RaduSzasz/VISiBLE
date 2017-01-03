@@ -3,3 +3,6 @@
 <vis-upload (onUpload)="updateTree($event)" *ngIf="!initialTree"><vis-upload>
 
 <tree-container [tree]="initialTree" *ngIf="initialTree"></tree-container>
+<div *ngIf="initialTree">
+  <button (click)="initialTree=null">upload tree again</button>
+</div>
