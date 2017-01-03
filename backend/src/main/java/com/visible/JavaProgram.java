@@ -4,6 +4,12 @@ package com.visible;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.Enumeration;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 public class JavaProgram {
 
@@ -44,6 +50,11 @@ public class JavaProgram {
       stream.write(code);
       stream.close();
 
+      try {
+		javaMethodNames();
+	} catch (Exception e) {
+		e.printStackTrace();
+	}
       return success;
     } catch (IOException e) {
       e.printStackTrace();
@@ -64,6 +75,36 @@ public class JavaProgram {
       e.printStackTrace();
       return false;
     }
+  }
+  
+  private static void javaMethodNames() throws IOException, ClassNotFoundException, InterruptedException {
+	  File f = new File("JarData");
+	  f.mkdir();
+	  Process process = Runtime.getRuntime().exec("unzip " + path+fileName +" -d JarData");
+	  process.waitFor();
+	  
+	  System.out.println(path+fileName);
+	  JarFile jarFile = new JarFile(path+fileName);
+	  Enumeration<JarEntry> entries = jarFile.entries();
+	  while (entries.hasMoreElements()) {
+		  JarEntry entry = entries.nextElement();
+		  if (entry.toString().endsWith(".class")) {
+			  File classFile = new File("JarData/");
+			  ClassLoader cl = new URLClassLoader(new URL[]{classFile.toURL()});
+			  String className = entry.toString().replace('/', '.');
+			  Class<?> cls = cl.loadClass(className.toString().substring(0, className.toString().lastIndexOf(".")));
+			  Method[] methods = cls.getDeclaredMethods();
+			  for (Method m : methods) {
+				  System.out.println("Method name: " + m.getName());
+				  System.out.println(m.getParameterTypes().length);
+				  System.out.println(m+"\n");
+			  }
+		  }
+	  }
+	  jarFile.close();
+	  
+	  Process processRM = Runtime.getRuntime().exec("rm -rf JarData");
+	  processRM.waitFor();
   }
 
 }

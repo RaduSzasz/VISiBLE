@@ -26,12 +26,13 @@ public class JPFAdapterTest {
 
     @BeforeClass
     public static void setUpJavaProgram() throws Exception {
-        System.setProperty("user.dir", "/home/vaibhav/Documents/VISiBLE");
+        System.setProperty("user.dir", "/Users/ameykusurkar/softeng/VISiBLE");
         Path pathToFile = Paths.get(PATH_TO_JAR);
         boolean success = JavaProgram.saveAndCompile(JAR_NAME + JAR_EXTENSION, Files.readAllBytes(pathToFile));
         assertTrue(success);
     }
 
+    /*
     @Test
     public void atStartFirstNodeIsReturned() throws ExecutionException, InterruptedException {
         ExecutorService service = Executors.newSingleThreadExecutor();
@@ -44,7 +45,7 @@ public class JPFAdapterTest {
 //         assertEquals(service.submit(jpfAdapter).get(), expectedResult);
         assertTrue(true);
     }
-
+	*/
 
     @AfterClass
     public static void tearDown() {
