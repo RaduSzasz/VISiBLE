@@ -58,8 +58,14 @@ public class JPFAdapter implements SymbolicExecutor {
 
         File jpfFile = new File(ABSOLUTE_PATH_TO_INPUT + jpfFileName);
         try {
-            // This will fail if the file already exists in backend/input/
-            boolean jpfFileCreated = jpfFile.createNewFile();
+            boolean jpfFileCreated = true;
+            if (!jpfFile.getParentFile().exists()) {
+                jpfFileCreated = jpfFile.getParentFile().mkdirs();
+            }
+
+            if (!jpfFile.exists()) {
+                jpfFileCreated &= jpfFile.createNewFile();
+            }
             if (!jpfFileCreated) {
                 throw new IOException();
             }
