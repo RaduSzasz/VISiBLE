@@ -10,13 +10,15 @@ import { TreeService } from './tree/tree.service';
 import { ApiService } from './shared/api.service';
 
 import { Ng2UploaderModule } from 'ng2-uploader/ng2-uploader';
+import { ModalModule } from 'ng2-bootstrap';
 
 @NgModule({
   imports: [
     BrowserModule,
     FormsModule,
     HttpModule,
-    Ng2UploaderModule
+    Ng2UploaderModule,
+    ModalModule.forRoot()
   ],
   declarations: [
     AppComponent,
