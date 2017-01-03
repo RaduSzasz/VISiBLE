@@ -73,6 +73,7 @@ public class JPFAdapter implements SymbolicExecutor {
         args[1] = SITE_PROPERTIES_PRE_PATH + System.getProperty("user.dir") + SITE_PROPERTIES;
 
         Config config = JPF.createConfig(args);
+        config.setProperty("classpath", ABSOLUTE_PATH_TO_INPUT + jarName);
         config.setProperty("symbolic.dp", SOLVER);
         config.setProperty("target", mainClassName);
         String symbolicMethod = mainClassName + "." + method + getSymbArgs(argNum);
