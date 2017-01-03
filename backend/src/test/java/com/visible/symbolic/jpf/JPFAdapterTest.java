@@ -26,15 +26,9 @@ public class JPFAdapterTest {
 
     @BeforeClass
     public static void setUpJavaProgram() throws Exception {
-<<<<<<< HEAD
-        File f = new File(JPFAdapterTest.class.getResource(PACKAGE_LEVEL + JAR_NAME + JAR_EXTENSION).toURI());
-        boolean success = JavaProgram.storeFile(JAR_NAME + JAR_EXTENSION, Files.readAllBytes(f.toPath()));
-        clearInputs();
-=======
         File f = new File(JPFAdapterTest.class.getResource(PACKAGE_LEVEL + JAR_NAME).toURI());
         JavaProgram javaProgram = new JavaProgram(JAR_NAME, Files.readAllBytes(f.toPath()));
         boolean success = javaProgram.saveToDirectory();
->>>>>>> 98bd37a2e9e1ef4b65e7dce22e442e409999855c
         assertTrue(success);
     }
 
