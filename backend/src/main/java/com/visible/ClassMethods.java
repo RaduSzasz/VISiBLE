@@ -14,7 +14,7 @@ import java.util.Map;
 public class ClassMethods {
 
     private final Map<String, List<MethodData>> classes = new HashMap<>();
-    @JsonInclude(JsonInclude.Include.NON_EMPTY) private String errorMsg;
+    @JsonInclude(JsonInclude.Include.NON_NULL) private String errorMsg;
 
 	void addMethodToClass(String className, String methodName,
                           int numArgs, String signature) {
