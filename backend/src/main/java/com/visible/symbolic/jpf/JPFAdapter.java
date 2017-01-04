@@ -23,6 +23,7 @@ public class JPFAdapter implements SymbolicExecutor {
     private String jarName;
     private String method;
     private int argNum;
+    private State errorState;
     private static final String RELATIVE_PATH_TO_INPUT = "backend/input/";
     private static final String ABSOLUTE_PATH_TO_INPUT = System.getProperty("user.dir") + "/" + RELATIVE_PATH_TO_INPUT;
     private static final String JPF_EXTENSION = ".jpf";
@@ -48,7 +49,7 @@ public class JPFAdapter implements SymbolicExecutor {
             Manifest manifest = new JarFile(RELATIVE_PATH_TO_INPUT + "/" + jarName).getManifest();
             mainClassName = manifest.getMainAttributes().getValue("Main-Class");
         } catch (IOException e) {
-            System.err.println("Manifest file in " + jarName + " could not be read.");
+            errorState = new State().withError("Manifest file in " + jarName + " could not be read.");
             return;
         }
 
@@ -73,7 +74,7 @@ public class JPFAdapter implements SymbolicExecutor {
                 throw new IOException();
             }
         } catch (IOException e) {
-            System.err.println(jpfFileName + " could not be created");
+            errorState = new State().withError(jpfFileName + " could not be created");
             return;
         }
 
@@ -139,5 +140,9 @@ public class JPFAdapter implements SymbolicExecutor {
     @Override
     public State stepRight() {
         return makeStep(Direction.RIGHT);
+    }
+
+    public State getErrorState() {
+        return errorState;
     }
 }

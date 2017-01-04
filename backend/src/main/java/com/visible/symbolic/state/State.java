@@ -55,12 +55,17 @@ public final class State {
         this.elsePC = null;
     }
 
-    public State(int id, State parent, String ifPC, String elsePC) {
-        this.id = id;
-        this.children = new LinkedList<>();
-        this.parent = parent;
-        this.ifPC = ifPC;
-        this.elsePC = elsePC;
+    public State() {
+        this.id = -1;
+        this.children = null;
+        this.parent = null;
+        this.ifPC = null;
+        this.elsePC = null;
+    }
+
+    public State withError(String errorMsg) {
+        setError(errorMsg);
+        return this;
     }
 
     @Override
