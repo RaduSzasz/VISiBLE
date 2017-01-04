@@ -21,9 +21,11 @@ public class JPFAdapter implements SymbolicExecutor {
 
     private static VisualiserListener visualiser;
     private String jarName;
+    private String className;
     private String method;
     private int argNum;
     private State errorState;
+    private boolean[] isSymb;
     private static final String RELATIVE_PATH_TO_INPUT = "backend/input/";
     private static final String ABSOLUTE_PATH_TO_INPUT = System.getProperty("user.dir") + "/" + RELATIVE_PATH_TO_INPUT;
     private static final String JPF_EXTENSION = ".jpf";
@@ -34,11 +36,20 @@ public class JPFAdapter implements SymbolicExecutor {
     @Autowired
     private ExecutorService service;
 
-    public JPFAdapter(String jarName, String method, int argNum, ExecutorService service) {
+    JPFAdapter(String jarName, String method, int argNum, ExecutorService service) {
         this.jarName = jarName;
         this.method = method;
         this.argNum = argNum;
         this.service = service;
+    }
+
+    public JPFAdapter(String className, String methodName, int numArgs, boolean[] isSymb, ExecutorService executorService) {
+        this.jarName = "Max.jar";
+        this.className = className;
+        this.method = methodName;
+        this.argNum = numArgs;
+        this.service = executorService;
+        this.isSymb = isSymb;
     }
 
     private void runJPF(String jarName, String method, int argNum, CountDownLatch jpfInitialised) {
@@ -85,7 +96,7 @@ public class JPFAdapter implements SymbolicExecutor {
         config.setProperty("classpath", ABSOLUTE_PATH_TO_INPUT + jarName);
         config.setProperty("symbolic.dp", SOLVER);
         config.setProperty("target", mainClassName);
-        String symbolicMethod = mainClassName + "." + method + getSymbArgs(argNum);
+        String symbolicMethod = className + "." + method + getSymbArgs(isSymb, argNum);
         config.setProperty("symbolic.method", symbolicMethod);
 
         JPF jpf = new JPF(config);
@@ -96,12 +107,16 @@ public class JPFAdapter implements SymbolicExecutor {
         service.submit(jpf);
     }
 
-    private String getSymbArgs(int n) {
+    private String getSymbArgs(boolean[] isSymb, int argNum) {
         StringBuilder sb = new StringBuilder("(");
-        for (int i = 0; i < n - 1; i++) {
-            sb.append("sym#");
+        for (int i = 0; i < argNum - 1; i++) {
+            if (isSymb[i]) {
+                sb.append("sym#");
+            } else {
+                sb.append("con#");
+            }
         }
-        sb.append("sym)");
+        sb.append(isSymb[argNum - 1] ? "sym)" : "con)");
         return sb.toString();
     }
 
