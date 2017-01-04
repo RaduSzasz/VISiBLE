@@ -26,6 +26,7 @@ public class JPFAdapter implements SymbolicExecutor {
     private int argNum;
     private State errorState;
     private boolean[] isSymb;
+
     private static final String RELATIVE_PATH_TO_INPUT = "backend/input/";
     private static final String ABSOLUTE_PATH_TO_INPUT = System.getProperty("user.dir") + "/" + RELATIVE_PATH_TO_INPUT;
     private static final String JPF_EXTENSION = ".jpf";
@@ -52,7 +53,7 @@ public class JPFAdapter implements SymbolicExecutor {
         this.isSymb = isSymb;
     }
 
-    private void runJPF(String jarName, String method, int argNum, CountDownLatch jpfInitialised) {
+    private void runJPF(CountDownLatch jpfInitialised) {
         String[] args = new String[2];
         String mainClassName;
 
@@ -127,7 +128,7 @@ public class JPFAdapter implements SymbolicExecutor {
     @Override
     public State call() {
         CountDownLatch jpfInitialised = new CountDownLatch(1);
-        runJPF(jarName, method, argNum, jpfInitialised);
+        runJPF(jpfInitialised);
         try {
             jpfInitialised.await();
         } catch (InterruptedException e) {

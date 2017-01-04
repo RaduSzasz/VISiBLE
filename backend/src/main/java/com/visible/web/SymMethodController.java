@@ -52,8 +52,8 @@ public class SymMethodController {
 
     // TODO: DEBUGGING ONLY, DELETE
     private boolean[] array() {
-        boolean[] array = new boolean[4];
-        for (int i = 0; i < 4; i++) {
+        boolean[] array = new boolean[numArgs];
+        for (int i = 0; i < numArgs; i++) {
             array[i] = true;
         }
         return array;
