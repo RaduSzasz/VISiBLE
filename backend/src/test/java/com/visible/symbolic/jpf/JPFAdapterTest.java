@@ -15,9 +15,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class JPFAdapterTest {
-    private final static String JAR_EXTENSION = ".jar";
-    private final static String JPF_EXTENSION = ".jpf";
-    private final static String JAR_NAME = "MaxOfFour";
+    private final static String JAR_NAME = "MaxOfFour.jar";
     private final static String SYMBOLIC_METHOD_NAME = "symVis";
     private final static int SYMBOLIC_METHOD_NO_ARGS = 4;
     private final static String PACKAGE_LEVEL = "../../../../";
@@ -28,9 +26,9 @@ public class JPFAdapterTest {
 
     @BeforeClass
     public static void setUpJavaProgram() throws Exception {
-        File f = new File(JPFAdapterTest.class.getResource(PACKAGE_LEVEL + JAR_NAME + JAR_EXTENSION).toURI());
-        boolean success = JavaProgram.saveAndCompile(JAR_NAME + JAR_EXTENSION, Files.readAllBytes(f.toPath()));
-        clearInputs();
+        File f = new File(JPFAdapterTest.class.getResource(PACKAGE_LEVEL + JAR_NAME).toURI());
+        JavaProgram javaProgram = new JavaProgram(JAR_NAME, Files.readAllBytes(f.toPath()));
+        boolean success = javaProgram.saveToDirectory();
         assertTrue(success);
     }
 
@@ -51,14 +49,6 @@ public class JPFAdapterTest {
                                 .setType("normal");
 
         assertEquals(service.submit(jpfAdapter).get(), expectedResult);
-        clearInputs();
-    }
-
-    private static void clearInputs() throws IOException, InterruptedException {
-        Process process1 = Runtime.getRuntime().exec("rm backend/input/" + JAR_NAME + JAR_EXTENSION);
-        Process process2 = Runtime.getRuntime().exec("rm backend/input/" + JAR_NAME + JPF_EXTENSION);
-        process1.waitFor();
-        process2.waitFor();
     }
 
     @AfterClass
