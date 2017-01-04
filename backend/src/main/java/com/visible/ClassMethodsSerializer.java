@@ -14,14 +14,19 @@ class ClassMethodsSerializer extends JsonSerializer<ClassMethods> {
     public void serialize(ClassMethods value, JsonGenerator gen,
                           SerializerProvider serializers) throws IOException, JsonProcessingException {
         gen.writeStartObject();
+
         for (String className : value.getClasses().keySet()) {
             gen.writeFieldName("class");
             gen.writeString(className);
             gen.writeFieldName("methods");
             gen.writeObject(value.getClasses().get(className));
         }
-        gen.writeFieldName("error");
-        gen.writeString(value.getErrorMsg());
+
+        if (value.getErrorMsg() != null) {
+            gen.writeFieldName("error");
+            gen.writeString(value.getErrorMsg());
+        }
+
         gen.writeEndObject();
     }
 }
