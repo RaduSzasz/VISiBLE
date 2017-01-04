@@ -6,7 +6,10 @@ import com.visible.symbolic.state.State;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.annotation.ApplicationScope;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -27,17 +30,15 @@ public class SymMethodController {
     private int numArgs;
     private boolean[] isSymb;
 
-//    @PostMapping
-    @GetMapping
-    public State runSelectedSymMethod(@RequestParam("jar_name") String jarName, @RequestParam("class_name") String className, @RequestParam("method_name") String methodName, @RequestParam("no_args") int numArgs, /*8RequestParam("is_symb") boolean[] isSymb,*/  RedirectAttributes redirectAttributes)
+    @PostMapping
+    public State runSelectedSymMethod(@RequestParam("jar_name") String jarName, @RequestParam("class_name") String className, @RequestParam("method_name") String methodName, @RequestParam("no_args") int numArgs, @RequestParam("is_symb") boolean[] isSymb,  RedirectAttributes redirectAttributes)
             throws java.io.IOException, InterruptedException, ExecutionException, ClassNotFoundException {
 
         this.jarName = jarName;
         this.className = className;
         this.methodName = methodName;
         this.numArgs = numArgs;
-//        this.isSymb = isSymb;
-        this.isSymb = array();
+        this.isSymb = isSymb;
 
         if (!(isSymb.length == numArgs)) {
             return new State().withError("Mismatch in number of arguments");
@@ -51,15 +52,6 @@ public class SymMethodController {
     @Scope("session")
     public SymbolicExecutor symbolicExecutor() {
         return new JPFAdapter(jarName, className, methodName, numArgs, isSymb, executorService());
-    }
-
-    // TODO: DEBUGGING ONLY, DELETE
-    private boolean[] array() {
-        boolean[] array = new boolean[numArgs];
-        for (int i = 0; i < numArgs; i++) {
-            array[i] = true;
-        }
-        return array;
     }
 
     @Bean
