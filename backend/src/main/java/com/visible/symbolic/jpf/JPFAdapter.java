@@ -37,13 +37,6 @@ public class JPFAdapter implements SymbolicExecutor {
     @Autowired
     private ExecutorService service;
 
-    JPFAdapter(String jarName, String method, int argNum, ExecutorService service) {
-        this.jarName = jarName;
-        this.method = method;
-        this.argNum = argNum;
-        this.service = service;
-    }
-
     public JPFAdapter(String className, String methodName, int numArgs, boolean[] isSymb, ExecutorService executorService) {
         this.jarName = "Max.jar";
         this.className = className;

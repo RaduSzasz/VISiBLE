@@ -16,6 +16,7 @@ import static org.junit.Assert.assertTrue;
 
 public class JPFAdapterTest {
     private final static String JAR_NAME = "MaxOfFour.jar";
+    private final static String CLASS_NAME = "MaxOfFour";
     private final static String SYMBOLIC_METHOD_NAME = "symVis";
     private final static int SYMBOLIC_METHOD_NO_ARGS = 4;
     private final static String PACKAGE_LEVEL = "../../../../";
@@ -41,7 +42,7 @@ public class JPFAdapterTest {
     @Test
     public void atStartFirstNodeIsReturned() throws IOException, ExecutionException, InterruptedException {
         JPFAdapter jpfAdapter =
-                new JPFAdapter(JAR_NAME, SYMBOLIC_METHOD_NAME, SYMBOLIC_METHOD_NO_ARGS, service);
+                new JPFAdapter(CLASS_NAME, SYMBOLIC_METHOD_NAME, SYMBOLIC_METHOD_NO_ARGS, generateBooleanArray(), service);
 
         State expectedResult = new State(0, null)
                                 .setIfPC("x_1_SYMINT>=y_2_SYMINT")
@@ -49,6 +50,14 @@ public class JPFAdapterTest {
                                 .setType("normal");
 
         assertEquals(service.submit(jpfAdapter).get(), expectedResult);
+    }
+
+    private boolean[] generateBooleanArray() {
+        boolean[] array = new boolean[SYMBOLIC_METHOD_NO_ARGS];
+        for (int i = 0; i < SYMBOLIC_METHOD_NO_ARGS; i++) {
+            array[i] = true;
+        }
+        return array;
     }
 
     @AfterClass
