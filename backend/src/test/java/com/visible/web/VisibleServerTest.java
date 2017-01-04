@@ -67,7 +67,7 @@ public class VisibleServerTest {
 
 		// Assert that both JSON objects are equivalent
 		assertEquals(om.readValue(expected.toString(), Map.class),
-				om.readValue(response, Map.class));
+					 om.readValue(response, Map.class));
 	}
 	
 }

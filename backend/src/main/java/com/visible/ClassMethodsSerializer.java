@@ -12,15 +12,21 @@ class ClassMethodsSerializer extends JsonSerializer<ClassMethods> {
 
     @Override
     public void serialize(ClassMethods value, JsonGenerator gen,
-                          SerializerProvider serializers) throws IOException, JsonProcessingException {
+                          SerializerProvider serializers) throws IOException {
+
         gen.writeStartObject();
 
+        gen.writeFieldName("data");
+        gen.writeStartArray();
         for (String className : value.getClasses().keySet()) {
+            gen.writeStartObject();
             gen.writeFieldName("class");
             gen.writeString(className);
             gen.writeFieldName("methods");
             gen.writeObject(value.getClasses().get(className));
+            gen.writeEndObject();
         }
+        gen.writeEndArray();
 
         if (value.getErrorMsg() != null) {
             gen.writeFieldName("error");

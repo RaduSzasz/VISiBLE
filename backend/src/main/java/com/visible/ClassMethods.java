@@ -80,7 +80,6 @@ public class ClassMethods {
 
             MethodData md = (MethodData) obj;
             return this.name.equals(md.name) && this.numArgs == md.numArgs && this.signature.equals(md.signature);
-
         }
 	}
 
