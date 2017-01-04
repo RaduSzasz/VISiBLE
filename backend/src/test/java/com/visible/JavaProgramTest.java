@@ -29,7 +29,7 @@ public class JavaProgramTest {
 
         // Check that saved file is correct
         byte[] data = Files.readAllBytes(Paths.get("input/MaxOfFour.jar"));
-        assertArrayEquals(expectedData, data);
+        assertArrayEquals(data, expectedData);
     }
 
     @Test
@@ -60,12 +60,32 @@ public class JavaProgramTest {
 
         // Check correct class methods are returned
         ClassMethods classMethods = javaProgram.getClassMethods();
-        assertEquals(expected, classMethods);
+        assertEquals(classMethods, expected);
     }
 
     @Test
-    public void getClassMethodsFromJarPackageFolderTest() {
-        // TODO: Test that can get class methods from jar with packages in the correct folders
+    public void getClassMethodsFromJarPackageFolderTest() throws IOException, ClassNotFoundException, InterruptedException {
+        byte[] expectedData = Files.readAllBytes(Paths.get("src/test/resources/Zero.jar"));
+        JavaProgram javaProgram = new JavaProgram("Zero.jar", expectedData);
+
+        // Check that file is saved
+        boolean success = javaProgram.saveToDirectory();
+        assertTrue(success);
+
+        // Build expected ClassMethods
+        ClassMethods expected = new ClassMethods();
+        expected.addMethodToClass("Zero", "zeroMethod", 1,
+                "public void Zero.zeroMethod(java.lang.String)");
+        expected.addMethodToClass("one.One", "oneMethod", 1,
+                "public void one.One.oneMethod(java.lang.String)");
+        expected.addMethodToClass("one.two.Two", "twoMethod", 1,
+                "public void one.two.Two.twoMethod(java.lang.String)");
+        expected.addMethodToClass("one.three.Three", "threeMethod", 1,
+                "public void one.three.Three.threeMethod(java.lang.String)");
+
+        // Check correct class methods are returned
+        ClassMethods classMethods = javaProgram.getClassMethods();
+        assertEquals(classMethods, expected);
     }
 
     @After
