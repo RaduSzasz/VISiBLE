@@ -19,6 +19,13 @@ import java.util.jar.Manifest;
 @SessionScope
 public class JPFAdapter implements SymbolicExecutor {
 
+    private static final String RELATIVE_PATH_TO_INPUT = "backend/input/";
+    private static final String ABSOLUTE_PATH_TO_INPUT = System.getProperty("user.dir") + "/" + RELATIVE_PATH_TO_INPUT;
+    private static final String JPF_EXTENSION = ".jpf";
+    private static final String SITE_PROPERTIES_PRE_PATH = "+site=";
+    private static final String SITE_PROPERTIES = "/site.properties";
+    private static final String SOLVER = "no_solver";
+
     private static VisualiserListener visualiser;
     private String jarName;
     private String className;
@@ -27,18 +34,11 @@ public class JPFAdapter implements SymbolicExecutor {
     private State errorState;
     private boolean[] isSymb;
 
-    private static final String RELATIVE_PATH_TO_INPUT = "backend/input/";
-    private static final String ABSOLUTE_PATH_TO_INPUT = System.getProperty("user.dir") + "/" + RELATIVE_PATH_TO_INPUT;
-    private static final String JPF_EXTENSION = ".jpf";
-    private static final String SITE_PROPERTIES_PRE_PATH = "+site=";
-    private static final String SITE_PROPERTIES = "/site.properties";
-    private static final String SOLVER = "no_solver";
-
     @Autowired
     private ExecutorService service;
 
-    public JPFAdapter(String className, String methodName, int numArgs, boolean[] isSymb, ExecutorService executorService) {
-        this.jarName = "Max.jar";
+    public JPFAdapter(String jarName, String className, String methodName, int numArgs, boolean[] isSymb, ExecutorService executorService) {
+        this.jarName = jarName;
         this.className = className;
         this.method = methodName;
         this.argNum = numArgs;

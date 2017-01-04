@@ -21,6 +21,7 @@ import java.util.concurrent.Executors;
 
 public class SymMethodController {
 
+    private String jarName;
     private String className;
     private String methodName;
     private int numArgs;
@@ -28,8 +29,10 @@ public class SymMethodController {
 
 //    @PostMapping
     @GetMapping
-    public State runSelectedSymMethod(@RequestParam("class_name") String className, @RequestParam("method_name") String methodName, @RequestParam("no_args") int numArgs, /*8RequestParam("is_symb") boolean[] isSymb,*/  RedirectAttributes redirectAttributes)
+    public State runSelectedSymMethod(@RequestParam("jar_name") String jarName, @RequestParam("class_name") String className, @RequestParam("method_name") String methodName, @RequestParam("no_args") int numArgs, /*8RequestParam("is_symb") boolean[] isSymb,*/  RedirectAttributes redirectAttributes)
             throws java.io.IOException, InterruptedException, ExecutionException, ClassNotFoundException {
+
+        this.jarName = jarName;
         this.className = className;
         this.methodName = methodName;
         this.numArgs = numArgs;
@@ -47,7 +50,7 @@ public class SymMethodController {
     @Bean
     @Scope("session")
     public SymbolicExecutor symbolicExecutor() {
-        return new JPFAdapter(className, methodName, numArgs, isSymb, executorService());
+        return new JPFAdapter(jarName, className, methodName, numArgs, isSymb, executorService());
     }
 
     // TODO: DEBUGGING ONLY, DELETE
