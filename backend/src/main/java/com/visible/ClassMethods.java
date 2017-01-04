@@ -1,6 +1,5 @@
 package com.visible;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -14,7 +13,7 @@ import java.util.Map;
 public class ClassMethods {
 
     private final Map<String, List<MethodData>> classes = new HashMap<>();
-    @JsonInclude(JsonInclude.Include.NON_EMPTY) private String errorMsg;
+    private String errorMsg;
 
 	void addMethodToClass(String className, String methodName,
                           int numArgs, String signature) {
@@ -73,6 +72,27 @@ public class ClassMethods {
 		public String getSignature() {
 			return signature;
 		}
+
+		@Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (obj == null || getClass() != obj.getClass()) return false;
+
+            MethodData md = (MethodData) obj;
+            return this.name.equals(md.name) && this.numArgs == md.numArgs && this.signature.equals(md.signature);
+
+        }
 	}
+
+	@Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+
+        ClassMethods cm = (ClassMethods) obj;
+        if (!(this.classes.equals(cm.classes))) return false;
+        if (this.errorMsg == null && cm.errorMsg == null) return true;
+        return this.errorMsg.equals(cm.errorMsg);
+    }
 
 }
