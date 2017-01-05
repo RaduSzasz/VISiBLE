@@ -97,10 +97,6 @@ public class JPFAdapter implements SymbolicExecutor {
         config.setProperty("symbolic.dp", SOLVER);
         config.setProperty("target", mainClassName);
         String symbolicMethod = className + "." + method + getSymbArgs(isSymb, argNum);
-        if (!className.equals(mainClassName)) {
-            errorState = new State().withError(mainClassName + " does not call the symbolic method.");
-            return false;
-        }
         config.setProperty("symbolic.method", symbolicMethod);
 
         JPF jpf = new JPF(config);
