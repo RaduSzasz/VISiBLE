@@ -4,31 +4,28 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @JsonSerialize(using=ClassMethodsSerializer.class)
 public class ClassMethods {
 
 	private String jarName = "";
 
-	private final Map<String, List<MethodData>> classes = new HashMap<>();
+	private final Map<String, Set<MethodData>> classes = new HashMap<>();
 
 	private String errorMsg;
 	void addMethodToClass(String className, String methodName,
                           int numArgs, String signature) {
-		List<MethodData> methods = classes.get(className);
+		Set<MethodData> methods = classes.get(className);
 		if (methods == null) {
-			methods = new ArrayList<>();
+			methods = new HashSet<>();
 		}
 		MethodData method = new MethodData(methodName, numArgs, signature);
 		methods.add(method);
 		classes.put(className, methods);
 	}
 
-	public Map<String, List<MethodData>> getClasses() {
+	public Map<String, Set<MethodData>> getClasses() {
 		return classes;
 	}
 

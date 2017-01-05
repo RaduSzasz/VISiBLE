@@ -29,7 +29,7 @@ public class JavaProgramTest {
 
         // Check that saved file is correct
         byte[] data = Files.readAllBytes(Paths.get("input/MaxOfFour.jar"));
-        assertArrayEquals(data, expectedData);
+        assertArrayEquals(expectedData, data);
     }
 
     @Test
@@ -62,14 +62,16 @@ public class JavaProgramTest {
 
         // Check correct class methods are returned
         ClassMethods classMethods = javaProgram.getClassMethods();
-        assertEquals(classMethods, expected);
+        System.out.println("Expected: " + expected);
+        System.out.println("Actual: " + classMethods);
+        assertEquals(expected, classMethods);
     }
 
     @Test
     public void getClassMethodsFromJarPackageFolderTest() throws IOException, ClassNotFoundException, InterruptedException {
         byte[] expectedData = Files.readAllBytes(Paths.get("src/test/resources/Zero.jar"));
         String jarName = "Zero.jar";
-        JavaProgram javaProgram = new JavaProgram("Zero.jar", expectedData);
+        JavaProgram javaProgram = new JavaProgram(jarName, expectedData);
 
         // Check that file is saved
         boolean success = javaProgram.saveToDirectory();
@@ -89,7 +91,7 @@ public class JavaProgramTest {
 
         // Check correct class methods are returned
         ClassMethods classMethods = javaProgram.getClassMethods();
-        assertEquals(classMethods, expected);
+        assertEquals(expected, classMethods);
     }
 
     @After
