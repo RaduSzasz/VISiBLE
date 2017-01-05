@@ -107,8 +107,11 @@ public class JPFAdapter implements SymbolicExecutor {
         visualiser = new VisualiserListener(config, jpf, jpfInitialised);
 
         jpf.addListener(visualiser);
-
         service.submit(jpf);
+        if (jpf.foundErrors()) {
+            errorState = new State().withError("Internal error in JPF.");
+            return false;
+        }
         return true;
     }
 

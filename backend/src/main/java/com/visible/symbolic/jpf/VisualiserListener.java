@@ -172,8 +172,6 @@ public class VisualiserListener extends PropertyListenerAdapter {
                         e.printStackTrace();
                     }
 
-                    System.out.println("Before selecting next destination");
-                    System.out.println(currentState);
                     if (direction == Direction.LEFT) {
                         cg.select(0);
                     } else {
