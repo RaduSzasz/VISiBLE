@@ -151,7 +151,6 @@ public class VisualiserListener extends PropertyListenerAdapter {
 
         if (cg instanceof PCChoiceGenerator) {
             if (cg.getTotalNumberOfChoices() > 1) {
-                System.out.println("CG ADVANCED");
                 Instruction instruction = vm.getInstruction();
                 ThreadInfo threadInfo = vm.getCurrentThread();
                 if (instruction instanceof IfInstruction) {
