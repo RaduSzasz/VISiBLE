@@ -52,15 +52,6 @@ public class VisualiserListener extends PropertyListenerAdapter {
     private final Map<Class, Comparator> doubleBranchComparators = doubleBranchComparatorsBuilder();
     private static final Map<Comparator, Comparator> comparatorsComplement = comparatorsComplementBuilder();
 
-    Optional<CountDownLatch> moveForward(Direction direction) {
-        this.direction = direction;
-        this.shouldMoveForward = true;
-        canMakeSelection.countDown();
-        threadInfo.setRunning();
-        movedForwardLatch = new CountDownLatch(1);
-        return searchHasFinished ? Optional.empty() : Optional.of(movedForwardLatch);
-    }
-
     VisualiserListener(Config config, JPF jpf, CountDownLatch jpfInitialised) {
         prev = null;
         stateById = new HashMap<>();
@@ -72,12 +63,20 @@ public class VisualiserListener extends PropertyListenerAdapter {
         this.canMakeSelection = new CountDownLatch(1);
     }
 
+    Optional<CountDownLatch> moveForward(Direction direction) {
+        this.direction = direction;
+        this.shouldMoveForward = true;
+        canMakeSelection.countDown();
+        threadInfo.setRunning();
+        movedForwardLatch = new CountDownLatch(1);
+        return searchHasFinished ? Optional.empty() : Optional.of(movedForwardLatch);
+    }
+
     public void stateAdvanced(Search search) {
         if (this.threadInfo == null) {
             this.threadInfo = search.getVM().getCurrentThread();
         }
         if (search.isIgnoredState()) {
-            System.out.println("[advanced] ignored state");
             return;
         }
 
@@ -122,19 +121,16 @@ public class VisualiserListener extends PropertyListenerAdapter {
     @Override
     public void stateRestored(Search search) {
         State s = stateById.get(search.getStateId());
-        System.out.println("[restored]");
         prev = s;
     }
 
     @Override
     public void stateBacktracked(Search search) {
         State s = stateById.get(search.getStateId());
-        System.out.println("[backtracked]");
         prev = s;
     }
     @Override
     public void searchFinished(Search search) {
-        System.out.println("[finished]");
         this.currentState.setType(END_NODE);
         if (this.movedForwardLatch != null) {
             this.movedForwardLatch.countDown();
@@ -155,7 +151,6 @@ public class VisualiserListener extends PropertyListenerAdapter {
 
         if (cg instanceof PCChoiceGenerator) {
             if (cg.getTotalNumberOfChoices() > 1) {
-                System.out.println("CG ADVANCED");
                 Instruction instruction = vm.getInstruction();
                 ThreadInfo threadInfo = vm.getCurrentThread();
                 if (instruction instanceof IfInstruction) {
@@ -172,8 +167,6 @@ public class VisualiserListener extends PropertyListenerAdapter {
                         e.printStackTrace();
                     }
 
-                    System.out.println("Before selecting next destination");
-                    System.out.println(currentState);
                     if (direction == Direction.LEFT) {
                         cg.select(0);
                     } else {

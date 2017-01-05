@@ -13,64 +13,114 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
+import java.util.jar.JarFile;
+import java.util.jar.Manifest;
 
 @SessionScope
 public class JPFAdapter implements SymbolicExecutor {
 
+    private static final String RELATIVE_PATH_TO_INPUT = "backend/input/";
+    private static final String ABSOLUTE_PATH_TO_INPUT = System.getProperty("user.dir") + "/" + RELATIVE_PATH_TO_INPUT;
+    private static final String JPF_EXTENSION = ".jpf";
+    private static final String SITE_PROPERTIES_PRE_PATH = "+site=";
+    private static final String SITE_PROPERTIES = "/site.properties";
+    private static final String SOLVER = "no_solver";
+
     private static VisualiserListener visualiser;
-    private String name;
+    private String jarName;
+    private String className;
     private String method;
     private int argNum;
-    private static final String PATH_TO_INPUT = "backend/input/";
-    private static final String JPF_EXTENSION = ".jpf";
-    private static final String SITE_PROPERTIES = "+site=backend/site.properties";
-    private static final String SOLVER = "no_solver";
+    private State errorState;
+    private boolean[] isSymb;
 
     @Autowired
     private ExecutorService service;
 
-    public JPFAdapter(String name, String method, int argNum, ExecutorService service) {
-        this.name = name;
-        this.method = method;
-        this.argNum = argNum;
-        this.service = service;
+    public JPFAdapter(String jarName, String className, String methodName, int numArgs, boolean[] isSymb, ExecutorService executorService) {
+        this.jarName = jarName;
+        this.className = className;
+        this.method = methodName;
+        this.argNum = numArgs;
+        this.service = executorService;
+        this.isSymb = isSymb;
+        this.errorState = new State().withError("An unknown error occurred.");
     }
 
-    private void runJPF(String jarName, String method, int argNum, CountDownLatch jpfInitialised) {
+    private boolean runJPF(CountDownLatch jpfInitialised) {
         String[] args = new String[2];
-        String mainClassName = "max.Max";
-        String path = System.getProperty("user.dir") + "/" + PATH_TO_INPUT;
-        File jpfFile = new File(path + mainClassName + JPF_EXTENSION);
+        String mainClassName;
+
         try {
-            jpfFile.createNewFile();
+            Manifest manifest = new JarFile(RELATIVE_PATH_TO_INPUT + "/" + jarName).getManifest();
+            mainClassName = manifest.getMainAttributes().getValue("Main-Class");
         } catch (IOException e) {
-            System.err.println(mainClassName + JPF_EXTENSION + " could not be created");
-            return;
+            errorState = new State().withError("Manifest file in " + jarName + " could not be read.");
+            return false;
         }
 
-        args[0] = PATH_TO_INPUT + mainClassName + JPF_EXTENSION;
-        args[1] = SITE_PROPERTIES;
+        if (mainClassName == null) {
+            errorState = new State().withError("No entrypoint specified in Manifest file.");
+            return false;
+        }
+
+        int indexOfDot = mainClassName.lastIndexOf('.');
+        String jpfFileName = (indexOfDot == -1) ? mainClassName : mainClassName.substring(indexOfDot, mainClassName.length());
+        jpfFileName += JPF_EXTENSION;
+
+        File jpfFile = new File(ABSOLUTE_PATH_TO_INPUT + jpfFileName);
+        try {
+            boolean jpfFileCreated = true;
+            if (!jpfFile.getParentFile().exists()) {
+                jpfFileCreated = jpfFile.getParentFile().mkdirs();
+            }
+
+            if (jpfFile.exists()) {
+                jpfFileCreated = jpfFileCreated && jpfFile.delete();
+            }
+
+            jpfFileCreated = jpfFileCreated && jpfFile.createNewFile();
+
+            if (!jpfFileCreated) {
+                throw new IOException();
+            }
+        } catch (IOException e) {
+            errorState = new State().withError(jpfFileName + " could not be created.");
+            return false;
+        }
+
+        args[0] = RELATIVE_PATH_TO_INPUT + jpfFileName;
+        args[1] = SITE_PROPERTIES_PRE_PATH + System.getProperty("user.dir") + SITE_PROPERTIES;
 
         Config config = JPF.createConfig(args);
+        config.setProperty("classpath", ABSOLUTE_PATH_TO_INPUT + jarName);
         config.setProperty("symbolic.dp", SOLVER);
         config.setProperty("target", mainClassName);
-        String symbolicMethod = mainClassName + "." + method + getSymbArgs(argNum);
+        String symbolicMethod = className + "." + method + getSymbArgs(isSymb, argNum);
         config.setProperty("symbolic.method", symbolicMethod);
 
         JPF jpf = new JPF(config);
         visualiser = new VisualiserListener(config, jpf, jpfInitialised);
 
         jpf.addListener(visualiser);
-
         service.submit(jpf);
+        if (jpf.foundErrors()) {
+            errorState = new State().withError("Internal error in JPF.");
+            return false;
+        }
+        return true;
     }
 
-    private String getSymbArgs(int n) {
+    private String getSymbArgs(boolean[] isSymb, int argNum) {
         StringBuilder sb = new StringBuilder("(");
-        for (int i = 0; i < n - 1; i++) {
-            sb.append("sym#");
+        for (int i = 0; i < argNum - 1; i++) {
+            if (isSymb[i]) {
+                sb.append("sym#");
+            } else {
+                sb.append("con#");
+            }
         }
-        sb.append("sym)");
+        sb.append(isSymb[argNum - 1] ? "sym)" : "con)");
         return sb.toString();
     }
 
@@ -81,7 +131,10 @@ public class JPFAdapter implements SymbolicExecutor {
     @Override
     public State call() {
         CountDownLatch jpfInitialised = new CountDownLatch(1);
-        runJPF(name, method, argNum, jpfInitialised);
+        boolean success = runJPF(jpfInitialised);
+        if (!success) {
+            return errorState;
+        }
         try {
             jpfInitialised.await();
         } catch (InterruptedException e) {
@@ -110,4 +163,5 @@ public class JPFAdapter implements SymbolicExecutor {
     public State stepRight() {
         return makeStep(Direction.RIGHT);
     }
+
 }

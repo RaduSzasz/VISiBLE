@@ -12,7 +12,6 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 public class JavaProgram {
-
     private static final String CLASS_EXT = ".class";
 
     private String pathToJar;
@@ -94,5 +93,4 @@ public class JavaProgram {
         jarFile.close();
         return classMethods;
     }
-
 }
