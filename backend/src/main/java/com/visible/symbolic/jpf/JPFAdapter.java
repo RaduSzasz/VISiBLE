@@ -96,7 +96,13 @@ public class JPFAdapter implements SymbolicExecutor {
         config.setProperty("classpath", ABSOLUTE_PATH_TO_INPUT + jarName);
         config.setProperty("symbolic.dp", SOLVER);
         config.setProperty("target", mainClassName);
-        String symbolicMethod = className + "." + method + getSymbArgs(isSymb, argNum);
+
+        // Using this symbolicMethod makes the .jar execute without producing any symbolic output
+        String symbolicMethod = method + getSymbArgs(isSymb, argNum);
+
+        // Using this symbolicMethod makes the JPF program freeze on entry, no state returned
+//        String symbolicMethod = className + "." + method + getSymbArgs(isSymb, argNum);
+
         config.setProperty("symbolic.method", symbolicMethod);
 
         JPF jpf = new JPF(config);
