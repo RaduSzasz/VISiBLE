@@ -14,9 +14,23 @@
         <h4 class="modal-title">Select Symbolic Method </h4>
       </div>
       <div class="modal-body">
-        <select [(ngModel)]="symbolicMethod" (ngModelChange)="setInitialTree()">
-          <option *ngFor="let method of methods" [ngValue]="method.name"> {{method.toString()}} </option>
+
+        <select [(ngModel)]="symbolicMethod" (ngModelChange)="isSymbSetup()">
+          <option *ngFor="let method of methods" [ngValue]="method"> {{method.class_name}} {{method.signature}} </option>
         </select>
+
+        <div *ngIf="symbolicMethod">
+          Select the arguments to be symbolic:
+          <div *ngFor="let b of isSymb; let i = index">
+            <label>
+              <input type="checkbox" [(ngModel)]="isSymb[i].value">
+              Argument {{i+1}}
+            </label>
+          </div>
+
+          <button (click)="setInitialTree()">Start!</button>
+        </div>
+
       </div>
     </div>
   </div>
