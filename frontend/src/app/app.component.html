@@ -1,12 +1,8 @@
 <h1>{{title}}: Upload a java file!</h1>
 
-<input type="file"
-  ngFileSelect 
-  [options]="options"
-  (onUpload)="selectSymbolic($event)">
+<vis-upload (onUpload)="updateTree($event)" *ngIf="!initialTree"><vis-upload>
 
-<select [(ngModel)]="symbolicMethod" (ngModelChange)="setInitialTree()">
-  <option *ngFor="let method of methods" [ngValue]="method.name"> {{method.toString()}} </option>
-</select>
-
-<tree-container [tree]="initialTree"></tree-container>
+<tree-container [tree]="initialTree" *ngIf="initialTree"></tree-container>
+<div *ngIf="initialTree">
+  <button (click)="initialTree=null">upload tree again</button>
+</div>

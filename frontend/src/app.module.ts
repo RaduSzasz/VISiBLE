@@ -4,6 +4,7 @@ import { FormsModule }   from '@angular/forms';
 import { HttpModule }   from '@angular/http';
 
 import { AppComponent }        from './app/app.component';
+import { UploadComponent }        from './upload/upload.component';
 import { TreeComponent }     from './tree/tree.component';
 
 import { TreeService } from './tree/tree.service';
@@ -22,6 +23,7 @@ import { ModalModule } from 'ng2-bootstrap';
   ],
   declarations: [
     AppComponent,
+    UploadComponent,
     TreeComponent,
   ],
   providers: [ 
