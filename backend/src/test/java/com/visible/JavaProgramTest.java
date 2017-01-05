@@ -45,7 +45,8 @@ public class JavaProgramTest {
     @Test
     public void getClassMethodsFromJarSimpleTest() throws IOException, ClassNotFoundException, InterruptedException {
         byte[] expectedData = Files.readAllBytes(Paths.get("src/test/resources/MaxOfFour.jar"));
-        JavaProgram javaProgram = new JavaProgram("MaxOfFour.jar", expectedData);
+        String jarName = "MaxOfFour.jar";
+        JavaProgram javaProgram = new JavaProgram(jarName, expectedData);
 
         // Check that file is saved
         boolean success = javaProgram.saveToDirectory();
@@ -57,20 +58,17 @@ public class JavaProgramTest {
                 "public static void MaxOfFour.main(java.lang.String[])");
         expected.addMethodToClass("MaxOfFour", "symVis", 4,
                 "private static java.lang.String MaxOfFour.symVis(int,int,int,int)");
+        expected.setJarName(jarName);
 
         // Check correct class methods are returned
         ClassMethods classMethods = javaProgram.getClassMethods();
-
-        try {
-            assertEquals(classMethods, expected);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        assertEquals(classMethods, expected);
     }
 
     @Test
     public void getClassMethodsFromJarPackageFolderTest() throws IOException, ClassNotFoundException, InterruptedException {
         byte[] expectedData = Files.readAllBytes(Paths.get("src/test/resources/Zero.jar"));
+        String jarName = "Zero.jar";
         JavaProgram javaProgram = new JavaProgram("Zero.jar", expectedData);
 
         // Check that file is saved
@@ -87,6 +85,7 @@ public class JavaProgramTest {
                 "public void one.two.Two.twoMethod(java.lang.String)");
         expected.addMethodToClass("one.three.Three", "threeMethod", 1,
                 "public void one.three.Three.threeMethod(java.lang.String)");
+        expected.setJarName(jarName);
 
         // Check correct class methods are returned
         ClassMethods classMethods = javaProgram.getClassMethods();

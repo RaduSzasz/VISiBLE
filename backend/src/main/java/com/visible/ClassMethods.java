@@ -100,6 +100,7 @@ public class ClassMethods {
 
         ClassMethods cm = (ClassMethods) obj;
         if (!(this.classes.equals(cm.classes))) return false;
+        if (!(this.jarName.equals(cm.jarName))) return false;
         if (this.errorMsg == null && cm.errorMsg == null) return true;
         return this.errorMsg.equals(cm.errorMsg);
     }
