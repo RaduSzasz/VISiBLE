@@ -13,6 +13,8 @@
 *.sw*
 build/
 backend/input/
+out/
+zero/
 
 # Gradle useless stuff
 .gradle
@@ -37,3 +39,7 @@ frontend/src/dummy-backend.js
 frontend/typings/modules/
 hs_err_pid*
 npm-debug.log
+
+# Eclipse useless stuff
+.classpath
+.project

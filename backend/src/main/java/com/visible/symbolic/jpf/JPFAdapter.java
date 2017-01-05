@@ -1,37 +1,44 @@
-package com.visible.jpf;
+package com.visible.symbolic.jpf;
 
+import com.visible.symbolic.Direction;
+import com.visible.symbolic.SymbolicExecutor;
+import com.visible.symbolic.state.State;
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.annotation.SessionScope;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
 
-public class JPFAdapter implements Runnable {
+@SessionScope
+public class JPFAdapter implements SymbolicExecutor {
 
     private static VisualiserListener visualiser;
     private String name;
     private String method;
-    private CountDownLatch latch;
     private int argNum;
     private static final String PATH_TO_INPUT = "backend/input/";
     private static final String JPF_EXTENSION = ".jpf";
     private static final String SITE_PROPERTIES = "+site=backend/site.properties";
     private static final String SOLVER = "no_solver";
 
-    public JPFAdapter(String name, String method, int argNum, CountDownLatch latch) {
+    @Autowired
+    private ExecutorService service;
+
+    public JPFAdapter(String name, String method, int argNum, ExecutorService service) {
         this.name = name;
         this.method = method;
         this.argNum = argNum;
-	this.latch = latch;
+        this.service = service;
     }
 
-    private static void runJPF(String mainClassName,
-		    	       String method,
-			       int argNum,
-			       CountDownLatch latch) {
+    private void runJPF(String jarName, String method, int argNum, CountDownLatch jpfInitialised) {
         String[] args = new String[2];
+        String mainClassName = "max.Max";
         String path = System.getProperty("user.dir") + "/" + PATH_TO_INPUT;
         File jpfFile = new File(path + mainClassName + JPF_EXTENSION);
         try {
@@ -51,14 +58,14 @@ public class JPFAdapter implements Runnable {
         config.setProperty("symbolic.method", symbolicMethod);
 
         JPF jpf = new JPF(config);
-        visualiser = new VisualiserListener(config, jpf, latch);
+        visualiser = new VisualiserListener(config, jpf, jpfInitialised);
 
         jpf.addListener(visualiser);
 
-        jpf.run();
+        service.submit(jpf);
     }
 
-    private static String getSymbArgs(int n) {
+    private String getSymbArgs(int n) {
         StringBuilder sb = new StringBuilder("(");
         for (int i = 0; i < n - 1; i++) {
             sb.append("sym#");
@@ -67,21 +74,40 @@ public class JPFAdapter implements Runnable {
         return sb.toString();
     }
 
-    public static State getListenerState() {
-        try {
-            return visualiser.getCurrentState();
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    public static Optional<CountDownLatch> moveForward(Direction direction) {
-        System.out.println("Entered function");
+    private Optional<CountDownLatch> moveForward(Direction direction) {
         return visualiser.moveForward(direction);
     }
 
     @Override
-    public void run() {
-        JPFAdapter.runJPF(name, method, argNum, latch);
+    public State call() {
+        CountDownLatch jpfInitialised = new CountDownLatch(1);
+        runJPF(name, method, argNum, jpfInitialised);
+        try {
+            jpfInitialised.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return visualiser.getCurrentState();
+    }
+
+    private State makeStep(Direction direction) {
+        moveForward(direction).ifPresent(latch -> {
+            try {
+                latch.await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
+        return visualiser.getCurrentState();
+    }
+
+    @Override
+    public State stepLeft() {
+        return makeStep(Direction.LEFT);
+    }
+
+    @Override
+    public State stepRight() {
+        return makeStep(Direction.RIGHT);
     }
 }

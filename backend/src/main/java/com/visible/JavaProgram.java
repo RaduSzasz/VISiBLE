@@ -4,52 +4,95 @@ package com.visible;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.Enumeration;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 public class JavaProgram {
 
-  private static final String JAVA_EXTENSION = ".java";
-  private static final String JAVAC = "javac -g ";
-  private static final String PATH_TO_INPUT = "backend/input/";
+    private static final String CLASS_EXT = ".class";
 
-  private String path;
-  private String fileName;
-  private byte[] code;
-  private boolean compilationSuccessful;
+    private String pathToJar;
+    private String fileName;
+    private byte[] data;
 
-  JavaProgram(String fileName, byte[] code) {
-
-    // Constructor takes filename without file extension
-    this.fileName = fileName + JAVA_EXTENSION;
-    this.code = code;
-    this.path = System.getProperty("user.dir") + "/" + PATH_TO_INPUT;
-    saveToDirectory();
-    compile();
-  }
-
-  private void saveToDirectory() {
-    try {
-      File file = new File(path + fileName);
-      file.createNewFile();
-
-      PrintStream stream = new PrintStream(file);
-      stream.println(new String(code, "UTF-8"));
-    } catch (IOException e) {
-      e.printStackTrace();
+    public JavaProgram(String fileName, byte[] data) {
+        String pwd = System.getProperty("user.dir");
+        String pathToInput;
+        if (pwd.endsWith("backend")) {
+            // Spring tests run from VISiBLE/backend
+            pathToInput = "/input/";
+        } else {
+            // Server runs from VISiBLE/
+            pathToInput = "/backend/input/";
+        }
+        this.pathToJar = pwd + "/" + pathToInput + fileName;
+        this.fileName = fileName;
+        this.data = data;
     }
-  }
 
-  private void compile() {
-    try {
-      Process process = Runtime.getRuntime().exec(JAVAC + PATH_TO_INPUT + fileName);
-      int exitCode = process.waitFor();
-      this.compilationSuccessful = exitCode == 0;
-    } catch (IOException | InterruptedException e) {
-      e.printStackTrace();
+    public boolean saveToDirectory() {
+        if (!fileName.endsWith(".jar")) {
+            return false;
+        }
+
+        try {
+            File file = new File(pathToJar);
+            boolean success = true;
+            if (!file.getParentFile().exists()) {
+                success = file.getParentFile().mkdirs();
+            }
+            if (!file.exists()) {
+                success &= file.createNewFile();
+            }
+
+            PrintStream stream = new PrintStream(file);
+            stream.write(data);
+            stream.close();
+
+            return success;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
-  }
 
-  boolean isCompilationSuccessful() {
-    return compilationSuccessful;
-  }
+    public ClassMethods getClassMethods() throws IOException, ClassNotFoundException, InterruptedException {
+
+        ClassMethods classMethods = new ClassMethods();
+        classMethods.setJarName(fileName);
+
+        JarFile jarFile = new JarFile(pathToJar);
+        Enumeration<JarEntry> entries = jarFile.entries();
+
+        URL[] urls = {new URL("file://" + pathToJar)};
+        URLClassLoader cl = new URLClassLoader(urls);
+
+        while (entries.hasMoreElements()) {
+            JarEntry entry = entries.nextElement();
+            String entryName = entry.getName();
+            if (entryName.endsWith(CLASS_EXT)) {
+
+                // Remove ".class" extension
+                String className = entryName.substring(0, entryName.lastIndexOf("."));
+
+                // Get full class name from path
+                className = className.replace('/', '.');
+
+                Class<?> cls = cl.loadClass(className);
+
+                for (Method m : cls.getDeclaredMethods()) {
+                    classMethods.addMethodToClass(className, m.getName(),
+                            m.getParameterTypes().length, m.toString());
+                }
+            }
+        }
+
+        jarFile.close();
+        return classMethods;
+    }
 
 }

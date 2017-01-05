@@ -34,7 +34,8 @@
     "bootstrap": "^3.3.7",
     "d3": "^3.5.17",
     "moment": "^2.15.2",
-    "ng2-uploader": "^1.5.3"
+    "ng2-uploader": "^1.5.3",
+    "ng2-bootstrap": "^1.1.16-11"
   },
   "devDependencies": {
     "canonical-path": "0.0.2",

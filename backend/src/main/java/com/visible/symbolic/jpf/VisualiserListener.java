@@ -1,5 +1,7 @@
-package com.visible.jpf;
+package com.visible.symbolic.jpf;
 
+import com.visible.symbolic.Direction;
+import com.visible.symbolic.state.State;
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
 import gov.nasa.jpf.PropertyListenerAdapter;
@@ -29,6 +31,9 @@ import java.util.concurrent.CountDownLatch;
 
 public class VisualiserListener extends PropertyListenerAdapter {
 
+    private static final String MIDDLE_NODE = "normal";
+    private static final String END_NODE = "leaf";
+
     private boolean shouldMoveForward;
     private ThreadInfo threadInfo;
     private State prev;
@@ -37,38 +42,39 @@ public class VisualiserListener extends PropertyListenerAdapter {
     private List<String> choicesTrace;
     private Direction direction;
     private State currentState;
-    
-    private CountDownLatch latch;
+    private boolean firstCG = true;
+
+    private CountDownLatch jpfInitialised;
     private CountDownLatch movedForwardLatch;
-    private boolean latchDown = false;
+    private CountDownLatch canMakeSelection;
 
     private static final Map<Class, Comparator> singleBranchComparators = singleBranchComparatorsBuilder();
     private final Map<Class, Comparator> doubleBranchComparators = doubleBranchComparatorsBuilder();
     private static final Map<Comparator, Comparator> comparatorsComplement = comparatorsComplementBuilder();
 
     Optional<CountDownLatch> moveForward(Direction direction) {
-        this.shouldMoveForward = true;
-        threadInfo.setRunning();
         this.direction = direction;
+        this.shouldMoveForward = true;
+        canMakeSelection.countDown();
+        threadInfo.setRunning();
         movedForwardLatch = new CountDownLatch(1);
-        return searchHasFinished ? Optional.<CountDownLatch>empty() : Optional.of(movedForwardLatch);
+        return searchHasFinished ? Optional.empty() : Optional.of(movedForwardLatch);
     }
 
-    VisualiserListener(Config config, JPF jpf, CountDownLatch latch) {
+    VisualiserListener(Config config, JPF jpf, CountDownLatch jpfInitialised) {
         prev = null;
         stateById = new HashMap<>();
         this.shouldMoveForward = true;
         this.searchHasFinished = false;
         this.choicesTrace = initializeChoicesTrace();
         this.currentState = null;
-        this.latch = latch;
+        this.jpfInitialised = jpfInitialised;
+        this.canMakeSelection = new CountDownLatch(1);
     }
 
     public void stateAdvanced(Search search) {
-
         if (this.threadInfo == null) {
-            ThreadInfo threadInfo = search.getVM().getCurrentThread();
-            this.threadInfo = threadInfo;
+            this.threadInfo = search.getVM().getCurrentThread();
         }
         if (search.isIgnoredState()) {
             System.out.println("[advanced] ignored state");
@@ -79,12 +85,11 @@ public class VisualiserListener extends PropertyListenerAdapter {
         State s;
         if (isNew) {
             s = createNewState(search);
-            stateById.put(s.id, s);
+            stateById.put(s.getId(), s);
         } else {
             s = stateById.get(search.getStateId());
         }
 
-//        System.out.println("[advanced]\n" + (s == null ? "null" : s));
         prev = s;
 
         while (!this.shouldMoveForward) {
@@ -92,11 +97,7 @@ public class VisualiserListener extends PropertyListenerAdapter {
         }
         this.shouldMoveForward = false;
         this.currentState = s;
-        if (!latchDown && latch != null) {
-            System.out.println("Set latch down");
-            latch.countDown();
-            latchDown = true;
-        }
+
     }
 
     private State createNewState(Search search) {
@@ -134,6 +135,10 @@ public class VisualiserListener extends PropertyListenerAdapter {
     @Override
     public void searchFinished(Search search) {
         System.out.println("[finished]");
+        this.currentState.setType(END_NODE);
+        if (this.movedForwardLatch != null) {
+            this.movedForwardLatch.countDown();
+        }
         this.searchHasFinished = true;
     }
 
@@ -150,33 +155,41 @@ public class VisualiserListener extends PropertyListenerAdapter {
 
         if (cg instanceof PCChoiceGenerator) {
             if (cg.getTotalNumberOfChoices() > 1) {
+                System.out.println("CG ADVANCED");
                 Instruction instruction = vm.getInstruction();
                 ThreadInfo threadInfo = vm.getCurrentThread();
                 if (instruction instanceof IfInstruction) {
-                    Boolean nextStep = null;
-                    nextStep = computeIFBranchPC(instruction, threadInfo, cg);
+                    computeIFBranchPC(instruction, threadInfo, cg);
 
-                    if (nextStep == null) {
-                        if (this.choicesTrace.size() > 1) {
-                            this.choicesTrace.remove(this.choicesTrace.size() - 1);
-                        }
-                        vm.ignoreState();
+                    if (jpfInitialised != null) {
+                        jpfInitialised.countDown();
+                        jpfInitialised = null;
+                    }
+
+                    try {
+                        canMakeSelection.await();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    System.out.println("Before selecting next destination");
+                    System.out.println(currentState);
+                    if (direction == Direction.LEFT) {
+                        cg.select(0);
                     } else {
-                        if (nextStep) {
-                            cg.select(0);
-                        } else {
-                            cg.select(1);
-                        }
+                        cg.select(1);
                     }
                 }
             }
-            if (this.movedForwardLatch != null) {
+
+            if (!firstCG && this.movedForwardLatch != null) {
                 this.movedForwardLatch.countDown();
             }
+            firstCG = false;
         }
     }
 
-    private Boolean computeIFBranchPC(Instruction instruction, ThreadInfo threadInfo, ChoiceGenerator<?> currentChoiceGenerator) {
+    private void computeIFBranchPC(Instruction instruction, ThreadInfo threadInfo, ChoiceGenerator<?> currentChoiceGenerator) {
         StackFrame sf = threadInfo.getTopFrame();
         PathCondition pathConditionIFBranch = null;
         PathCondition pathConditionELSEBranch = null;
@@ -239,16 +252,9 @@ public class VisualiserListener extends PropertyListenerAdapter {
 
         String elsePC = choicesTraceIF.get(choicesTraceIF.size() - 1);
         this.currentState.setElsePC(elsePC);
+        this.currentState.setType(MIDDLE_NODE);
 
-        boolean switchCondition = this.direction == Direction.LEFT;
-
-        if (switchCondition) {
-            this.choicesTrace = choicesTraceELSE;
-        } else {
-            this.choicesTrace = choicesTraceIF;
-        }
-        return switchCondition;
-
+        this.choicesTrace = this.direction == Direction.LEFT ? choicesTraceELSE : choicesTraceIF;
     }
 
     private String cleanConstraint(String constraint) {
