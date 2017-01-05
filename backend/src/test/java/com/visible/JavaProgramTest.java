@@ -62,8 +62,6 @@ public class JavaProgramTest {
 
         // Check correct class methods are returned
         ClassMethods classMethods = javaProgram.getClassMethods();
-        System.out.println("Expected: " + expected);
-        System.out.println("Actual: " + classMethods);
         assertEquals(expected, classMethods);
     }
 
