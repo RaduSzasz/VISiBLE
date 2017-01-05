@@ -40,7 +40,7 @@ public class SymMethodController {
         this.numArgs = numArgs;
         this.isSymb = isSymb;
 
-        if (!(isSymb.length == numArgs)) {
+        if (!(this.isSymb.length == numArgs)) {
             return new State().withError("Mismatch in number of arguments");
         }
 

@@ -44,9 +44,10 @@ public class JPFAdapter implements SymbolicExecutor {
         this.argNum = numArgs;
         this.service = executorService;
         this.isSymb = isSymb;
+        this.errorState = new State().withError("An unknown error occurred.");
     }
 
-    private void runJPF(CountDownLatch jpfInitialised) {
+    private boolean runJPF(CountDownLatch jpfInitialised) {
         String[] args = new String[2];
         String mainClassName;
 
@@ -55,7 +56,12 @@ public class JPFAdapter implements SymbolicExecutor {
             mainClassName = manifest.getMainAttributes().getValue("Main-Class");
         } catch (IOException e) {
             errorState = new State().withError("Manifest file in " + jarName + " could not be read.");
-            return;
+            return false;
+        }
+
+        if (mainClassName == null) {
+            errorState = new State().withError("No entrypoint specified in Manifest file.");
+            return false;
         }
 
         int indexOfDot = mainClassName.lastIndexOf('.');
@@ -79,8 +85,8 @@ public class JPFAdapter implements SymbolicExecutor {
                 throw new IOException();
             }
         } catch (IOException e) {
-            errorState = new State().withError(jpfFileName + " could not be created");
-            return;
+            errorState = new State().withError(jpfFileName + " could not be created.");
+            return false;
         }
 
         args[0] = RELATIVE_PATH_TO_INPUT + jpfFileName;
@@ -91,6 +97,10 @@ public class JPFAdapter implements SymbolicExecutor {
         config.setProperty("symbolic.dp", SOLVER);
         config.setProperty("target", mainClassName);
         String symbolicMethod = className + "." + method + getSymbArgs(isSymb, argNum);
+        if (!className.equals(mainClassName)) {
+            errorState = new State().withError(mainClassName + " does not call the symbolic method.");
+            return false;
+        }
         config.setProperty("symbolic.method", symbolicMethod);
 
         JPF jpf = new JPF(config);
@@ -99,6 +109,7 @@ public class JPFAdapter implements SymbolicExecutor {
         jpf.addListener(visualiser);
 
         service.submit(jpf);
+        return true;
     }
 
     private String getSymbArgs(boolean[] isSymb, int argNum) {
@@ -121,7 +132,10 @@ public class JPFAdapter implements SymbolicExecutor {
     @Override
     public State call() {
         CountDownLatch jpfInitialised = new CountDownLatch(1);
-        runJPF(jpfInitialised);
+        boolean success = runJPF(jpfInitialised);
+        if (!success) {
+            return errorState;
+        }
         try {
             jpfInitialised.await();
         } catch (InterruptedException e) {
@@ -151,7 +165,4 @@ public class JPFAdapter implements SymbolicExecutor {
         return makeStep(Direction.RIGHT);
     }
 
-    public State getErrorState() {
-        return errorState;
-    }
 }
