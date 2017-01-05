@@ -91,6 +91,12 @@ public class ClassMethods {
             MethodData md = (MethodData) obj;
             return this.name.equals(md.name) && this.numArgs == md.numArgs && this.signature.equals(md.signature);
         }
+
+        @Override
+        public int hashCode() {
+		    return numArgs;
+        }
+
 	}
 
 	@Override
@@ -103,6 +109,11 @@ public class ClassMethods {
         if (!(this.jarName.equals(cm.jarName))) return false;
         if (this.errorMsg == null && cm.errorMsg == null) return true;
         return this.errorMsg.equals(cm.errorMsg);
+    }
+
+    @Override
+    public int hashCode() {
+	    return classes.hashCode();
     }
 
 }
