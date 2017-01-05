@@ -16,6 +16,9 @@ class ClassMethodsSerializer extends JsonSerializer<ClassMethods> {
 
         gen.writeStartObject();
 
+        gen.writeFieldName("jar");
+        gen.writeString(value.getJarName());
+        
         gen.writeFieldName("data");
         gen.writeStartArray();
         for (String className : value.getClasses().keySet()) {

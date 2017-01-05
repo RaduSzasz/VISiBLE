@@ -12,9 +12,11 @@ import java.util.Map;
 @JsonSerialize(using=ClassMethodsSerializer.class)
 public class ClassMethods {
 
-    private final Map<String, List<MethodData>> classes = new HashMap<>();
-    private String errorMsg;
+	private String jarName = "";
 
+	private final Map<String, List<MethodData>> classes = new HashMap<>();
+
+	private String errorMsg;
 	void addMethodToClass(String className, String methodName,
                           int numArgs, String signature) {
 		List<MethodData> methods = classes.get(className);
@@ -28,6 +30,14 @@ public class ClassMethods {
 
 	public Map<String, List<MethodData>> getClasses() {
 		return classes;
+	}
+
+	public void setJarName(String jarName) {
+		this.jarName = jarName;
+	}
+
+	public String getJarName() {
+		return jarName;
 	}
 
     public String getErrorMsg() {

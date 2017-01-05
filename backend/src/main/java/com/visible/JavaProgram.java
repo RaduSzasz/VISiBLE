@@ -63,6 +63,7 @@ public class JavaProgram {
     public ClassMethods getClassMethods() throws IOException, ClassNotFoundException, InterruptedException {
 
         ClassMethods classMethods = new ClassMethods();
+        classMethods.setJarName(fileName);
 
         JarFile jarFile = new JarFile(pathToJar);
         Enumeration<JarEntry> entries = jarFile.entries();
