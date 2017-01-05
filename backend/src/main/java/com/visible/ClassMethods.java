@@ -8,6 +8,7 @@ import java.util.*;
 
 @JsonSerialize(using=ClassMethodsSerializer.class)
 public class ClassMethods {
+
 	private String jarName = "";
 
 	private final Map<String, Set<MethodData>> classes = new HashMap<>();
