@@ -30,6 +30,7 @@ zero/
 build/
 frontend/dist/
 frontend/node/
+frontend/typings/
 node_modules/
 frontend/src/dummy-backend.js
 

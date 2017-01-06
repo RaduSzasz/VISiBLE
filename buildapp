@@ -1,6 +1,0 @@
-cd frontend && npm run tsc &&
-
-cd .. && ./gradlew build &&
-
-# Deploying locally
-heroku local
