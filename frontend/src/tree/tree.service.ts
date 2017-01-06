@@ -48,8 +48,8 @@ export class TreeService {
     node = new Node_(node.id,
                     currNode,
                     currNode.getIfPC(),
-                    node.IfPC,
-                    node.ElsePC);
+                    node.ifPC,
+                    node.elsePC);
     console.log(node);
     currNode.addLeft(node);
     console.log(currNode);
@@ -61,8 +61,8 @@ export class TreeService {
     node = new Node_(node.id,
                     currNode,
                     currNode.getElsePC(),
-                    node.IfPC,
-                    node.ElsePC);
+                    node.ifPC,
+                    node.elsePC);
     currNode.addRight(node);
     return currNode;
   }
