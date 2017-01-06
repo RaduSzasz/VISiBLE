@@ -40,7 +40,7 @@ export class TreeService {
     // parseTree :: Node] -> Tree
 
     // construct the trees from the node
-    return new Tree(new Node_(n.id, n.parent_, null, n.IfPC, n.ElsePC));
+    return new Tree(new Node_(n.id, n.parent_, null, n.ifPC, n.elsePC));
   }
 
   addNewLeft(currNode, node) {
