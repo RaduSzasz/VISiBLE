@@ -12,7 +12,7 @@
     "tsc:w": "tsc -w",
     "typings": "typings",
     "build:prod": "tsc",
-    "test": "tsc && concurrently \"tsc -w\" \"karma start karma.conf.js\"",
+    "test": "tsc && concurrently \"tsc -w\" \"karma start --browsers Firefox --single-run karma.conf.js\"",
     "test-once": "tsc && karma start karma.conf.js --single-run"
   },
   "license": "ISC",
