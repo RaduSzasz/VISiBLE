@@ -27,6 +27,8 @@ export class TreeComponent implements OnInit, OnChanges {
     var width = 960 - margin.right - margin.left;
     var height = 500 - margin.top - margin.bottom;
     this._d3_tree = d3.layout.tree().size([width, height]);
+    console.log(d3);
+    console.log(this._d3_tree);
     this._d3_diagonal = d3.svg.diagonal();
 
     this._d3_svg = d3.select(this.elemRef.nativeElement).select('svg')
@@ -38,6 +40,7 @@ export class TreeComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes) {
     if(changes['tree'].currentValue){
+      console.log(this.tree);
       if (!this.currNode) {
         this.rootNode = this.tree.getRoot();
         this.currNode = this.rootNode;
@@ -52,6 +55,7 @@ export class TreeComponent implements OnInit, OnChanges {
     var diagonal = this._d3_diagonal;
 
     // Compute the new tree layout.
+    console.log(tree);
     var nodes = tree.nodes(this.rootNode);
     console.log(this.currNode);
     console.log(nodes);

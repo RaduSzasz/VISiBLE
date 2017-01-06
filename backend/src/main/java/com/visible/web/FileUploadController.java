@@ -19,7 +19,6 @@ import java.util.concurrent.ExecutionException;
 @Scope("session")
 @RequestMapping("/upload")
 public class FileUploadController {
-
   @PostMapping
   public ClassMethods handleFileUpload(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes)
           throws java.io.IOException, InterruptedException, ExecutionException, ClassNotFoundException {
@@ -37,5 +36,4 @@ public class FileUploadController {
     }
 
   }
-
 }
