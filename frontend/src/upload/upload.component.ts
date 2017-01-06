@@ -60,6 +60,7 @@ export class UploadComponent {
       this.isSymb.map(s => s.value)
     );
     steer_promise.then(tree => {
+      this.staticModal.hide();
       this.onUpload.emit(tree);
     });
   }
