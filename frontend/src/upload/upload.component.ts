@@ -6,6 +6,7 @@ import { TreeComponent } from '../tree/tree.component';
 
 import { Method } from './method';
 import { ModalDirective } from 'ng2-bootstrap';
+import {Http} from "@angular/http";
 
 @Component({
   selector: 'vis-upload',
@@ -14,10 +15,12 @@ import { ModalDirective } from 'ng2-bootstrap';
 
 export class UploadComponent {
   @Output() onUpload = new EventEmitter();
-
   @ViewChild('staticModal') public staticModal : ModalDirective;
+
+  private uploadUrl;
+
   options: Object = {
-    url: 'http://localhost:8080/upload'
+    url: this.uploadUrl
   };
   symbolicMethod : Method = null;
 
@@ -25,7 +28,11 @@ export class UploadComponent {
   methods = null;
   isSymb = null;
 
-  constructor(private treeService: TreeService){ }
+  constructor(private treeService: TreeService){
+    const port = window.location.port? `:${window.location.port}/`: `/`;
+    this.uploadUrl = `http://${window.location.hostname}` + port + "upload";
+    console.log("Upload directing queries to " + this.uploadUrl);
+  }
 
   selectSymbolic(data) {
     if(!data || !data.response) return;
