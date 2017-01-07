@@ -12,7 +12,7 @@
     "tsc:w": "tsc -w",
     "typings": "typings",
     "build:prod": "tsc",
-    "test": "tsc && \"karma start --single-run karma.conf.js\"",
+    "test": "tsc && karma start --single-run karma.conf.js",
     "test-once": "tsc && karma start karma.conf.js --single-run"
   },
   "license": "ISC",
