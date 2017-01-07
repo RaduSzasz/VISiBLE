@@ -1,27 +1,46 @@
-*.class
-
+# Angular redundancies
+# Gradle useless stuff
 # Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
 # Package Files #
-*.jar
 *.war
 *.ear
 
 # Swap files
+# Typings modules
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+*.class
+*.jar
 *.sw*
+build/
+backend/input/
+out/
+zero/
 
 # Gradle useless stuff
 .gradle
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
-build/
 
 .DS_Store
 
 # Angular redundancies
+.DS_Store
+.gradle
+.mtj.tmp/
+build/
 frontend/dist/
-frontend/node_modules/
 frontend/node/
+frontend/typings/
+node_modules/
 frontend/src/dummy-backend.js
+
+# IntelliJ useless stuff
+*.iml
+*.idea 
+frontend/typings/modules/
+hs_err_pid*
+npm-debug.log
+
+# Eclipse useless stuff
+.classpath
+.project

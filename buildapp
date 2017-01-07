@@ -1,14 +1,3 @@
-# Build frontend and backend
-cd frontend && npm install && npm run tsc
-cd ..
-cd backend && ./gradlew stage
-cd ..
+./gradlew build
 
-# Test backend and frontend`
-cd backend && ./gradlew check
-cd ..
-cd frontend && npm test
-cd ..
-
-# Deploying locally
-heroku local
+java -Dserver.port=8080 -jar backend/build/libs/gs-spring-boot-0.1.0.jar

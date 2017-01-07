@@ -4,22 +4,32 @@ import { FormsModule }   from '@angular/forms';
 import { HttpModule }   from '@angular/http';
 
 import { AppComponent }        from './app/app.component';
-import { UploadComponent }     from './upload/upload.component';
+import { UploadComponent }        from './upload/upload.component';
+import { TreeComponent }     from './tree/tree.component';
 
-import { UPLOAD_DIRECTIVES } from 'ng2-uploader/ng2-uploader';
+import { TreeService } from './tree/tree.service';
+import { ApiService } from './shared/api.service';
+
+import { Ng2UploaderModule } from 'ng2-uploader/ng2-uploader';
+import { ModalModule } from 'ng2-bootstrap';
 
 @NgModule({
   imports: [
     BrowserModule,
     FormsModule,
-    HttpModule
+    HttpModule,
+    Ng2UploaderModule,
+    ModalModule.forRoot()
   ],
   declarations: [
     AppComponent,
     UploadComponent,
-    UPLOAD_DIRECTIVES
+    TreeComponent,
   ],
-  providers: [ ],
+  providers: [ 
+    TreeService,
+    ApiService
+  ],
   bootstrap: [ AppComponent ]
 })
 export class AppModule { }

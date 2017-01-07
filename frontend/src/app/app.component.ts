@@ -1,5 +1,7 @@
-import { Component }         from '@angular/core';
-import { UploadComponent }   from '../upload/upload.component';
+import { Component }     from '@angular/core';
+
+import { TreeService }   from '../tree/tree.service';
+import { Tree } from '../tree/tree';
 
 @Component({
   selector: 'my-app',
@@ -8,25 +10,14 @@ import { UploadComponent }   from '../upload/upload.component';
 })
 
 export class AppComponent {
+  public initialTree = null;
   title = 'VISiBLE';
-  uploadFile: any;
-  hasBaseDropZoneOver: boolean = false;
-  filename: string;
-  uploadSuccess: boolean = false;
-  options: Object = {
-    url: 'http://localhost:5000/upload'
-  };
 
-  handleUpload(data): void {
-    if (data && data.response) {
-      this.filename = data.originalName;
-      data = JSON.parse(data.response);
-      this.uploadSuccess = true;
-      this.uploadFile = data;
-    }
-  }
+  constructor(private treeService: TreeService){ }
 
-  fileOverBase(e:any):void {
-    this.hasBaseDropZoneOver = e;
+  updateTree(tree) {
+    console.log(tree);
+    this.initialTree = tree;
   }
+  
 }
