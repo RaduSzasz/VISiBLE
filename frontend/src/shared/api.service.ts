@@ -5,8 +5,13 @@ import 'rxjs/add/operator/map';
 
 @Injectable()
 export class ApiService {
-  private api_base = `http://${window.location.hostname}:8080/`;
-  constructor(private http: Http) { }
+  private api_base = `http://${window.location.hostname}`;
+
+  constructor(private http: Http) {
+    const port = window.location.port? `:${window.location.port}/`: `/`;
+    this.api_base = this.api_base + port;
+    console.log("Frontend directing queries to " + this.api_base);
+  }
 
   private parseQuery(query) {
     if(!query || Object.keys(query).length <= 0) return '';
