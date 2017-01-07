@@ -1,4 +1,4 @@
-import { Component, ViewChild, EventEmitter, Output }     from '@angular/core';
+import { Component, ViewChild, EventEmitter, Output, OnInit }     from '@angular/core';
 
 import { TreeService }   from '../tree/tree.service';
 import { Tree } from '../tree/tree';
@@ -13,26 +13,29 @@ import {Http} from "@angular/http";
   templateUrl: 'src/upload/upload.component.html'
 })
 
-export class UploadComponent {
+export class UploadComponent implements OnInit {
   @Output() onUpload = new EventEmitter();
   @ViewChild('staticModal') public staticModal : ModalDirective;
 
+  ngOnInit() {
+    const port = window.location.port? `:${window.location.port}/`: `/`;
+    this.uploadUrl = `http://${window.location.hostname}` + port + `upload`;
+    console.log("Upload directing queries to " + this.uploadUrl);
+    this.options = {
+      url: this.uploadUrl
+    }
+  }
+
   private uploadUrl;
 
-  options: Object = {
-    url: this.uploadUrl
-  };
+  options;
   symbolicMethod : Method = null;
 
   jar = null;
   methods = null;
   isSymb = null;
 
-  constructor(private treeService: TreeService){
-    const port = window.location.port? `:${window.location.port}/`: `/`;
-    this.uploadUrl = `http://${window.location.hostname}` + port + "upload";
-    console.log("Upload directing queries to " + this.uploadUrl);
-  }
+  constructor(private treeService: TreeService){ }
 
   selectSymbolic(data) {
     if(!data || !data.response) return;
