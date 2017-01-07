@@ -13,6 +13,7 @@ import java.util.jar.JarFile;
 
 public class JavaProgram {
     private static final String CLASS_EXT = ".class";
+    private static final String JACOCO_METHOD = "$jacocoInit";
 
     private String pathToJar;
     private String fileName;
@@ -84,6 +85,9 @@ public class JavaProgram {
                 Class<?> cls = cl.loadClass(className);
 
                 for (Method m : cls.getDeclaredMethods()) {
+                    if (m.getName().equals(JACOCO_METHOD)) {
+                        continue;
+                    }
                     classMethods.addMethodToClass(className, m.getName(),
                             m.getParameterTypes().length, m.toString());
                 }
