@@ -24,18 +24,17 @@ export class UploadComponent implements OnInit {
     this.options = {
       url: this.uploadUrl
     }
+    this.resetComponent();
   }
 
   private uploadUrl;
 
-  options;
-  symbolicMethod : Method = null;
-
-  jar = null;
-  methods = null;
-  isSymb = null;
-
-  isLoading = false;
+  public options;
+  public symbolicMethod : Method;
+  public jar;
+  public methods;
+  public isSymb;
+  public isLoading;
 
   constructor(private treeService: TreeService){ }
 
@@ -73,9 +72,20 @@ export class UploadComponent implements OnInit {
       this.isSymb.map(s => s.value)
     );
     steer_promise.then(tree => {
+      this.resetComponent();
       this.staticModal.hide();
       this.onUpload.emit(tree);
     });
+  }
+
+  resetComponent(){
+    this.symbolicMethod = null;
+
+    this.jar = null;
+    this.methods = null;
+    this.isSymb = null;
+
+    this.isLoading = false;
   }
   
 }
