@@ -1,4 +1,4 @@
-import { OnInit, OnChanges } from '@angular/core';
+import {OnInit, OnChanges, style} from '@angular/core';
 import { Component, ElementRef, Input } from '@angular/core';
 import * as d3 from 'd3';
 import * as Moment from 'moment';
@@ -14,7 +14,7 @@ import { TreeService } from './tree.service';
 export class TreeComponent implements OnInit, OnChanges {
   private _d3_svg;
   private _d3_tree;
-  private _d3_diagonal;;
+  private _d3_diagonal;
   private currNode;
   private rootNode;
   @Input() tree;
@@ -128,19 +128,34 @@ export class TreeComponent implements OnInit, OnChanges {
     svg.selectAll('g.link').remove();
     var link = svg.selectAll('g.link').data(links);
 
+        //.style('stroke', '#d50000')
+        //.style('stroke-width', '1.5px');
+
     // Enter any new links at the parent's previous position.
-    var linkEnter = link.enter().insert('g', 'g.node')
+    var linkEnter = link.enter().insert('g', 'g.node');
     linkEnter.append('path');
     linkEnter.append('text');
 
     link.selectAll('path')
-      .attr('class', 'link')
-      .attr('d', diagonal);
+        .attr('class', 'link')
+        .attr('d', diagonal)
+        .style('stroke', '#d50000')
+        .style('stroke-width', '1.5px')
+        .style('fill', 'none');
 
+    /*
+  .link path{
+      fill: none;
+      /*  stroke: #ccc;
+      stroke: #d50000;
+      stroke-width: 1.5px;
+    }
+*/
     link.selectAll('text')
     .attr('x', d => 0.5*d.source.x + 0.5*d.target.x + ((d.target.isRight())? 20: -20))
     .attr('y', d => 0.5*d.source.y + 0.5*d.target.y)
     .attr('text-anchor', d => (d.target.isRight())? 'start' : 'end')
+    // TODO: Pretty printing of pc.
     .text((d:any) => d.target.pc);
 
     link.attr('class', 'link');
