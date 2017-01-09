@@ -35,6 +35,8 @@ export class UploadComponent implements OnInit {
   methods = null;
   isSymb = null;
 
+  isLoading = false;
+
   constructor(private treeService: TreeService){ }
 
   selectSymbolic(data) {
@@ -64,6 +66,7 @@ export class UploadComponent implements OnInit {
   }
 
   setInitialTree(){
+    this.isLoading = true;
     let steer_promise: Promise<Tree> = this.treeService.drawTree(
       this.jar,
       this.symbolicMethod,
