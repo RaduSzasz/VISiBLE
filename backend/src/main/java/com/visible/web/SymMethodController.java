@@ -24,11 +24,15 @@ import java.util.concurrent.Executors;
 
 public class SymMethodController {
 
+    private static final int NUMBER_OF_THREADS = 8;
     private String jarName;
     private String className;
     private String methodName;
     private int numArgs;
     private boolean[] isSymb;
+    private boolean isRestartCall = false;
+    private ExecutorService jpfExecutor;
+    private SymbolicExecutor symbolicExecutor;
 
     @PostMapping
     public State runSelectedSymMethod(@RequestParam("jar_name") String jarName, @RequestParam("class_name") String className, @RequestParam("method_name") String methodName, @RequestParam("no_args") int numArgs, @RequestParam("is_symb") boolean[] isSymb,  RedirectAttributes redirectAttributes)
@@ -44,19 +48,34 @@ public class SymMethodController {
             return new State().withError("Mismatch in number of arguments");
         }
 
-        SymbolicExecutor symbolicExecutor = symbolicExecutor();
+        if (isRestartCall) {
+            restart();
+        }
+
+        isRestartCall = true;
+        this.symbolicExecutor = symbolicExecutor();
         return executorService().submit(symbolicExecutor).get();
+    }
+
+    private void restart() throws ExecutionException, InterruptedException {
+        jpfExecutor.shutdown();
+        while (!jpfExecutor.isTerminated()) {
+            symbolicExecutor.stepLeft();
+        }
     }
 
     @Bean
     @Scope("session")
     public SymbolicExecutor symbolicExecutor() {
-        return new JPFAdapter(jarName, className, methodName, numArgs, isSymb, executorService());
+        if (this.jpfExecutor.isShutdown()) {
+            this.jpfExecutor = executorService();
+        }
+        return new JPFAdapter(jarName, className, methodName, numArgs, isSymb, jpfExecutor);
     }
 
     @Bean
     @ApplicationScope
     public ExecutorService executorService() {
-        return Executors.newFixedThreadPool(8);
+        return Executors.newFixedThreadPool(NUMBER_OF_THREADS);
     }
 }
