@@ -40,11 +40,8 @@ export class TreeComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes) {
     if(changes['tree'].currentValue){
-      console.log(this.tree);
-      if (!this.currNode) {
-        this.rootNode = this.tree.getRoot();
-        this.currNode = this.rootNode;
-      }
+      this.rootNode = this.tree.getRoot();
+      this.currNode = this.rootNode;
       this.drawTree();
     }
   }

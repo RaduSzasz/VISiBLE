@@ -28,7 +28,12 @@
             </label>
           </div>
 
-          <button (click)="setInitialTree()">Start!</button>
+          <div class="progress" *ngIf="isLoading">
+            <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="1" aria-valuemin="0" aria-valuemax="1" style="width: 100%">
+              Loading...
+            </div>
+          </div>
+          <button (click)="setInitialTree()" *ngIf="!isLoading">Start!</button>
         </div>
 
       </div>
