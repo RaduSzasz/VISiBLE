@@ -1,0 +1,60 @@
+/* Tree css  */
+
+.node {
+    cursor: pointer;
+}
+
+.overlay{
+    background-color:#EEE;
+}
+
+.node circle {
+    fill: #fff;
+    stroke: steelblue;
+    stroke-width: 1.5px;
+}
+
+.node text {
+    font-family:sans-serif;
+}
+
+.link path{
+    fill: none;
+    /*  stroke: #ccc; */
+    stroke: #d50000;
+    stroke-width: 1.5px;
+}
+
+.templink {
+    fill: none;
+    stroke: red;
+    stroke-width: 3px;
+}
+
+.ghostCircle.show{
+    display:block;
+}
+
+.ghostCircle, .activeDrag .ghostCircle {
+    display: none;
+}
+
+.node circle {
+    fill: #fff;
+    stroke: steelblue;
+    stroke-width: 3px;
+}
+
+.node text {
+    font: 12px sans-serif;
+}
+
+.link{
+    fill: none;
+    stroke: #ccc;
+    stroke-width: 2px;
+}
+
+h2{
+    color: red;
+}
