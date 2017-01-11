@@ -22,6 +22,7 @@ export class TreeComponent implements OnInit, OnChanges {
               private elemRef: ElementRef) { }
 
   restart() {
+    this.currNode = null;
     this.tree = null;
     this.treeService.restart().then(tree => {
       this.tree = tree
@@ -58,8 +59,9 @@ export class TreeComponent implements OnInit, OnChanges {
     var svg = this._d3_svg;
     var diagonal = this._d3_diagonal;
 
+    console.log(this.currNode);
     this.rootNode = this.tree.getRoot();
-    this.currNode = this.rootNode;
+    if(!this.currNode) this.currNode = this.rootNode;
 
     // Compute the new tree layout.
     console.log(tree);
@@ -90,7 +92,6 @@ export class TreeComponent implements OnInit, OnChanges {
           if(clickedID == leftID) {
             steer_promise = this.treeService.stepLeft(this.currNode);
             console.log(steer_promise);
-            // TODO : change the currNode
             steer_promise.then(res => {
               console.log("Updating current node (left)");
               this.currNode = this.currNode.getLeft();
