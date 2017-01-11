@@ -3,3 +3,19 @@ body {
   color: #fdf6e3;
   font-family: 'Menlo';
 }
+
+html{
+  background: #002b36;
+}
+
+.backdrop{
+  opacity: 0;
+  -webkit-transition: opacity 800ms ease-out;
+  -moz-transition: opacity 800ms ease-out;
+  -o-transition: opacity 800ms ease-out;
+  transition: opacity 800ms ease-out;
+}
+
+.fade-out{
+  opacity: 1;
+}
