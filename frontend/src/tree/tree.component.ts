@@ -63,6 +63,9 @@ export class TreeComponent implements OnInit, OnChanges {
     this.rootNode = this.tree.getRoot();
     if(!this.currNode) this.currNode = this.rootNode;
 
+    var isExpandableLeft = (n) => n.getID() == -2 * this.currNode.getID() - 1;
+    var isExpandableRight = (n) => n.getID() == -2 * this.currNode.getID() - 2;
+
     // Compute the new tree layout.
     console.log(tree);
     var nodes = tree.nodes(this.rootNode);
@@ -75,23 +78,32 @@ export class TreeComponent implements OnInit, OnChanges {
 
     // Enter any new nodes at the parent's previous position.
     var nodeEnter = node.enter().append('g');
+    nodeEnter.append('circle')
+      .attr('r', 10);
+    node.selectAll('circle')
+      .style('fill', (d) => {
+        if(isExpandableLeft(d) || isExpandableRight(d)){
+          return 'lightsteelblue';
+        } else{
+          return 'black';
+        }
+      });
+
     node.attr('class', 'node')
       .attr('transform', (d) => `translate(${d.x}, ${d.y})`)
+      .style('cursor', (d) => {
+        if(isExpandableLeft(d) || isExpandableRight(d)){
+          return 'pointer';
+        } else{
+          return 'default';
+        }
+      })
       .on('click', (d) => {
         var steer_promise;
         
-        var clickedID = d.getID();
-        console.log(clickedID);
-        var currID = this.currNode.getID();
-        console.log(currID);
-        if(clickedID < 0 && d.getParent().getID() == currID) {
-          // you are in the currNode's virtual node
-          var leftID = -2 * currID - 1;
-          var rightID = leftID - 1;
-         
-          if(clickedID == leftID) {
+        if(d.getID() < 0 && d.getParent().getID() == this.currNode.getID()) {
+          if(isExpandableLeft(d)) {
             steer_promise = this.treeService.stepLeft(this.currNode);
-            console.log(steer_promise);
             steer_promise.then(res => {
               console.log("Updating current node (left)");
               this.currNode = this.currNode.getLeft();
@@ -102,7 +114,7 @@ export class TreeComponent implements OnInit, OnChanges {
             });
           }
 
-          if(clickedID == rightID) {
+          if(isExpandableRight(d)) {
             steer_promise = this.treeService.stepRight(this.currNode);
             steer_promise.then(res => {
               console.log("Updating current node (right)");
@@ -114,20 +126,7 @@ export class TreeComponent implements OnInit, OnChanges {
           }
         }
         
-/* if(d.id >= max_index -1) {
-            console.log('bye');
-          steer_promise.then(tree => {
-            console.log('hello');
-            d.children = tree.children;
-            this.drawTree();
-          });
-        }
-        */
       }) ;
-
-    nodeEnter.append('circle')
-    .attr('r', 10)
-    .style('fill', 'lightsteelblue');
 
     // Transition exiting nodes to the parent's new position.
     node.exit().remove();
@@ -135,9 +134,6 @@ export class TreeComponent implements OnInit, OnChanges {
     // Update the links…
     svg.selectAll('g.link').remove();
     var link = svg.selectAll('g.link').data(links);
-
-        //.style('stroke', '#d50000')
-        //.style('stroke-width', '1.5px');
 
     // Enter any new links at the parent's previous position.
     var linkEnter = link.enter().insert('g', 'g.node');
@@ -151,20 +147,11 @@ export class TreeComponent implements OnInit, OnChanges {
         .style('stroke-width', '1.5px')
         .style('fill', 'none');
 
-    /*
-  .link path{
-      fill: none;
-      /*  stroke: #ccc;
-      stroke: #d50000;
-      stroke-width: 1.5px;
-    }
-*/
     link.selectAll('text')
     .attr('x', d => 0.5*d.source.x + 0.5*d.target.x + ((d.target.isRight())? 20: -20))
     .attr('y', d => 0.5*d.source.y + 0.5*d.target.y)
     .attr('text-anchor', d => (d.target.isRight())? 'start' : 'end')
-    // TODO: Pretty printing of pc.
-    .text((d:any) => d.target.pc);
+    .text(d => d.target.pc);
 
     link.attr('class', 'link');
 
