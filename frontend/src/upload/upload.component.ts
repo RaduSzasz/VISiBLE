@@ -10,6 +10,7 @@ import {Http} from "@angular/http";
 
 @Component({
   selector: 'vis-upload',
+  styleUrls: ['src/upload/upload.component.css'],
   templateUrl: 'src/upload/upload.component.html'
 })
 

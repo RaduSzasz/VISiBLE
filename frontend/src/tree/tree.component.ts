@@ -24,12 +24,9 @@ export class TreeComponent implements OnInit, OnChanges {
     link_expandable: '#fdf6e3',
     link_non_expandable: 'green',
     text_connected: '#859900',
-    //text_disconnected: '#839496' 
     text_disconnected: '#fdf6e3'
   }
   @Input() tree;
-
-       
 
   constructor(private treeService: TreeService,
               private elemRef: ElementRef) { }
