@@ -19,12 +19,13 @@ export class TreeComponent implements OnInit, OnChanges {
   private COLORS = {
     node_expandable: '#fdf6e3',
     node_visited:'#b58900',
-    node_unvisited:'black',
-    link_connected: '#dc322f',
+    node_unvisited:'#657B83',
+    link_connected: '#b58900',
     link_expandable: '#fdf6e3',
-    link_non_expandable: 'green',
-    text_connected: '#859900',
-    text_disconnected: '#fdf6e3'
+    link_non_expandable: '#657B83',
+    text_connected: '#b58900',
+    text_non_expandable: '#657B83',
+    text_expandable: '#fdf6e3'
   }
   @Input() tree;
 
@@ -201,9 +202,9 @@ export class TreeComponent implements OnInit, OnChanges {
         return this.COLORS.text_connected;
         //return "#dc322f";
       } else {
-        return this.COLORS.text_disconnected;
+        return this.COLORS.text_expandable;
       }
-    });
+    })
 
     link.attr('class', 'link');
 
