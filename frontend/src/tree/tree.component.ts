@@ -7,8 +7,7 @@ import { TreeService } from './tree.service';
 @Component({
   selector: 'tree-container',
   styleUrls: ['src/tree/tree.component.css'],
-  templateUrl: 'src/tree/tree.component.html',
-  providers: [TreeService]
+  templateUrl: 'src/tree/tree.component.html'
 })
 
 export class TreeComponent implements OnInit, OnChanges {
@@ -21,6 +20,14 @@ export class TreeComponent implements OnInit, OnChanges {
 
   constructor(private treeService: TreeService,
               private elemRef: ElementRef) { }
+
+  restart() {
+    this.tree = null;
+    this.treeService.restart().then(tree => {
+      this.tree = tree
+      this.drawTree();
+    });
+  }
 
   ngOnInit() {
     var margin = {top: 20, right: 120, bottom: 20, left: 120};
@@ -41,8 +48,6 @@ export class TreeComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes) {
     if(changes['tree'].currentValue){
-      this.rootNode = this.tree.getRoot();
-      this.currNode = this.rootNode;
       if(this._d3_svg) this.drawTree();
     }
   }
@@ -52,6 +57,9 @@ export class TreeComponent implements OnInit, OnChanges {
     var tree = this._d3_tree;
     var svg = this._d3_svg;
     var diagonal = this._d3_diagonal;
+
+    this.rootNode = this.tree.getRoot();
+    this.currNode = this.rootNode;
 
     // Compute the new tree layout.
     console.log(tree);

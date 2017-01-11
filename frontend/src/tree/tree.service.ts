@@ -10,17 +10,24 @@ import { Method } from '../upload/method';
 export class TreeService {
 
   constructor(private api: ApiService) {}
+  private last_symbolicmethod = null;
+
   drawTree(jar, method : Method, isSymb) : Promise<Tree> {
-    let json : Object = {
+    this.last_symbolicmethod = {
       jar_name: jar,
       class_name: method.class_name,
       method_name: method.name,
       no_args: method.numArgs,
       is_symb: isSymb
     };
+    return this.restart();
+  }
+
+  restart(): Promise<Tree> {
+    console.log(this.last_symbolicmethod);
     return new Promise((resolve, reject) => {
       // note that the json is sent as a query, i.e. in the url
-      this.api.post(`symbolicmethod`, json, null).then(node => resolve(this.parseTree(node)));
+      this.api.post(`symbolicmethod`, this.last_symbolicmethod, null).then(node => resolve(this.parseTree(node)));
     });
   }
 
