@@ -19,18 +19,15 @@ export class TreeComponent implements OnInit, OnChanges {
   private COLORS = {
     node_expandable: '#fdf6e3',
     node_visited:'#b58900',
-    node_unvisited:'black',
-    link_connected: '#dc322f',
+    node_unvisited:'#657B83',
+    link_connected: '#b58900',
     link_expandable: '#fdf6e3',
-    link_non_expandable: 'green',
-    text_connected: '#859900',
-    //text_disconnected: '#839496' 
-    text_expandable: 'yellow',
-    text_non_expandable: '#fdf6e3'
+    link_non_expandable: '#657B83',
+    text_connected: '#b58900',
+    text_non_expandable: '#657B83',
+    text_expandable: '#fdf6e3'
   }
   @Input() tree;
-
-       
 
   constructor(private treeService: TreeService,
               private elemRef: ElementRef) { }
@@ -99,10 +96,11 @@ export class TreeComponent implements OnInit, OnChanges {
     nodeEnter.append('circle')
       .attr('r', 10);
 
+    /*
     // for debug purpose: displays id next to each node
     nodeEnter.append('text').attr('dx', '15px');
     node.selectAll('text').text(d => {console.log(d.getID()); return d.getID()})
-
+    */
 
     node.selectAll('circle')
       .style('fill', (d) => {
@@ -213,7 +211,7 @@ export class TreeComponent implements OnInit, OnChanges {
           return this.COLORS.text_non_expandable;
         }
       }
-    });
+    })
 
     link.attr('class', 'link');
 

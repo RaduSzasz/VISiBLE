@@ -69,3 +69,8 @@ table {
 h2{
     color: red;
 }
+
+.restart{
+  color: #6ed3cf;
+  font-size: 2em;
+}

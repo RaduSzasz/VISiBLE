@@ -5,7 +5,7 @@
 
   <div class="col-md-2">
     <div *ngIf="currNode" class="concrete-values-box">
-      <table class="table table-hover table-condensed">
+      <table class="table table-condensed">
         <thead>
           <th>Variable</th>
           <th>Value</th>
@@ -23,4 +23,4 @@
   </div>
 </div>
 
-<button (click)="restart()" class="btn btn-link" [disabled]="!tree"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> restart</button>
+<button (click)="restart()" class="restart btn btn-link" [disabled]="!tree"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> restart</button>
