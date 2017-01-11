@@ -6,13 +6,17 @@ import com.visible.symbolic.state.State;
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.web.context.annotation.ApplicationScope;
 import org.springframework.web.context.annotation.SessionScope;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
@@ -27,6 +31,7 @@ public class JPFAdapter implements SymbolicExecutor {
     private static final String SOLVER = "no_solver";
 
     private static VisualiserListener visualiser;
+    private static final int NUMBER_OF_THREADS = 8;
     private String jarName;
     private String className;
     private String method;
@@ -35,16 +40,20 @@ public class JPFAdapter implements SymbolicExecutor {
     private boolean[] isSymb;
 
     @Autowired
-    private ExecutorService service;
+    private ExecutorService executorService;
 
-    public JPFAdapter(String jarName, String className, String methodName, int numArgs, boolean[] isSymb, ExecutorService executorService) {
+    @Autowired
+    private ExecutorService jpfExecutor;
+
+    public JPFAdapter(String jarName, String className, String methodName, int numArgs, boolean[] isSymb) {
         this.jarName = jarName;
         this.className = className;
         this.method = methodName;
         this.argNum = numArgs;
-        this.service = executorService;
         this.isSymb = isSymb;
         this.errorState = new State().withError("An unknown error occurred.");
+        this.executorService = executorService();
+        this.jpfExecutor = executorService();
     }
 
     private boolean runJPF(CountDownLatch jpfInitialised) {
@@ -104,7 +113,7 @@ public class JPFAdapter implements SymbolicExecutor {
         visualiser = new VisualiserListener(config, jpf, jpfInitialised);
 
         jpf.addListener(visualiser);
-        service.submit(jpf);
+        jpfExecutor.submit(jpf);
         if (jpf.foundErrors()) {
             errorState = new State().withError("Internal error in JPF.");
             return false;
@@ -163,6 +172,33 @@ public class JPFAdapter implements SymbolicExecutor {
     @Override
     public State stepRight() {
         return makeStep(Direction.RIGHT);
+    }
+
+    @Override
+    public State execute() throws ExecutionException, InterruptedException {
+        return executorService.submit(this).get();
+    }
+
+    @Bean
+    @ApplicationScope
+    private ExecutorService executorService() {
+        return Executors.newFixedThreadPool(NUMBER_OF_THREADS);
+    }
+
+    @Override
+    public State restart() throws ExecutionException, InterruptedException {
+        jpfExecutor.shutdown();
+        while (!jpfExecutor.isTerminated()) {
+            stepLeft();
+        }
+        if (!jpfExecutor.isShutdown()) {
+            return new State().withError("Restart could not be completed.");
+        }
+        if (executorService.isShutdown()) {
+            this.executorService = executorService();
+        }
+        this.jpfExecutor = executorService();
+        return execute();
     }
 
 }

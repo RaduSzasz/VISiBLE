@@ -7,8 +7,7 @@ import { TreeService } from './tree.service';
 @Component({
   selector: 'tree-container',
   styleUrls: ['src/tree/tree.component.css'],
-  templateUrl: 'src/tree/tree.component.html',
-  providers: [TreeService]
+  templateUrl: 'src/tree/tree.component.html'
 })
 
 export class TreeComponent implements OnInit, OnChanges {
@@ -21,6 +20,15 @@ export class TreeComponent implements OnInit, OnChanges {
 
   constructor(private treeService: TreeService,
               private elemRef: ElementRef) { }
+
+  restart() {
+    this.currNode = null;
+    this.tree = null;
+    this.treeService.restart().then(tree => {
+      this.tree = tree
+      this.drawTree();
+    });
+  }
 
   ngOnInit() {
     var margin = {top: 20, right: 120, bottom: 20, left: 120};
@@ -36,20 +44,24 @@ export class TreeComponent implements OnInit, OnChanges {
                 .attr('height', height + margin.top + margin.bottom)
                 .append('g')
                 .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+    if(this.tree) this.drawTree();
   }
 
   ngOnChanges(changes) {
     if(changes['tree'].currentValue){
-      this.rootNode = this.tree.getRoot();
-      this.currNode = this.rootNode;
-      this.drawTree();
+      if(this._d3_svg) this.drawTree();
     }
   }
 
   drawTree() {
+    console.log('drawing');
     var tree = this._d3_tree;
     var svg = this._d3_svg;
     var diagonal = this._d3_diagonal;
+
+    console.log(this.currNode);
+    this.rootNode = this.tree.getRoot();
+    if(!this.currNode) this.currNode = this.rootNode;
 
     // Compute the new tree layout.
     console.log(tree);
@@ -80,7 +92,6 @@ export class TreeComponent implements OnInit, OnChanges {
           if(clickedID == leftID) {
             steer_promise = this.treeService.stepLeft(this.currNode);
             console.log(steer_promise);
-            // TODO : change the currNode
             steer_promise.then(res => {
               console.log("Updating current node (left)");
               this.currNode = this.currNode.getLeft();

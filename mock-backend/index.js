@@ -1,3 +1,5 @@
+var path = require('path');
+
 var express = require('express')
 var app = express()
 
@@ -14,7 +16,8 @@ app.post('/upload', (req, res) => {
 });
 
 app.post('/symbolicmethod', (req, res) => {
-  setTimeout(() => res.json(dummy['symbolicmethod']), 3000);
+	step_no = 0;
+  setTimeout(() => res.json(dummy['symbolicmethod']), 2000);
 });
 
 app.get(/\/step(left|right)/, (req, res) => {
@@ -23,7 +26,7 @@ app.get(/\/step(left|right)/, (req, res) => {
 });
 
 app.get('*', (req, res) => {
-	res.sendFile('../frontend/index.html');
+	res.sendFile(path.resolve('../frontend/index.html'));
 });
 
 app.listen(8080);
