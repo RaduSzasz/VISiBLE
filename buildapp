@@ -1,3 +1,1 @@
-./gradlew build
-
-java -Dserver.port=8080 -jar backend/build/libs/gs-spring-boot-0.1.0.jar
+./gradlew build && java -Dserver.port=8080 -jar backend/build/libs/gs-spring-boot-0.1.0.jar
