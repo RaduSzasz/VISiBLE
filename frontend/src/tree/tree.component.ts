@@ -95,9 +95,9 @@ export class TreeComponent implements OnInit, OnChanges {
       .style('fill', (d) => {
         console.log(d.getID());
         if(isExpandableLeft(d) || isExpandableRight(d)){
-          return 'lightsteelblue';
+          return '#839496';
         } else{
-          return 'black';
+          return '#b58900';
         }
       });
 
@@ -157,7 +157,8 @@ export class TreeComponent implements OnInit, OnChanges {
         .attr('d', diagonal)
         .style('stroke', p => {
           if(p.target.getID() >= 0){
-            return '#4285f4';
+            return '#dc322f';
+            //return '#4285f4';
           } else {
             return '#9a9494';
           }
@@ -176,7 +177,14 @@ export class TreeComponent implements OnInit, OnChanges {
     .attr('x', d => 0.5*d.source.x + 0.5*d.target.x + ((d.target.isRight())? 20: -20))
     .attr('y', d => 0.5*d.source.y + 0.5*d.target.y)
     .attr('text-anchor', d => (d.target.isRight())? 'start' : 'end')
-    .text(d => d.target.pc);
+    .text(d => d.target.pc)
+    .style('fill', link => {
+      if (link.target.getID() >= 0) {
+        return "#dc322f";
+      } else {
+        return "#839496"; 
+      }
+    });
 
     link.attr('class', 'link');
 

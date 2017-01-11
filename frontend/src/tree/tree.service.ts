@@ -44,10 +44,10 @@ export class TreeService {
   }
 
   parseTree(n) {
-    // parseTree :: Node] -> Tree
+    // parseTree :: [Node] -> Tree
 
     // construct the trees from the node
-    return new Tree(new Node_(n.id, n.parent_, null, n.ifPC, n.elsePC));
+    return new Tree(new Node_(n.id, n.parent_, null, n.concreteValues, n.ifPC, n.elsePC));
   }
 
   addNewLeft(currNode, node) {
@@ -55,6 +55,7 @@ export class TreeService {
     node = new Node_(node.id,
                     currNode,
                     currNode.getIfPC(),
+                    node.concreteValues,
                     node.ifPC,
                     node.elsePC);
     console.log(node);
@@ -68,6 +69,7 @@ export class TreeService {
     node = new Node_(node.id,
                     currNode,
                     currNode.getElsePC(),
+                    node.concreteValues,
                     node.ifPC,
                     node.elsePC);
     currNode.addRight(node);
