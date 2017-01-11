@@ -1,21 +1,25 @@
-<div>
-  <svg></svg>
+<div class="row">
+  <div class="col-md-10">
+    <svg></svg>
+  </div>
 
-  <div *ngIf="currNode" class="concrete-values-box">
-    <table class="table table-hover table-condensed">
-      <thead>
-        <th>Variable</th>
-        <th>Value</th>
-      </thead>
-      <tr *ngFor="let variable of currNode.getConcreteVariableNames()">
-        <td>
-          {{variable}}:
-        </td>
-        <td>
-          {{currNode.getConcreteValue(variable)}}
-        </td>
-      </tr>
-    </table>
+  <div class="col-md-2">
+    <div *ngIf="currNode" class="concrete-values-box">
+      <table class="table table-hover table-condensed">
+        <thead>
+          <th>Variable</th>
+          <th>Value</th>
+        </thead>
+        <tr *ngFor="let variable of currNode.getConcreteVariableNames()">
+          <td>
+            {{variable}}:
+          </td>
+          <td>
+            {{currNode.getConcreteValue(variable)}}
+          </td>
+        </tr>
+      </table>
+    </div>
   </div>
 </div>
 
