@@ -25,7 +25,8 @@ export class TreeComponent implements OnInit, OnChanges {
     link_non_expandable: 'green',
     text_connected: '#859900',
     //text_disconnected: '#839496' 
-    text_disconnected: '#fdf6e3'
+    text_expandable: 'yellow',
+    text_non_expandable: '#fdf6e3'
   }
   @Input() tree;
 
@@ -35,9 +36,10 @@ export class TreeComponent implements OnInit, OnChanges {
               private elemRef: ElementRef) { }
 
   restart() {
-    this.currNode = null;
+    //this.currNode = null;
     this.tree = null;
     this.treeService.restart().then(tree => {
+      this.currNode = null;
       this.tree = tree
       this.drawTree();
     });
@@ -204,7 +206,12 @@ export class TreeComponent implements OnInit, OnChanges {
         return this.COLORS.text_connected;
         //return "#dc322f";
       } else {
-        return this.COLORS.text_disconnected;
+        // Check if expandable
+        if (isExpandableLeft(link.target) || isExpandableRight(link.target)) {
+          return this.COLORS.text_expandable;
+        } else {
+          return this.COLORS.text_non_expandable;
+        }
       }
     });
 
