@@ -21,9 +21,11 @@ export class TreeComponent implements OnInit, OnChanges {
     node_visited:'#b58900',
     node_unvisited:'black',
     link_connected: '#dc322f',
-    link_disconnected: '#fdf6e3',
+    link_expandable: '#fdf6e3',
+    link_non_expandable: 'green',
     text_connected: '#859900',
-    text_disconnected: '#839496' 
+    //text_disconnected: '#839496' 
+    text_disconnected: '#fdf6e3'
   }
   @Input() tree;
 
@@ -174,7 +176,12 @@ export class TreeComponent implements OnInit, OnChanges {
             return this.COLORS.link_connected;
             //return '#4285f4';
           } else {
-            return this.COLORS.link_disconnected;
+            // Check if expandable
+            if(isExpandableLeft(p.target) || isExpandableRight(p.target)){
+              return this.COLORS.link_expandable;
+            } else{
+              return this.COLORS.link_non_expandable;
+            }
           }
         })
         .style("stroke-dasharray", p => {
