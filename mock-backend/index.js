@@ -1,3 +1,5 @@
+var path = require('path');
+
 var express = require('express')
 var app = express()
 
@@ -23,7 +25,7 @@ app.get(/\/step(left|right)/, (req, res) => {
 });
 
 app.get('*', (req, res) => {
-	res.sendFile('../frontend/index.html');
+	res.sendFile(path.resolve('../frontend/index.html'));
 });
 
 app.listen(8080);

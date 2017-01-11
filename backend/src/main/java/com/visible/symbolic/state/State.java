@@ -15,8 +15,13 @@ public final class State {
     @JsonSerialize(using = ParentSerializer.class)
     private State parent;
     @JsonIgnore public List<State> children;
+
+    @JsonSerialize(using = ConditionSerializer.class)
     private String ifPC;
+
+    @JsonSerialize(using = ConditionSerializer.class)
     private String elsePC;
+
     private String type;
     @JsonInclude(JsonInclude.Include.NON_EMPTY) private String errorMsg;
     private int id;
