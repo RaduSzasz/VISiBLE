@@ -16,7 +16,17 @@ export class TreeComponent implements OnInit, OnChanges {
   private _d3_diagonal;
   private currNode;
   private rootNode;
+  private COLORS = {
+    node_expandable: '#fdf6e3',
+    node_non_expandable:'#b58900',
+    link_connected: '#dc322f',
+    link_disconnected: '#fdf6e3',
+    text_connected: '#859900',
+    text_disconnected: '#839496' 
+  }
   @Input() tree;
+
+       
 
   constructor(private treeService: TreeService,
               private elemRef: ElementRef) { }
@@ -95,9 +105,9 @@ export class TreeComponent implements OnInit, OnChanges {
       .style('fill', (d) => {
         console.log(d.getID());
         if(isExpandableLeft(d) || isExpandableRight(d)){
-          return '#839496';
+          return this.COLORS.node_expandable;
         } else{
-          return '#b58900';
+          return this.COLORS.node_non_expandable;
         }
       });
 
@@ -157,10 +167,10 @@ export class TreeComponent implements OnInit, OnChanges {
         .attr('d', diagonal)
         .style('stroke', p => {
           if(p.target.getID() >= 0){
-            return '#dc322f';
+            return this.COLORS.link_connected;
             //return '#4285f4';
           } else {
-            return '#9a9494';
+            return this.COLORS.link_disconnected;
           }
         })
         .style("stroke-dasharray", p => {
@@ -180,9 +190,10 @@ export class TreeComponent implements OnInit, OnChanges {
     .text(d => d.target.pc)
     .style('fill', link => {
       if (link.target.getID() >= 0) {
-        return "#dc322f";
+        return this.COLORS.text_connected;
+        //return "#dc322f";
       } else {
-        return "#839496"; 
+        return this.COLORS.text_disconnected;
       }
     });
 
