@@ -5,9 +5,12 @@
   </div>
 </div>
 
-<div class="container">
+<div *ngIf="!initialTree" class="container">
   <h2>Upload a file:</h2>
   <vis-upload (onUpload)="updateTree($event)"></vis-upload>
+</div>
+
+<div *ngIf="initialTree" class="container">
   <tree-container [tree]="initialTree"></tree-container>
   <!--button (click)="initialTree=null">upload tree again</button-->
 </div>

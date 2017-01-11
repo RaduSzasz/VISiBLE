@@ -36,17 +36,19 @@ export class TreeComponent implements OnInit, OnChanges {
                 .attr('height', height + margin.top + margin.bottom)
                 .append('g')
                 .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+    if(this.tree) this.drawTree();
   }
 
   ngOnChanges(changes) {
     if(changes['tree'].currentValue){
       this.rootNode = this.tree.getRoot();
       this.currNode = this.rootNode;
-      this.drawTree();
+      if(this._d3_svg) this.drawTree();
     }
   }
 
   drawTree() {
+    console.log('drawing');
     var tree = this._d3_tree;
     var svg = this._d3_svg;
     var diagonal = this._d3_diagonal;
