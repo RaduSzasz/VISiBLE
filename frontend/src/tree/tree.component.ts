@@ -18,7 +18,8 @@ export class TreeComponent implements OnInit, OnChanges {
   private rootNode;
   private COLORS = {
     node_expandable: '#fdf6e3',
-    node_non_expandable:'#b58900',
+    node_visited:'#b58900',
+    node_unvisited:'black',
     link_connected: '#dc322f',
     link_disconnected: '#fdf6e3',
     text_connected: '#859900',
@@ -94,20 +95,23 @@ export class TreeComponent implements OnInit, OnChanges {
     nodeEnter.append('circle')
       .attr('r', 10);
 
-    /*
     // for debug purpose: displays id next to each node
     nodeEnter.append('text').attr('dx', '15px');
     node.selectAll('text').text(d => {console.log(d.getID()); return d.getID()})
-    */
 
 
     node.selectAll('circle')
       .style('fill', (d) => {
         console.log(d.getID());
-        if(isExpandableLeft(d) || isExpandableRight(d)){
+        if(isExpandableLeft(d) || isExpandableRight(d)) {
           return this.COLORS.node_expandable;
-        } else{
-          return this.COLORS.node_non_expandable;
+        } else {
+          // visited and not visited 
+          if (d.getID() >= 0 ) {
+            return this.COLORS.node_visited;
+          } else {
+            return this.COLORS.node_unvisited;
+          }
         }
       });
 
