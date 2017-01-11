@@ -186,8 +186,19 @@ public class JPFAdapter implements SymbolicExecutor {
     }
 
     @Override
-    public State restart() {
-        return new State().withError("Restarted JPF");
+    public State restart() throws ExecutionException, InterruptedException {
+        jpfExecutor.shutdown();
+        while (!jpfExecutor.isTerminated()) {
+            stepLeft();
+        }
+        if (!jpfExecutor.isShutdown()) {
+            return new State().withError("Restart could not be completed.");
+        }
+        if (executorService.isShutdown()) {
+            this.executorService = executorService();
+        }
+        this.jpfExecutor = executorService();
+        return execute();
     }
 
 }

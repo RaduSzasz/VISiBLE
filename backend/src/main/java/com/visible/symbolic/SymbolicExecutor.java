@@ -9,5 +9,5 @@ public interface SymbolicExecutor extends Callable<State> {
     State stepLeft();
     State stepRight();
     State execute() throws ExecutionException, InterruptedException;
-    State restart();
+    State restart() throws ExecutionException, InterruptedException;
 }
