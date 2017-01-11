@@ -19,11 +19,8 @@ public class JPFAdapterTest {
     private final static String CLASS_NAME = "MaxOfFour";
     private final static String SYMBOLIC_METHOD_NAME = "symVis";
     private final static int SYMBOLIC_METHOD_NO_ARGS = 4;
-    private final static String PACKAGE_LEVEL = "../../../../";
-
     // We need to get back to the base package, which is 4 packages up.
-
-    private ExecutorService service;
+    private final static String PACKAGE_LEVEL = "../../../../";
 
     @BeforeClass
     public static void setUpJavaProgram() throws Exception {
@@ -33,23 +30,18 @@ public class JPFAdapterTest {
         assertTrue(success);
     }
 
-    @Before
-    public void generateExecutorService() {
-        service = Executors.newFixedThreadPool(4);
-    }
-
     @Ignore
     @Test
     public void atStartFirstNodeIsReturned() throws IOException, ExecutionException, InterruptedException {
         JPFAdapter jpfAdapter =
-                new JPFAdapter(JAR_NAME, CLASS_NAME, SYMBOLIC_METHOD_NAME, SYMBOLIC_METHOD_NO_ARGS, generateBooleanArray(), service);
+                new JPFAdapter(JAR_NAME, CLASS_NAME, SYMBOLIC_METHOD_NAME, SYMBOLIC_METHOD_NO_ARGS, generateBooleanArray());
 
         State expectedResult = new State(0, null)
                                 .setIfPC("x >= y")
                                 .setElsePC("x < y")
                                 .setType("normal");
 
-        assertEquals(service.submit(jpfAdapter).get(), expectedResult);
+        assertEquals(jpfAdapter.execute(), expectedResult);
     }
 
     private boolean[] generateBooleanArray() {

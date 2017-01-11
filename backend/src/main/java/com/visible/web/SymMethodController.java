@@ -31,7 +31,6 @@ public class SymMethodController {
     private int numArgs;
     private boolean[] isSymb;
     private boolean isRestartCall = false;
-    private ExecutorService jpfExecutor;
     private SymbolicExecutor symbolicExecutor;
 
     @PostMapping
@@ -45,32 +44,27 @@ public class SymMethodController {
         this.isSymb = isSymb;
 
         if (!(this.isSymb.length == numArgs)) {
-            return new State().withError("Mismatch in number of arguments");
+            return new State().withError("Mismatch in number of argument.");
         }
 
         if (isRestartCall) {
-            restart();
+            if (symbolicExecutor == null) {
+                return new State().withError("Restart not allowed at this point.");
+            }
+            return symbolicExecutor.restart();
         }
 
+        // This piece of code only executes on first run
         isRestartCall = true;
         this.symbolicExecutor = symbolicExecutor();
-        return executorService().submit(symbolicExecutor).get();
+        return symbolicExecutor.execute();
     }
 
-    private void restart() throws ExecutionException, InterruptedException {
-        jpfExecutor.shutdown();
-        while (!jpfExecutor.isTerminated()) {
-            symbolicExecutor.stepLeft();
-        }
-    }
 
     @Bean
     @Scope("session")
     public SymbolicExecutor symbolicExecutor() {
-        if (this.jpfExecutor.isShutdown()) {
-            this.jpfExecutor = executorService();
-        }
-        return new JPFAdapter(jarName, className, methodName, numArgs, isSymb, jpfExecutor);
+        return new JPFAdapter(jarName, className, methodName, numArgs, isSymb);
     }
 
     @Bean
