@@ -16,6 +16,7 @@ app.post('/upload', (req, res) => {
 });
 
 app.post('/symbolicmethod', (req, res) => {
+	step_no = 0;
   setTimeout(() => res.json(dummy['symbolicmethod']), 2000);
 });
 
