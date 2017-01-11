@@ -59,6 +59,8 @@ export class TreeComponent implements OnInit, OnChanges {
     var svg = this._d3_svg;
     var diagonal = this._d3_diagonal;
 
+    svg.html('');
+
     console.log(this.currNode);
     this.rootNode = this.tree.getRoot();
     if(!this.currNode) this.currNode = this.rootNode;
@@ -69,6 +71,7 @@ export class TreeComponent implements OnInit, OnChanges {
     // Compute the new tree layout.
     console.log(tree);
     var nodes = tree.nodes(this.rootNode);
+    console.log(this.rootNode);
     console.log(this.currNode);
     console.log(nodes);
     var links = tree.links(nodes);
@@ -80,8 +83,17 @@ export class TreeComponent implements OnInit, OnChanges {
     var nodeEnter = node.enter().append('g');
     nodeEnter.append('circle')
       .attr('r', 10);
+
+    /*
+    // for debug purpose: displays id next to each node
+    nodeEnter.append('text').attr('dx', '15px');
+    node.selectAll('text').text(d => {console.log(d.getID()); return d.getID()})
+    */
+
+
     node.selectAll('circle')
       .style('fill', (d) => {
+        console.log(d.getID());
         if(isExpandableLeft(d) || isExpandableRight(d)){
           return 'lightsteelblue';
         } else{
@@ -143,7 +155,20 @@ export class TreeComponent implements OnInit, OnChanges {
     link.selectAll('path')
         .attr('class', 'link')
         .attr('d', diagonal)
-        .style('stroke', '#d50000')
+        .style('stroke', p => {
+          if(p.target.getID() >= 0){
+            return '#4285f4';
+          } else {
+            return '#9a9494';
+          }
+        })
+        .style("stroke-dasharray", p => {
+          if(p.target.getID() >= 0){
+            return "0, 0";
+          } else{
+            return "10,3";
+          }
+        })
         .style('stroke-width', '1.5px')
         .style('fill', 'none');
 
