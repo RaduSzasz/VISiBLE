@@ -16,7 +16,17 @@ export class TreeComponent implements OnInit, OnChanges {
   private _d3_diagonal;
   private currNode;
   private rootNode;
+  private COLORS = {
+    node_expandable: '#fdf6e3',
+    node_non_expandable:'#b58900',
+    link_connected: '#b58900',
+    link_disconnected: '#fdf6e3',
+    text_connected: '#b58900',
+    text_disconnected: '#fdf6e3'
+  }
   @Input() tree;
+
+       
 
   constructor(private treeService: TreeService,
               private elemRef: ElementRef) { }
@@ -95,9 +105,9 @@ export class TreeComponent implements OnInit, OnChanges {
       .style('fill', (d) => {
         console.log(d.getID());
         if(isExpandableLeft(d) || isExpandableRight(d)){
-          return 'lightsteelblue';
+          return this.COLORS.node_expandable;
         } else{
-          return 'black';
+          return this.COLORS.node_non_expandable;
         }
       });
 
@@ -157,9 +167,10 @@ export class TreeComponent implements OnInit, OnChanges {
         .attr('d', diagonal)
         .style('stroke', p => {
           if(p.target.getID() >= 0){
-            return '#4285f4';
+            return this.COLORS.link_connected;
+            //return '#4285f4';
           } else {
-            return '#9a9494';
+            return this.COLORS.link_disconnected;
           }
         })
         .style("stroke-dasharray", p => {
@@ -176,7 +187,15 @@ export class TreeComponent implements OnInit, OnChanges {
     .attr('x', d => 0.5*d.source.x + 0.5*d.target.x + ((d.target.isRight())? 20: -20))
     .attr('y', d => 0.5*d.source.y + 0.5*d.target.y)
     .attr('text-anchor', d => (d.target.isRight())? 'start' : 'end')
-    .text(d => d.target.pc);
+    .text(d => d.target.pc)
+    .style('fill', link => {
+      if (link.target.getID() >= 0) {
+        return this.COLORS.text_connected;
+        //return "#dc322f";
+      } else {
+        return this.COLORS.text_disconnected;
+      }
+    });
 
     link.attr('class', 'link');
 

@@ -1,13 +1,19 @@
+<!--
 <div class="jumbotron">
   <div class="container">
     <h1>{{title}}</h1>
     <p>VISiBLE stands for Visual Steerable Symbolic Execution. Given a Java program, VISiBLE allows the user to visualise and steer the symbolic execution of the program. The execution is represented in the form of a tree, with every node representing a binary decision point in the program (such as an if/else statement).</p>
   </div>
 </div>
+-->
 
 <div *ngIf="!initialTree" class="container">
-  <h2>Upload a file:</h2>
-  <vis-upload (onUpload)="updateTree($event)"></vis-upload>
+  <div class="row">
+    <div class="absolute-center is-responsive">
+      <h1 style="font-size: 4em">{{title}}</h1>
+      <vis-upload (onUpload)="updateTree($event)"></vis-upload>
+    </div>
+  </div>
 </div>
 
 <div *ngIf="initialTree" class="container">

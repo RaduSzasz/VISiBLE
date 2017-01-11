@@ -1,0 +1,12 @@
+.modal-color{
+  background-color: #e8edf3;
+  color: #657b83;
+}
+
+.upload-icon{
+  font-size: 4em;
+}
+.upload-icon:hover{
+  cursor: pointer;
+  color: #6ed3cf;
+}
