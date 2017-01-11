@@ -29,6 +29,8 @@ export class TreeComponent implements OnInit, OnChanges {
   }
   @Input() tree;
 
+       
+
   constructor(private treeService: TreeService,
               private elemRef: ElementRef) { }
 
@@ -211,7 +213,7 @@ export class TreeComponent implements OnInit, OnChanges {
           return this.COLORS.text_non_expandable;
         }
       }
-    })
+    });
 
     link.attr('class', 'link');
 
