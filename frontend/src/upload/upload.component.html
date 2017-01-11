@@ -1,11 +1,14 @@
-<input type="file"
-       ngFileSelect 
-       [options]="options"
-       (onUpload)="selectSymbolic($event)" >
+<label>
+  <span class="glyphicon glyphicon-upload" style="font-size: 3em"></span>
+  <input type="file" class="hide"
+                     ngFileSelect 
+                     [options]="options"
+                     (onUpload)="selectSymbolic($event)" >
+</label>
 
 <div class="modal fade" bsModal #staticModal="bs-modal" [config]="{backdrop: 'static'}"
      tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-sm">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" aria-label="Close" (click)="staticModal.hide()">
@@ -19,7 +22,7 @@
           <option *ngFor="let method of methods" [ngValue]="method"> {{method.class_name}} {{method.signature}} </option>
         </select>
 
-        <div *ngIf="symbolicMethod">
+        <div *ngIf="symbolicMethod" style="width: 40%; margin: auto; margin-top: 10px; text-align:left">
           Select the arguments to be symbolic:
           <div *ngFor="let b of isSymb; let i = index">
             <label>
@@ -33,9 +36,8 @@
               Loading...
             </div>
           </div>
-          <button (click)="setInitialTree()" *ngIf="!isLoading">Start!</button>
         </div>
-
+        <button (click)="setInitialTree()" *ngIf="symbolicMethod && !isLoading">Start!</button>
       </div>
     </div>
   </div>
