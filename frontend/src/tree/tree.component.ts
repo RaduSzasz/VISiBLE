@@ -19,10 +19,10 @@ export class TreeComponent implements OnInit, OnChanges {
   private COLORS = {
     node_expandable: '#fdf6e3',
     node_non_expandable:'#b58900',
-    link_connected: '#dc322f',
+    link_connected: '#b58900',
     link_disconnected: '#fdf6e3',
-    text_connected: '#859900',
-    text_disconnected: '#839496' 
+    text_connected: '#b58900',
+    text_disconnected: '#fdf6e3'
   }
   @Input() tree;
 
