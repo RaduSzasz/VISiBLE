@@ -43,6 +43,7 @@ public class VisualiserListener extends PropertyListenerAdapter {
     private Direction direction;
     private State currentState;
     private boolean firstCG = true;
+    private List<String> pc;
 
     private CountDownLatch jpfInitialised;
     private CountDownLatch movedForwardLatch;
@@ -61,6 +62,7 @@ public class VisualiserListener extends PropertyListenerAdapter {
         this.currentState = null;
         this.jpfInitialised = jpfInitialised;
         this.canMakeSelection = new CountDownLatch(1);
+        this.pc = new ArrayList<>();
     }
 
     Optional<CountDownLatch> moveForward(Direction direction) {
@@ -106,16 +108,33 @@ public class VisualiserListener extends PropertyListenerAdapter {
             pc = ((PCChoiceGenerator) cg).getCurrentPC();
         }
 
+        ConcreteValueGenerator cvg = new ConcreteValueGenerator();
+        if (pc != null) {
+            String pathCondition = processPC(pc);
+            boolean success = cvg.addConstraint(pathCondition);
+            if (!success) {
+                return null;
+//                return new State().withError("Constraint could not be added");
+            }
+        }
+        Map<String, Integer> map = cvg.getConcreteValues();
+
         State s = new State(search.getStateId(), prev);
+        s.setConcreteValues(map);
         if (prev != null) {
             prev.children.add(s);
         }
         return s;
     }
 
+    private String processPC(PathCondition pc) {
+        return pc.toString();
+    }
+
     @Override
     public void stateProcessed(Search search) {
-        System.out.println("Finished with State " + search.getStateId());
+        int id = search.getStateId();
+        System.out.println("Finished with State " + id);
     }
 
     @Override
@@ -132,6 +151,7 @@ public class VisualiserListener extends PropertyListenerAdapter {
     @Override
     public void searchFinished(Search search) {
         this.currentState.setType(END_NODE);
+        pc.forEach(System.out::println);
         if (this.movedForwardLatch != null) {
             this.movedForwardLatch.countDown();
         }
@@ -247,7 +267,7 @@ public class VisualiserListener extends PropertyListenerAdapter {
         this.currentState.setElsePC(elsePC);
         this.currentState.setType(MIDDLE_NODE);
 
-        this.choicesTrace = this.direction == Direction.LEFT ? choicesTraceELSE : choicesTraceIF;
+        this.choicesTrace =  this.direction == Direction.LEFT ? choicesTraceELSE : choicesTraceIF;
     }
 
     private String cleanConstraint(String constraint) {

@@ -6,8 +6,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public final class State {
 
@@ -25,6 +27,9 @@ public final class State {
     private String type;
     @JsonInclude(JsonInclude.Include.NON_EMPTY) private String errorMsg;
     private int id;
+
+    @JsonSerialize(using = ConcreteValueSerializer.class)
+    private Map<String, Integer> concreteValues;
 
     public State setIfPC(String ifPC) {
         this.ifPC = ifPC;
@@ -58,6 +63,7 @@ public final class State {
         this.parent = parent;
         this.ifPC = null;
         this.elsePC = null;
+        this.concreteValues = new HashMap<>();
     }
 
     public State() {
@@ -122,5 +128,13 @@ public final class State {
         this.type = ERROR;
         this.errorMsg = errorMsg;
         return this;
+    }
+
+    public Map<String, Integer> getConcreteValues() {
+        return concreteValues;
+    }
+
+    public void setConcreteValues(Map<String, Integer> concreteValues) {
+        this.concreteValues = concreteValues;
     }
 }
