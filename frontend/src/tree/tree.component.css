@@ -55,6 +55,20 @@
     stroke-width: 2px;
 }
 
+.concrete-values-box {
+  height: 12em;
+  overflow-x: hidden;
+  overflow-y: auto;
+  border: black 1px solid;
+  margin: auto;
+  width: 50%;
+  margin-top: 200px;
+}
+
+table {
+  width: 100%;
+}
+
 h2{
     color: red;
 }
