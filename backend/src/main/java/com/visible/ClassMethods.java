@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.util.*;
 
 @JsonSerialize(using=ClassMethodsSerializer.class)
-public class ClassMethods {
+public final class ClassMethods {
 
 	private String jarName = "";
 

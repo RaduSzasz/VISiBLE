@@ -1,7 +1,7 @@
 package com.visible.web;
 
+import com.visible.symbolic.docker.DockerizedExecutor;
 import com.visible.symbolic.SymbolicExecutor;
-import com.visible.symbolic.jpf.JPFAdapter;
 import com.visible.symbolic.state.State;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,9 +19,7 @@ import java.util.concurrent.Executors;
 
 @Configuration
 @RestController
-@Scope("session")
 @RequestMapping("/symbolicmethod")
-
 public class SymMethodController {
 
     private static final int NUMBER_OF_THREADS = 8;
@@ -64,7 +62,8 @@ public class SymMethodController {
     @Bean
     @Scope("session")
     public SymbolicExecutor symbolicExecutor() {
-        return new JPFAdapter(jarName, className, methodName, numArgs, isSymb);
+        // return new JPFAdapter(jarName, className, methodName, numArgs, isSymb);
+        return new DockerizedExecutor();
     }
 
     @Bean

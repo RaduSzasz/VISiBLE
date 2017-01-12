@@ -6,8 +6,6 @@ import com.visible.symbolic.state.State;
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.web.context.annotation.ApplicationScope;
 import org.springframework.web.context.annotation.SessionScope;
 
 import java.io.File;
@@ -16,7 +14,6 @@ import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
@@ -52,8 +49,6 @@ public class JPFAdapter implements SymbolicExecutor {
         this.argNum = numArgs;
         this.isSymb = isSymb;
         this.errorState = new State().withError("An unknown error occurred.");
-        this.executorService = executorService();
-        this.jpfExecutor = executorService();
     }
 
     private boolean runJPF(CountDownLatch jpfInitialised) {
@@ -179,25 +174,8 @@ public class JPFAdapter implements SymbolicExecutor {
         return executorService.submit(this).get();
     }
 
-    @Bean
-    @ApplicationScope
-    private ExecutorService executorService() {
-        return Executors.newFixedThreadPool(NUMBER_OF_THREADS);
-    }
-
     @Override
     public State restart() throws ExecutionException, InterruptedException {
-        jpfExecutor.shutdown();
-        while (!jpfExecutor.isTerminated()) {
-            stepLeft();
-        }
-        if (!jpfExecutor.isShutdown()) {
-            return new State().withError("Restart could not be completed.");
-        }
-        if (executorService.isShutdown()) {
-            this.executorService = executorService();
-        }
-        this.jpfExecutor = executorService();
         return execute();
     }
 

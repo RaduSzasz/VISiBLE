@@ -11,7 +11,7 @@ import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-public class JavaProgram {
+public final class JavaProgram {
     private static final String CLASS_EXT = ".class";
     private static final String JACOCO_METHOD = "$jacocoInit";
 

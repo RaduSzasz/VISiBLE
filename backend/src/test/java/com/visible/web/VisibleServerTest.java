@@ -47,12 +47,14 @@ public class VisibleServerTest {
 	
 	@MockBean 
 	private ExecutorService service;
-	
+
+	@Ignore
 	@Test
 	public void dummyTest() {
 		assertTrue(true);
 	}
 
+	@Ignore
 	@Test
 	public void testUploadedFileIsJAR() throws java.io.IOException {
 		String filePath = "src/test/resources/WouldIUseJPFAgain.java";
