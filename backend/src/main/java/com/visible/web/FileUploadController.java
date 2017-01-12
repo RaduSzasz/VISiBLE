@@ -8,6 +8,9 @@ import com.visible.symbolic.docker.DockerContainer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -64,10 +67,12 @@ public class FileUploadController {
         return file -> {
             ClassMethods classMethods = extractClassMethods(file);
             try {
-                URL url = new URL("http", dockerContainer.getIp(), dockerContainer.getPort(), "upload");
+                URL url = new URL("http", dockerContainer.getIp(), dockerContainer.getPort(), "/upload");
                 System.out.println(url.toString());
+                MultiValueMap<String, Object> mvm = new LinkedMultiValueMap<>();
+                mvm.add("file", new ByteArrayResource(file.getBytes()));
 
-                return restTemplate.postForEntity(url.toURI(), null, ClassMethods.class).getBody();
+                return restTemplate.postForObject(url.toURI(), mvm, ClassMethods.class);
 
             } catch (URISyntaxException e) {
                 throw new RuntimeException("Failed upload file to Docker container");
@@ -78,9 +83,7 @@ public class FileUploadController {
     @Bean
     @Conditional(DockerCondition.class)
     private UploadHandler getClassMethod() {
-        return file -> {
-            return extractClassMethods(file);
-        };
+        return this::extractClassMethods;
     }
 
 
