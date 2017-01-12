@@ -125,7 +125,7 @@ export class TreeComponent implements OnInit, OnChanges {
         if(isExpandableLeft(d) || isExpandableRight(d)){
           return 'pointer';
         } else{
-          return 'default';
+          return 'not-allowed';
         }
       })
       .on('click', (d) => {
