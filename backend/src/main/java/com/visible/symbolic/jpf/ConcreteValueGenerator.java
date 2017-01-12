@@ -46,6 +46,7 @@ public class ConcreteValueGenerator {
         switch(op) {
             case "!=":
                 a.ne(b).post();
+                break;
             case "<=":
                 a.le(b).post();
                 break;

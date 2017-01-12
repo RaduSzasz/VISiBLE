@@ -44,6 +44,17 @@ public class ConcreteValueGeneratorTest {
     }
 
     @Test
+    public void testGreaterThanEqual() {
+        ConcreteValueGenerator cvg = new ConcreteValueGenerator();
+        cvg.addConstraint("x_1_SYMINT>=y_2_SYMINT");
+
+        Map<String, Integer> values = cvg.getConcreteValues();
+        assertNotNull(values);
+
+        assertTrue(values.get("x_1_SYMINT") >= values.get("y_2_SYMINT"));
+    }
+
+    @Test
     public void testEqual() {
         ConcreteValueGenerator cvg = new ConcreteValueGenerator();
         cvg.addConstraint("x==y");
