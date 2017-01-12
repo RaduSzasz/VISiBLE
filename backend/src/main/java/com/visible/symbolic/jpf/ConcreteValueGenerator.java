@@ -4,7 +4,8 @@ import org.chocosolver.solver.Model;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.variables.IntVar;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ConcreteValueGenerator {
 
@@ -39,8 +40,8 @@ public class ConcreteValueGenerator {
             return false;
         }
 
-        IntVar a = storeVariable(variables[0]);
-        IntVar b = storeVariable(variables[1]);
+        IntVar a = storeVariable(variables[0].trim());
+        IntVar b = storeVariable(variables[1].trim());
 
         // Add the correct constraint
         switch(op) {
@@ -90,6 +91,7 @@ public class ConcreteValueGenerator {
                 values.put(var.getName(), var.getValue());
             }
 
+            solver.reset();
             return values;
         } else {
             // Could not find feasible solution
