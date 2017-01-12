@@ -16,15 +16,29 @@ export class TreeComponent implements OnInit, OnChanges {
   private _d3_diagonal;
   private currNode;
   private rootNode;
+  private COLORS = {
+    node_expandable: '#fdf6e3',
+    node_visited:'#b58900',
+    node_unvisited:'#657B83',
+    link_connected: '#b58900',
+    link_expandable: '#fdf6e3',
+    link_non_expandable: '#657B83',
+    text_connected: '#b58900',
+    text_non_expandable: '#657B83',
+    text_expandable: '#fdf6e3'
+  }
   @Input() tree;
+
+       
 
   constructor(private treeService: TreeService,
               private elemRef: ElementRef) { }
 
   restart() {
-    this.currNode = null;
+    //this.currNode = null;
     this.tree = null;
     this.treeService.restart().then(tree => {
+      this.currNode = null;
       this.tree = tree
       this.drawTree();
     });
@@ -59,13 +73,19 @@ export class TreeComponent implements OnInit, OnChanges {
     var svg = this._d3_svg;
     var diagonal = this._d3_diagonal;
 
+    svg.html('');
+
     console.log(this.currNode);
     this.rootNode = this.tree.getRoot();
     if(!this.currNode) this.currNode = this.rootNode;
 
+    var isExpandableLeft = (n) => n.getID() == -2 * this.currNode.getID() - 1;
+    var isExpandableRight = (n) => n.getID() == -2 * this.currNode.getID() - 2;
+
     // Compute the new tree layout.
     console.log(tree);
     var nodes = tree.nodes(this.rootNode);
+    console.log(this.rootNode);
     console.log(this.currNode);
     console.log(nodes);
     var links = tree.links(nodes);
@@ -75,23 +95,45 @@ export class TreeComponent implements OnInit, OnChanges {
 
     // Enter any new nodes at the parent's previous position.
     var nodeEnter = node.enter().append('g');
+    nodeEnter.append('circle')
+      .attr('r', 10);
+
+    /*
+    // for debug purpose: displays id next to each node
+    nodeEnter.append('text').attr('dx', '15px');
+    node.selectAll('text').text(d => {console.log(d.getID()); return d.getID()})
+    */
+
+    node.selectAll('circle')
+      .style('fill', (d) => {
+        console.log(d.getID());
+        if(isExpandableLeft(d) || isExpandableRight(d)) {
+          return this.COLORS.node_expandable;
+        } else {
+          // visited and not visited 
+          if (d.getID() >= 0 ) {
+            return this.COLORS.node_visited;
+          } else {
+            return this.COLORS.node_unvisited;
+          }
+        }
+      });
+
     node.attr('class', 'node')
       .attr('transform', (d) => `translate(${d.x}, ${d.y})`)
+      .style('cursor', (d) => {
+        if(isExpandableLeft(d) || isExpandableRight(d)){
+          return 'pointer';
+        } else{
+          return 'default';
+        }
+      })
       .on('click', (d) => {
         var steer_promise;
         
-        var clickedID = d.getID();
-        console.log(clickedID);
-        var currID = this.currNode.getID();
-        console.log(currID);
-        if(clickedID < 0 && d.getParent().getID() == currID) {
-          // you are in the currNode's virtual node
-          var leftID = -2 * currID - 1;
-          var rightID = leftID - 1;
-         
-          if(clickedID == leftID) {
+        if(d.getID() < 0 && d.getParent().getID() == this.currNode.getID()) {
+          if(isExpandableLeft(d)) {
             steer_promise = this.treeService.stepLeft(this.currNode);
-            console.log(steer_promise);
             steer_promise.then(res => {
               console.log("Updating current node (left)");
               this.currNode = this.currNode.getLeft();
@@ -102,7 +144,7 @@ export class TreeComponent implements OnInit, OnChanges {
             });
           }
 
-          if(clickedID == rightID) {
+          if(isExpandableRight(d)) {
             steer_promise = this.treeService.stepRight(this.currNode);
             steer_promise.then(res => {
               console.log("Updating current node (right)");
@@ -114,20 +156,7 @@ export class TreeComponent implements OnInit, OnChanges {
           }
         }
         
-/* if(d.id >= max_index -1) {
-            console.log('bye');
-          steer_promise.then(tree => {
-            console.log('hello');
-            d.children = tree.children;
-            this.drawTree();
-          });
-        }
-        */
       }) ;
-
-    nodeEnter.append('circle')
-    .attr('r', 10)
-    .style('fill', 'lightsteelblue');
 
     // Transition exiting nodes to the parent's new position.
     node.exit().remove();
@@ -135,9 +164,6 @@ export class TreeComponent implements OnInit, OnChanges {
     // Update the links…
     svg.selectAll('g.link').remove();
     var link = svg.selectAll('g.link').data(links);
-
-        //.style('stroke', '#d50000')
-        //.style('stroke-width', '1.5px');
 
     // Enter any new links at the parent's previous position.
     var linkEnter = link.enter().insert('g', 'g.node');
@@ -147,24 +173,47 @@ export class TreeComponent implements OnInit, OnChanges {
     link.selectAll('path')
         .attr('class', 'link')
         .attr('d', diagonal)
-        .style('stroke', '#d50000')
+        .style('stroke', p => {
+          if(p.target.getID() >= 0){
+            return this.COLORS.link_connected;
+            //return '#4285f4';
+          } else {
+            // Check if expandable
+            if(isExpandableLeft(p.target) || isExpandableRight(p.target)){
+              return this.COLORS.link_expandable;
+            } else{
+              return this.COLORS.link_non_expandable;
+            }
+          }
+        })
+        .style("stroke-dasharray", p => {
+          if(p.target.getID() >= 0){
+            return "0, 0";
+          } else{
+            return "10,3";
+          }
+        })
         .style('stroke-width', '1.5px')
         .style('fill', 'none');
 
-    /*
-  .link path{
-      fill: none;
-      /*  stroke: #ccc;
-      stroke: #d50000;
-      stroke-width: 1.5px;
-    }
-*/
     link.selectAll('text')
     .attr('x', d => 0.5*d.source.x + 0.5*d.target.x + ((d.target.isRight())? 20: -20))
     .attr('y', d => 0.5*d.source.y + 0.5*d.target.y)
     .attr('text-anchor', d => (d.target.isRight())? 'start' : 'end')
-    // TODO: Pretty printing of pc.
-    .text((d:any) => d.target.pc);
+    .text(d => d.target.pc)
+    .style('fill', link => {
+      if (link.target.getID() >= 0) {
+        return this.COLORS.text_connected;
+        //return "#dc322f";
+      } else {
+        // Check if expandable
+        if (isExpandableLeft(link.target) || isExpandableRight(link.target)) {
+          return this.COLORS.text_expandable;
+        } else {
+          return this.COLORS.text_non_expandable;
+        }
+      }
+    });
 
     link.attr('class', 'link');
 
