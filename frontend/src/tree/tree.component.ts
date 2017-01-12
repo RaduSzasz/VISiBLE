@@ -204,7 +204,6 @@ export class TreeComponent implements OnInit, OnChanges {
     .style('fill', link => {
       if (link.target.getID() >= 0) {
         return this.COLORS.text_connected;
-        //return "#dc322f";
       } else {
         // Check if expandable
         if (isExpandableLeft(link.target) || isExpandableRight(link.target)) {
@@ -213,7 +212,8 @@ export class TreeComponent implements OnInit, OnChanges {
           return this.COLORS.text_non_expandable;
         }
       }
-    });
+    })
+    .style('font-size', '1.5em');
 
     link.attr('class', 'link');
 

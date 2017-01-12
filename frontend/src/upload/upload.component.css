@@ -10,3 +10,22 @@
   cursor: pointer;
   color: #6ed3cf;
 }
+
+.message-main {
+  /*color: yellow;*/
+  font-size: 1.5em;
+  color: darkgray;
+}
+
+.message-subtitle {
+  /*color: yellow;*/
+  color: #b58900;
+}
+
+caption {
+  color: red;
+}
+
+.table-title {
+  color: yellow;
+}
