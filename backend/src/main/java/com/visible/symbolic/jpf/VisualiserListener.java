@@ -70,11 +70,10 @@ public class VisualiserListener extends PropertyListenerAdapter {
 
     Optional<CountDownLatch> moveForward(Direction direction) {
         this.direction = direction;
-        System.out.println(direction);
         this.shouldMoveForward = true;
         canMakeSelection.countDown();
-        threadInfo.setRunning();
         movedForwardLatch = new CountDownLatch(1);
+        threadInfo.setRunning();
         return searchHasFinished ? Optional.empty() : Optional.of(movedForwardLatch);
     }
 
@@ -155,8 +154,11 @@ public class VisualiserListener extends PropertyListenerAdapter {
     @Override
     public void searchFinished(Search search) {
         this.currentState.setType(END_NODE);
-        // ADD PC TO LEAF NODS
-        pc.forEach(System.out::println);
+        if (this.direction == Direction.LEFT) {
+            pc.add(currentState.getParent().getIfPC());
+        } else {
+            pc.add(currentState.getParent().getElsePC());
+        }
         if (this.movedForwardLatch != null) {
             this.movedForwardLatch.countDown();
         }
@@ -185,7 +187,7 @@ public class VisualiserListener extends PropertyListenerAdapter {
                     } else {
                         pathCondition = nextRight;
                     }
-                    System.out.println(pathCondition);
+                    pc.add(pathCondition);
                     computeIFBranchPC(instruction, threadInfo, cg);
 
                     if (jpfInitialised != null) {
