@@ -28,6 +28,7 @@ public final class State {
     @JsonInclude(JsonInclude.Include.NON_EMPTY) private String errorMsg;
     private int id;
 
+    @JsonSerialize(keyUsing = VarNameSerializer.class)
     private Map<String, Integer> concreteValues;
 
     public State setIfPC(String ifPC) {

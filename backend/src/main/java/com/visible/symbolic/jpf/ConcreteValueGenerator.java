@@ -1,5 +1,6 @@
 package com.visible.symbolic.jpf;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.chocosolver.solver.Model;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.variables.IntVar;
