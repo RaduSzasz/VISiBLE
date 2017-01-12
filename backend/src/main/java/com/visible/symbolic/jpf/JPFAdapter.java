@@ -28,7 +28,6 @@ public class JPFAdapter implements SymbolicExecutor {
     private static final String SOLVER = "no_solver";
 
     private static VisualiserListener visualiser;
-    private static final int NUMBER_OF_THREADS = 8;
     private String jarName;
     private String className;
     private String method;

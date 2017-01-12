@@ -6,6 +6,7 @@ import com.visible.symbolic.state.State;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -60,7 +61,7 @@ public class SymMethodController {
 
 
     @Bean
-    @Scope("session")
+    @Scope(value = "session", proxyMode = ScopedProxyMode.TARGET_CLASS)
     public SymbolicExecutor symbolicExecutor() {
         // return new JPFAdapter(jarName, className, methodName, numArgs, isSymb);
         return new DockerizedExecutor();

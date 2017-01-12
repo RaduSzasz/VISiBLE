@@ -11,8 +11,14 @@ import com.visible.symbolic.docker.DockerContainer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.context.request.RequestContextListener;
 
 import java.util.Map;
 
@@ -32,7 +38,7 @@ public class VisibleServerApplication {
 	}
 
 	@Bean
-	@Scope("session")
+	@Scope(value = "session", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public DockerContainer dockerContainer() {
 		if (dockerClient == null) {
 			throw new RuntimeException("Docker client was null");
@@ -57,14 +63,36 @@ public class VisibleServerApplication {
         Map<ExposedPort, Ports.Binding[]> bindings = networkSettings.getPorts().getBindings();
         for (ExposedPort exposedPort : bindings.keySet()) {
             Ports.Binding[] portBindings = bindings.get(exposedPort);
+            System.out.println(portBindings);
             for(Ports.Binding portBinding : portBindings) {
-                String containerIP = portBinding.getHostIp();
-                int containerPort = Integer.getInteger(portBinding.getHostPortSpec());
+                System.out.println("IN THE FOR LOOP");
+                if (portBinding != null) {
+                    String containerIP = portBinding.getHostIp();
+                    int containerPort = Integer.valueOf(portBinding.getHostPortSpec());
+                    System.out.println(Integer.valueOf(portBinding.getHostPortSpec()));
 
-                dockerContainer = new DockerContainer(containerIP, containerPort);
+                    dockerContainer = new DockerContainer(containerIP, containerPort);
+                }
             }
         }
 
 		return dockerContainer;
 	}
+
+    @Bean
+    @ConditionalOnMissingBean(RequestContextListener.class)
+    public RequestContextListener requestContextListener() {
+        return new RequestContextListener();
+    }
+
+    @Bean
+    public RestTemplate restTemplate() {
+        RestTemplate restTemplate = new RestTemplate();
+
+        restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+        restTemplate.getMessageConverters().add(new StringHttpMessageConverter());
+
+        return restTemplate;
+    }
+
 }
