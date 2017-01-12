@@ -28,7 +28,6 @@ public class JPFAdapter implements SymbolicExecutor {
     private static final String JPF_EXTENSION = ".jpf";
     private static final String SITE_PROPERTIES_PRE_PATH = "+site=";
     private static final String SITE_PROPERTIES = "/site.properties";
-    private static final String SOLVER = "no_solver";
 
     private static VisualiserListener visualiser;
     private static final int NUMBER_OF_THREADS = 8;
@@ -103,7 +102,6 @@ public class JPFAdapter implements SymbolicExecutor {
 
         Config config = JPF.createConfig(args);
         config.setProperty("classpath", ABSOLUTE_PATH_TO_INPUT + jarName);
-        config.setProperty("symbolic.dp", SOLVER);
         config.setProperty("target", mainClassName);
         String symbolicMethod = className + "." + method + getSymbArgs(isSymb, argNum);
 

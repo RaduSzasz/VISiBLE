@@ -42,6 +42,10 @@ dependencies {
 
   compile files('jpf-core/build/jpf.jar')
   compile files('jpf-symbc/build/jpf-symbc.jar')
+  compile files('jpf-symbc/lib/choco-1_2_04.jar')
+
+  compile group: 'org.choco-solver', name: 'choco-solver', version: '4.0.1'
+
   // end::actuator[]
   testCompile("junit:junit")
 }

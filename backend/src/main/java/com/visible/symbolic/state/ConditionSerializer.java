@@ -14,7 +14,7 @@ public class ConditionSerializer extends JsonSerializer<String> {
                           SerializerProvider serializers) throws IOException {
 
         // Currently assumes that no &&, ||
-        String[] delims = {"<=", ">=", "==", "<", ">"};
+        String[] delims = {"!=", "<=", ">=", "==", "<", ">"};
 
         String op = null;
         String[] vars = null;
