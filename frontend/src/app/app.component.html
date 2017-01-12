@@ -17,6 +17,7 @@
   </div>
 
   <div *ngIf="initialTree" class="container">
+    <h1 style="font-size: 4em">{{title}}</h1>
     <tree-container [tree]="initialTree"></tree-container>
     <!--button (click)="initialTree=null">upload tree again</button-->
   </div>
