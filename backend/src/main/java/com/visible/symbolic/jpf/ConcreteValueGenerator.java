@@ -13,8 +13,8 @@ public class ConcreteValueGenerator {
     private Model model;
     private Map<String, IntVar> vars;
 
-    private static final int LOWER = 0;
-    private static final int UPPER = 100;
+    private static final int LOWER = -10;
+    private static final int UPPER = 10;
 
     public ConcreteValueGenerator() {
         this.model = new Model("Model");
