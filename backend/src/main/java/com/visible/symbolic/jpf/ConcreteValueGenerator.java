@@ -20,7 +20,7 @@ public class ConcreteValueGenerator {
     }
 
     public boolean addConstraint(String constraint) {
-        String[] delims = {"<=", ">=", "==", "<", ">"};
+        String[] delims = {"!=", "<=", ">=", "==", "<", ">"};
 
         String op = null;
         String[] variables = null;
@@ -44,6 +44,8 @@ public class ConcreteValueGenerator {
 
         // Add the correct constraint
         switch(op) {
+            case "!=":
+                a.ne(b).post();
             case "<=":
                 a.le(b).post();
                 break;

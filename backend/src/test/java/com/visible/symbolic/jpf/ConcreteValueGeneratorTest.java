@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import java.util.Map;
 
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -88,5 +89,16 @@ public class ConcreteValueGeneratorTest {
         assertNotNull(values);
 
         assertTrue(values.get("x") > 5);
+    }
+
+    @Test
+    public void testNotEqual() {
+        ConcreteValueGenerator cvg = new ConcreteValueGenerator();
+        cvg.addConstraint("y!=x");
+
+        Map<String, Integer> values = cvg.getConcreteValues();
+        assertNotNull(values);
+
+        assertNotEquals(values.get("x"), values.get("y"));
     }
 }
