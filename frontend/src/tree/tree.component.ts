@@ -18,11 +18,14 @@ export class TreeComponent implements OnInit, OnChanges {
   private rootNode;
   private COLORS = {
     node_expandable: '#fdf6e3',
-    node_non_expandable:'#b58900',
+    node_visited:'#b58900',
+    node_unvisited:'#657B83',
     link_connected: '#b58900',
-    link_disconnected: '#fdf6e3',
+    link_expandable: '#fdf6e3',
+    link_non_expandable: '#657B83',
     text_connected: '#b58900',
-    text_disconnected: '#fdf6e3'
+    text_non_expandable: '#657B83',
+    text_expandable: '#fdf6e3'
   }
   @Input() tree;
 
@@ -32,9 +35,10 @@ export class TreeComponent implements OnInit, OnChanges {
               private elemRef: ElementRef) { }
 
   restart() {
-    this.currNode = null;
+    //this.currNode = null;
     this.tree = null;
     this.treeService.restart().then(tree => {
+      this.currNode = null;
       this.tree = tree
       this.drawTree();
     });
@@ -100,14 +104,18 @@ export class TreeComponent implements OnInit, OnChanges {
     node.selectAll('text').text(d => {console.log(d.getID()); return d.getID()})
     */
 
-
     node.selectAll('circle')
       .style('fill', (d) => {
         console.log(d.getID());
-        if(isExpandableLeft(d) || isExpandableRight(d)){
+        if(isExpandableLeft(d) || isExpandableRight(d)) {
           return this.COLORS.node_expandable;
-        } else{
-          return this.COLORS.node_non_expandable;
+        } else {
+          // visited and not visited 
+          if (d.getID() >= 0 ) {
+            return this.COLORS.node_visited;
+          } else {
+            return this.COLORS.node_unvisited;
+          }
         }
       });
 
@@ -170,7 +178,12 @@ export class TreeComponent implements OnInit, OnChanges {
             return this.COLORS.link_connected;
             //return '#4285f4';
           } else {
-            return this.COLORS.link_disconnected;
+            // Check if expandable
+            if(isExpandableLeft(p.target) || isExpandableRight(p.target)){
+              return this.COLORS.link_expandable;
+            } else{
+              return this.COLORS.link_non_expandable;
+            }
           }
         })
         .style("stroke-dasharray", p => {
@@ -193,7 +206,12 @@ export class TreeComponent implements OnInit, OnChanges {
         return this.COLORS.text_connected;
         //return "#dc322f";
       } else {
-        return this.COLORS.text_disconnected;
+        // Check if expandable
+        if (isExpandableLeft(link.target) || isExpandableRight(link.target)) {
+          return this.COLORS.text_expandable;
+        } else {
+          return this.COLORS.text_non_expandable;
+        }
       }
     });
 

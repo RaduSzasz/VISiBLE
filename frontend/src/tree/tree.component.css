@@ -59,10 +59,8 @@
   height: 12em;
   overflow-x: hidden;
   overflow-y: auto;
-  border: black 1px solid;
-  margin: auto;
-  width: 50%;
-  margin-top: 200px;
+  margin-top: 100px;
+  /*margin-top: 200px;*/
 }
 
 table {
