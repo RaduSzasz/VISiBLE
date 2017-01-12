@@ -44,6 +44,7 @@ public class VisualiserListener extends PropertyListenerAdapter {
     private State currentState;
     private boolean firstCG = true;
     private List<String> pc;
+    private ConcreteValueGenerator cvg;
 
     private CountDownLatch jpfInitialised;
     private CountDownLatch movedForwardLatch;
@@ -66,6 +67,7 @@ public class VisualiserListener extends PropertyListenerAdapter {
         this.jpfInitialised = jpfInitialised;
         this.canMakeSelection = new CountDownLatch(1);
         this.pc = new ArrayList<>();
+        this.cvg = new ConcreteValueGenerator();
     }
 
     Optional<CountDownLatch> moveForward(Direction direction) {
@@ -105,39 +107,16 @@ public class VisualiserListener extends PropertyListenerAdapter {
     }
 
     private State createNewState(Search search) {
-        PathCondition pc = null;
-        ChoiceGenerator<?> cg = search.getVM().getLastChoiceGeneratorOfType(PCChoiceGenerator.class);
-        if (cg != null) {
-            pc = ((PCChoiceGenerator) cg).getCurrentPC();
-        }
-
-        ConcreteValueGenerator cvg = new ConcreteValueGenerator();
-        if (pc != null) {
-            String pathCondition = processPC(pc);
-            boolean success = cvg.addConstraint(pathCondition);
-            if (!success) {
-                return null;
-//                return new State().withError("Constraint could not be added");
-            }
-        }
-        Map<String, Integer> map = cvg.getConcreteValues();
-
         State s = new State(search.getStateId(), prev);
-        s.setConcreteValues(map);
         if (prev != null) {
             prev.children.add(s);
         }
         return s;
     }
 
-    private String processPC(PathCondition pc) {
-        return pc.toString();
-    }
-
     @Override
     public void stateProcessed(Search search) {
-        int id = search.getStateId();
-        System.out.println("Finished with State " + id);
+        System.out.println("Finished with State " + search.getStateId());
     }
 
     @Override
@@ -155,10 +134,12 @@ public class VisualiserListener extends PropertyListenerAdapter {
     public void searchFinished(Search search) {
         this.currentState.setType(END_NODE);
         if (this.direction == Direction.LEFT) {
-            pc.add(currentState.getParent().getIfPC());
+            cvg.addConstraint(currentState.getParent().getIfPC());
         } else {
-            pc.add(currentState.getParent().getElsePC());
+            cvg.addConstraint(currentState.getParent().getElsePC());
         }
+        Map<String, Integer> map = cvg.getConcreteValues();
+        currentState.setConcreteValues(map);
         if (this.movedForwardLatch != null) {
             this.movedForwardLatch.countDown();
         }
@@ -187,7 +168,10 @@ public class VisualiserListener extends PropertyListenerAdapter {
                     } else {
                         pathCondition = nextRight;
                     }
-                    pc.add(pathCondition);
+                    if (!firstCG) {
+                        cvg.addConstraint(pathCondition);
+                        currentState.setConcreteValues(cvg.getConcreteValues());
+                    }
                     computeIFBranchPC(instruction, threadInfo, cg);
 
                     if (jpfInitialised != null) {
