@@ -44,12 +44,12 @@ public class SymMethodController {
         this.isSymb = isSymb;
 
         if (!(this.isSymb.length == numArgs)) {
-            return new State().withError("Mismatch in number of argument.");
+            return State.createErrorState("Mismatch in number of argument.");
         }
 
         if (isRestartCall) {
             if (symbolicExecutor == null) {
-                return new State().withError("Restart not allowed at this point.");
+                return State.createErrorState("Restart not allowed at this point.");
             }
             return symbolicExecutor.restart();
         }

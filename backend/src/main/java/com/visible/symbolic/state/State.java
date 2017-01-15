@@ -1,14 +1,11 @@
 package com.visible.symbolic.state;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 public final class State {
@@ -16,7 +13,6 @@ public final class State {
     private static final String ERROR = "error";
     @JsonSerialize(using = ParentSerializer.class)
     private State parent;
-//    @JsonIgnore public List<State> children;
 
     @JsonSerialize(using = ConditionSerializer.class)
     private String ifPC;
@@ -59,24 +55,16 @@ public final class State {
 
     public State(int id, State parent) {
         this.id = id;
-//        this.children = new LinkedList<>();
         this.parent = parent;
         this.ifPC = null;
         this.elsePC = null;
         this.concreteValues = new HashMap<>();
     }
 
-    public State() {
-        this.id = -1;
-//        this.children = null;
-        this.parent = null;
-        this.ifPC = null;
-        this.elsePC = null;
-    }
-
-    public State withError(String errorMsg) {
-        setError(errorMsg);
-        return this;
+    public static State createErrorState(String errorMsg) {
+        State s = new State(-1, null);
+        s.setError(errorMsg);
+        return s;
     }
 
     @Override
@@ -124,7 +112,7 @@ public final class State {
         return errorMsg;
     }
 
-    private State setError(String errorMsg) {
+    public State setError(String errorMsg) {
         this.type = ERROR;
         this.errorMsg = errorMsg;
         return this;

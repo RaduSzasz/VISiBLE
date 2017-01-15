@@ -28,19 +28,19 @@ public class JPFAdapter implements SymbolicExecutor {
     private static final String JPF_EXTENSION = ".jpf";
     private static final String SITE_PROPERTIES_PRE_PATH = "+site=";
     private static final String SITE_PROPERTIES = "/site.properties";
+    private static final int NUMBER_OF_THREADS = 8;
 
     private static VisualiserListener visualiser;
-    private static final int NUMBER_OF_THREADS = 8;
     private String jarName;
     private String className;
     private String method;
     private int argNum;
     private State errorState;
     private boolean[] isSymb;
+    private CountDownLatch jpfInitialised;
 
     @Autowired
     private ExecutorService executorService;
-
     @Autowired
     private ExecutorService jpfExecutor;
 
@@ -50,12 +50,12 @@ public class JPFAdapter implements SymbolicExecutor {
         this.method = methodName;
         this.argNum = numArgs;
         this.isSymb = isSymb;
-        this.errorState = new State().withError("An unknown error occurred.");
+        this.errorState = State.createErrorState("An unknown error occurred.");
         this.executorService = executorService();
         this.jpfExecutor = executorService();
     }
 
-    private boolean runJPF(CountDownLatch jpfInitialised) {
+    private boolean runJPF() {
         String[] args = new String[2];
         String mainClassName;
 
@@ -63,12 +63,13 @@ public class JPFAdapter implements SymbolicExecutor {
             Manifest manifest = new JarFile(RELATIVE_PATH_TO_INPUT + "/" + jarName).getManifest();
             mainClassName = manifest.getMainAttributes().getValue("Main-Class");
         } catch (IOException e) {
-            errorState = new State().withError("Manifest file in " + jarName + " could not be read.");
+            String errorMsg = jarName == null ? "No file has been uploaded." : "Manifest file in " + jarName + " could not be read.";
+            errorState.setError(errorMsg);
             return false;
         }
 
         if (mainClassName == null) {
-            errorState = new State().withError("No entrypoint specified in Manifest file.");
+            errorState.setError("No entrypoint specified in Manifest file.");
             return false;
         }
 
@@ -90,10 +91,11 @@ public class JPFAdapter implements SymbolicExecutor {
             jpfFileCreated = jpfFileCreated && jpfFile.createNewFile();
 
             if (!jpfFileCreated) {
+                // If file not created, we need to return an error state - same as below
                 throw new IOException();
             }
         } catch (IOException e) {
-            errorState = new State().withError(jpfFileName + " could not be created.");
+            errorState.setError(jpfFileName + " could not be created.");
             return false;
         }
 
@@ -103,8 +105,8 @@ public class JPFAdapter implements SymbolicExecutor {
         Config config = JPF.createConfig(args);
         config.setProperty("classpath", ABSOLUTE_PATH_TO_INPUT + jarName);
         config.setProperty("target", mainClassName);
-        String symbolicMethod = className + "." + method + getSymbArgs(isSymb, argNum);
 
+        String symbolicMethod = className + "." + method + getSymbArgs(isSymb, argNum);
         config.setProperty("symbolic.method", symbolicMethod);
 
         JPF jpf = new JPF(config);
@@ -113,7 +115,7 @@ public class JPFAdapter implements SymbolicExecutor {
         jpf.addListener(visualiser);
         jpfExecutor.submit(jpf);
         if (jpf.foundErrors()) {
-            errorState = new State().withError("Internal error in JPF.");
+            errorState.setError("Internal error in JPF.");
             return false;
         }
         return true;
@@ -138,8 +140,8 @@ public class JPFAdapter implements SymbolicExecutor {
 
     @Override
     public State call() {
-        CountDownLatch jpfInitialised = new CountDownLatch(1);
-        boolean success = runJPF(jpfInitialised);
+        this.jpfInitialised = new CountDownLatch(1);
+        boolean success = runJPF();
         if (!success) {
             return errorState;
         }
@@ -152,14 +154,18 @@ public class JPFAdapter implements SymbolicExecutor {
     }
 
     private State makeStep(Direction direction) {
-        moveForward(direction).ifPresent(latch -> {
-            try {
-                latch.await();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        });
-        return visualiser.getCurrentState();
+        try {
+            moveForward(direction).ifPresent(latch -> {
+                try {
+                    latch.await();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            });
+            return visualiser.getCurrentState();
+        } catch (NullPointerException e) {
+            return State.createErrorState("JPF has not initialised yet.");
+        }
     }
 
     @Override
@@ -190,7 +196,7 @@ public class JPFAdapter implements SymbolicExecutor {
             stepLeft();
         }
         if (!jpfExecutor.isShutdown()) {
-            return new State().withError("Restart could not be completed.");
+            return State.createErrorState("Restart could not be completed.");
         }
         if (executorService.isShutdown()) {
             this.executorService = executorService();
