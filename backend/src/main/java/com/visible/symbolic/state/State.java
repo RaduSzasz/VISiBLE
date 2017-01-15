@@ -10,6 +10,11 @@ import java.util.Map;
 
 public final class State {
 
+    public static final String ERR_UNKNOWN = "An unknown error occurred.";
+    public static final String ERR_ARG_MISMATCH = "Mismatch in number of arguments";
+    public static final String ERR_EXEC_NOT_INIT = "Symbolic Executor has not been initialised yet";
+    public static final String ERR_RESTART_FAIL = "Restart could not be completed";
+
     private static final String ERROR = "error";
     @JsonSerialize(using = ParentSerializer.class)
     private State parent;

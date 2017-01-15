@@ -50,7 +50,7 @@ public class JPFAdapter implements SymbolicExecutor {
         this.method = methodName;
         this.argNum = numArgs;
         this.isSymb = isSymb;
-        this.errorState = State.createErrorState("An unknown error occurred.");
+        this.errorState = State.createErrorState(State.ERR_UNKNOWN);
         this.executorService = executorService();
         this.jpfExecutor = executorService();
     }
@@ -160,7 +160,7 @@ public class JPFAdapter implements SymbolicExecutor {
             });
             return visualiser.getCurrentState();
         } catch (NullPointerException e) {
-            return State.createErrorState("JPF has not initialised yet.");
+            return State.createErrorState(State.ERR_EXEC_NOT_INIT);
         }
     }
 
@@ -179,7 +179,7 @@ public class JPFAdapter implements SymbolicExecutor {
         if (jpfExecutor != null) {
             jpfExecutor.shutdownNow();
             if (!jpfExecutor.isShutdown()) {
-                return State.createErrorState("Restart could not be completed.");
+                return State.createErrorState(State.ERR_RESTART_FAIL);
             }
             if (executorService.isShutdown()) {
                 this.executorService = executorService();

@@ -42,7 +42,7 @@ public class SymMethodController {
         this.isSymb = isSymb;
 
         if (!(this.isSymb.length == numArgs)) {
-            return State.createErrorState("Mismatch in number of argument.");
+            return State.createErrorState(State.ERR_ARG_MISMATCH);
         }
 
         return symbolicExecutor().execute();
