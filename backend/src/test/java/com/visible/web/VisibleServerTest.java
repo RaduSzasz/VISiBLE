@@ -3,11 +3,13 @@ package com.visible.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.visible.ClassMethods;
+import com.visible.JavaProgram;
 import com.visible.symbolic.SymbolicExecutor;
 import com.visible.symbolic.state.State;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -18,12 +20,14 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.BDDMockito.given;
 
 
 @RunWith(SpringRunner.class)
@@ -34,35 +38,31 @@ public class VisibleServerTest {
 	
 	@Autowired
 	private TestRestTemplate restTemplate;
-	
-	// TODO: Figure out mocking problem for JavaProgram
-	//@MockBean
-	//private JavaProgram javaProgram;
-	
-	@MockBean
-	private SymbolicExecutor executor;
-	
-	@MockBean
-	private Future<State> future;
-	
-	@MockBean 
-	private ExecutorService service;
-	
-	@Test
-	public void dummyTest() {
-		assertTrue(true);
-	}
+
+	@Mock
+    private JavaProgram javaProgram;
+
+	//@MockBean private SymbolicExecutor executor;
+	//@MockBean private Future<State> future;
+	//@MockBean private ExecutorService service;
 
 	@Test
-	public void testUploadedFileIsJAR() throws java.io.IOException {
-		String filePath = "src/test/resources/WouldIUseJPFAgain.java";
+	public void testUpload() throws IOException, ClassNotFoundException, InterruptedException {
+		String filePath = "src/test/resources/MaxOfFour.jar";
 
-		ClassMethods expected = new ClassMethods();
-		expected.setError();
+        // Build expected ClassMethods
+        ClassMethods expected = new ClassMethods();
+        expected.addMethodToClass("MaxOfFour", "main", 1,
+                "public static void MaxOfFour.main(java.lang.String[])");
+        expected.addMethodToClass("MaxOfFour", "symVis", 4,
+                "private static java.lang.String MaxOfFour.symVis(int,int,int,int)");
+        expected.setJarName("MaxOfFour.jar");
 
+		given(this.javaProgram.getClassMethods()).willReturn(expected);
+
+		// Make POST request
 		MultiValueMap<String, Object> parts = new LinkedMultiValueMap<>();
 		parts.add("file", new FileSystemResource(filePath));
-
 		String response = this.restTemplate.postForObject("/upload", parts, String.class);
 
 		// Assert that both JSON objects are equivalent
