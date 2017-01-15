@@ -124,11 +124,7 @@ public class JPFAdapter implements SymbolicExecutor {
     private String getSymbArgs(boolean[] isSymb, int argNum) {
         StringBuilder sb = new StringBuilder("(");
         for (int i = 0; i < argNum - 1; i++) {
-            if (isSymb[i]) {
-                sb.append("sym#");
-            } else {
-                sb.append("con#");
-            }
+            sb.append(isSymb[i] ? "sym#" : "con#");
         }
         sb.append(isSymb[argNum - 1] ? "sym)" : "con)");
         return sb.toString();
@@ -191,10 +187,7 @@ public class JPFAdapter implements SymbolicExecutor {
 
     @Override
     public State restart() throws ExecutionException, InterruptedException {
-        jpfExecutor.shutdown();
-        while (!jpfExecutor.isTerminated()) {
-            stepLeft();
-        }
+        jpfExecutor.shutdownNow();
         if (!jpfExecutor.isShutdown()) {
             return State.createErrorState("Restart could not be completed.");
         }
