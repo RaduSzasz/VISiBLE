@@ -176,26 +176,23 @@ public class JPFAdapter implements SymbolicExecutor {
 
     @Override
     public State execute() throws ExecutionException, InterruptedException {
-        return executorService.submit(this).get();
+        if (jpfExecutor != null) {
+            jpfExecutor.shutdownNow();
+            if (!jpfExecutor.isShutdown()) {
+                return State.createErrorState("Restart could not be completed.");
+            }
+            if (executorService.isShutdown()) {
+                this.executorService = executorService();
+            }
+            this.jpfExecutor = executorService();
+        }
+        return executorService().submit(this).get();
     }
 
     @Bean
     @ApplicationScope
     private ExecutorService executorService() {
         return Executors.newFixedThreadPool(NUMBER_OF_THREADS);
-    }
-
-    @Override
-    public State restart() throws ExecutionException, InterruptedException {
-        jpfExecutor.shutdownNow();
-        if (!jpfExecutor.isShutdown()) {
-            return State.createErrorState("Restart could not be completed.");
-        }
-        if (executorService.isShutdown()) {
-            this.executorService = executorService();
-        }
-        this.jpfExecutor = executorService();
-        return execute();
     }
 
 }
