@@ -7,7 +7,7 @@ import org.chocosolver.solver.variables.IntVar;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ConcreteValueGenerator {
+class ConcreteValueGenerator {
 
     private Model model;
     private Map<String, IntVar> vars;
@@ -15,12 +15,12 @@ public class ConcreteValueGenerator {
     private static final int LOWER = -10;
     private static final int UPPER = 10;
 
-    public ConcreteValueGenerator() {
+    ConcreteValueGenerator() {
         this.model = new Model("Model");
         this.vars = new HashMap<>();
     }
 
-    public boolean addConstraint(String constraint) {
+    boolean addConstraint(String constraint) {
         String[] delims = {"!=", "<=", ">=", "==", "<", ">"};
 
         String op = null;
@@ -82,7 +82,7 @@ public class ConcreteValueGenerator {
 
     }
 
-    public Map<String, Integer> getConcreteValues() {
+    Map<String, Integer> getConcreteValues() {
         Solver solver = model.getSolver();
         if (solver.solve()) {
             Map<String, Integer> values = new HashMap<>();

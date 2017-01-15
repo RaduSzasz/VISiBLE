@@ -43,7 +43,6 @@ public class VisualiserListener extends PropertyListenerAdapter {
     private Direction direction;
     private State currentState;
     private boolean firstCG = true;
-    private List<String> pc;
     private ConcreteValueGenerator cvg;
 
     private CountDownLatch jpfInitialised;
@@ -66,7 +65,6 @@ public class VisualiserListener extends PropertyListenerAdapter {
         this.currentState = null;
         this.jpfInitialised = jpfInitialised;
         this.canMakeSelection = new CountDownLatch(1);
-        this.pc = new ArrayList<>();
         this.cvg = new ConcreteValueGenerator();
     }
 
@@ -108,9 +106,9 @@ public class VisualiserListener extends PropertyListenerAdapter {
 
     private State createNewState(Search search) {
         State s = new State(search.getStateId(), prev);
-        if (prev != null) {
-            prev.children.add(s);
-        }
+//        if (prev != null) {
+//            prev.children.add(s);
+//        }
         return s;
     }
 
