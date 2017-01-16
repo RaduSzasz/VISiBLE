@@ -36,8 +36,6 @@ public class VisibleServerTest {
     private JavaProgram javaProgram;
 
 	//@MockBean private SymbolicExecutor executor;
-	//@MockBean private Future<State> future;
-	//@MockBean private ExecutorService service;
 
 	@Test
 	public void testUploadSuccess() throws IOException, ClassNotFoundException, InterruptedException {
