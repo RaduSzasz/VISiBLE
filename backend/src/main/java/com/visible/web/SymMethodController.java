@@ -32,7 +32,11 @@ public class SymMethodController {
     private boolean[] isSymb;
 
     @PostMapping
-    public State runSelectedSymMethod(@RequestParam("jar_name") String jarName, @RequestParam("class_name") String className, @RequestParam("method_name") String methodName, @RequestParam("no_args") int numArgs, @RequestParam("is_symb") boolean[] isSymb,  RedirectAttributes redirectAttributes)
+    public State runSelectedSymMethod(@RequestParam("jar_name") String jarName,
+                                      @RequestParam("class_name") String className,
+                                      @RequestParam("method_name") String methodName,
+                                      @RequestParam("no_args") int numArgs,
+                                      @RequestParam("is_symb") boolean[] isSymb, RedirectAttributes redirectAttributes)
             throws java.io.IOException, InterruptedException, ExecutionException, ClassNotFoundException {
 
         this.jarName = jarName;

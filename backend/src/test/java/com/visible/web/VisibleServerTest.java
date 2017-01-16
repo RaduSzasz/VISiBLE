@@ -4,6 +4,7 @@ package com.visible.web;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.visible.ClassMethods;
 import com.visible.JavaProgram;
+import com.visible.symbolic.state.State;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,7 @@ public class VisibleServerTest {
 	//@MockBean private ExecutorService service;
 
 	@Test
-	public void testUpload() throws IOException, ClassNotFoundException, InterruptedException {
+	public void testUploadSuccess() throws IOException, ClassNotFoundException, InterruptedException {
 		String filePath = "src/test/resources/MaxOfFour.jar";
 
         // Build expected ClassMethods
@@ -62,6 +63,48 @@ public class VisibleServerTest {
 		assertEquals(om.readValue(expected.toString(), Map.class),
 					 om.readValue(response, Map.class));
 	}
+
+    @Test
+    public void testUploadFail() throws IOException, ClassNotFoundException, InterruptedException {
+        String filePath = "src/test/resources/WouldIUseJPFAgain.java";
+
+        // Build expected ClassMethods
+        ClassMethods expected = new ClassMethods();
+        expected.setError();
+
+        given(this.javaProgram.saveToDirectory()).willReturn(false);
+
+        // Make POST request
+        MultiValueMap<String, Object> parts = new LinkedMultiValueMap<>();
+        parts.add("file", new FileSystemResource(filePath));
+        String response = this.restTemplate.postForObject("/upload", parts, String.class);
+
+        // Assert that both JSON objects are equivalent
+        assertEquals(om.readValue(expected.toString(), Map.class),
+                om.readValue(response, Map.class));
+    }
+
+    @Test
+    public void testNumArgsMismatch() throws IOException {
+
+        State expected = State.createErrorState(State.ERR_ARG_MISMATCH);
+
+        // Make POST request
+        MultiValueMap<String, Object> parts = new LinkedMultiValueMap<>();
+        parts.add("jar_name", "MaxOfFour.jar");
+        parts.add("class_name", "MaxOfFour");
+        parts.add("method_name", "symVis");
+        parts.add("no_args", "4");
+        parts.add("is_symb", true);
+        parts.add("is_symb", true);
+        parts.add("is_symb", true);
+
+        String response = this.restTemplate.postForObject("/symbolicmethod", parts, String.class);
+
+        // Assert that both JSON objects are equivalent
+        assertEquals(om.readValue(expected.toString(), Map.class),
+                om.readValue(response, Map.class));
+    }
 	
 }
 
