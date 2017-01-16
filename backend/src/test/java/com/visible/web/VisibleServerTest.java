@@ -4,12 +4,8 @@ package com.visible.web;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.visible.ClassMethods;
 import com.visible.JavaProgram;
-import com.visible.symbolic.SymbolicExecutor;
-import com.visible.symbolic.state.State;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -22,13 +18,9 @@ import org.springframework.util.MultiValueMap;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
-
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -39,7 +31,7 @@ public class VisibleServerTest {
 	@Autowired
 	private TestRestTemplate restTemplate;
 
-	@Mock
+	@MockBean
     private JavaProgram javaProgram;
 
 	//@MockBean private SymbolicExecutor executor;
@@ -58,6 +50,7 @@ public class VisibleServerTest {
                 "private static java.lang.String MaxOfFour.symVis(int,int,int,int)");
         expected.setJarName("MaxOfFour.jar");
 
+        given(this.javaProgram.saveToDirectory()).willReturn(true);
 		given(this.javaProgram.getClassMethods()).willReturn(expected);
 
 		// Make POST request
