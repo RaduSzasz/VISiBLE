@@ -14,6 +14,9 @@ public final class State {
     public static final String ERR_ARG_MISMATCH = "Mismatch in number of arguments";
     public static final String ERR_EXEC_NOT_INIT = "Symbolic Executor has not been initialised yet";
     public static final String ERR_RESTART_FAIL = "Restart could not be completed";
+    public static final String ERR_NO_MAIN_CLASS = "No entry-point specified in Manifest file";
+    public static final String ERR_MISSING_FILE = "No file has been uploaded";
+    public static final String ERR_JPF_INTERNAL = "Internal error in JPF";
 
     private static final String ERROR = "error";
     @JsonSerialize(using = ParentSerializer.class)

@@ -63,13 +63,13 @@ public class JPFAdapter implements SymbolicExecutor {
             Manifest manifest = new JarFile(RELATIVE_PATH_TO_INPUT + "/" + jarName).getManifest();
             mainClassName = manifest.getMainAttributes().getValue("Main-Class");
         } catch (IOException e) {
-            String errorMsg = jarName == null ? "No file has been uploaded." : "Manifest file in " + jarName + " could not be read.";
+            String errorMsg = jarName == null ? State.ERR_MISSING_FILE : "Manifest file in " + jarName + " could not be read.";
             errorState.setError(errorMsg);
             return false;
         }
 
         if (mainClassName == null) {
-            errorState.setError("No entrypoint specified in Manifest file.");
+            errorState.setError(State.ERR_NO_MAIN_CLASS);
             return false;
         }
 
@@ -115,7 +115,7 @@ public class JPFAdapter implements SymbolicExecutor {
         jpf.addListener(visualiser);
         jpfExecutor.submit(jpf);
         if (jpf.foundErrors()) {
-            errorState.setError("Internal error in JPF.");
+            errorState.setError(State.ERR_JPF_INTERNAL);
             return false;
         }
         return true;

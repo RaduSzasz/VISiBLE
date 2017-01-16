@@ -53,7 +53,8 @@ public class JPFAdapterTest {
     }
 
     @AfterClass
-    public static void tearDown() {
-        // TODO: Remove java program from File System
+    public static void tearDown() throws IOException, InterruptedException {
+        Process processRM = Runtime.getRuntime().exec("rm -rf input/*");
+        processRM.waitFor();
     }
 }
