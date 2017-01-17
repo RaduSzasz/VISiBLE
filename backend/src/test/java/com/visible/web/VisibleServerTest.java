@@ -39,7 +39,7 @@ public class VisibleServerTest {
 
 	@Test
 	public void testUploadSuccess() throws IOException, ClassNotFoundException, InterruptedException {
-		String filePath = "src/test/resources/MaxOfFour.jar";
+		String filePath = "backend/src/test/resources/MaxOfFour.jar";
 
         // Build expected ClassMethods
         ClassMethods expected = new ClassMethods();

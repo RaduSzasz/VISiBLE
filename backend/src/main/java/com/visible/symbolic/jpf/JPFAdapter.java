@@ -29,7 +29,6 @@ public class JPFAdapter implements SymbolicExecutor {
     private static final String SITE_PROPERTIES_PRE_PATH = "+site=";
     private static final String SITE_PROPERTIES = "/site.properties";
     private static final int NUMBER_OF_THREADS = 8;
-    private static final String TEST_PATH = "build/resources/test/";
 
     private static VisualiserListener visualiser;
     private String jarName;
@@ -44,7 +43,6 @@ public class JPFAdapter implements SymbolicExecutor {
     private ExecutorService executorService;
     @Autowired
     private ExecutorService jpfExecutor;
-    private boolean isTest;
 
     public JPFAdapter(String jarName, String className, String methodName, int numArgs, boolean[] isSymb) {
         this.jarName = jarName;
@@ -63,11 +61,7 @@ public class JPFAdapter implements SymbolicExecutor {
 
         try {
             Manifest manifest;
-            if (isTest) {
-                manifest = new JarFile(TEST_PATH + jarName).getManifest();
-            } else {
-                manifest = new JarFile(RELATIVE_PATH_TO_INPUT + "/" + jarName).getManifest();
-            }
+            manifest = new JarFile(RELATIVE_PATH_TO_INPUT + "/" + jarName).getManifest();
             mainClassName = manifest.getMainAttributes().getValue("Main-Class");
         } catch (IOException e) {
             String errorMsg = jarName == null ? State.ERR_MISSING_FILE : "Manifest file in " + jarName + " could not be read.";
@@ -107,17 +101,10 @@ public class JPFAdapter implements SymbolicExecutor {
         }
 
         args[0] = RELATIVE_PATH_TO_INPUT + jpfFileName;
+        args[1] = SITE_PROPERTIES_PRE_PATH + System.getProperty("user.dir") + SITE_PROPERTIES;
 
         Config config = JPF.createConfig(args);
-        if (isTest) {
-            // Spring tests run from VISiBLE/backend
-            args[1] = SITE_PROPERTIES_PRE_PATH + System.getProperty("user.dir") + "/.." + SITE_PROPERTIES;
-            config.setProperty("classpath",  System.getProperty("user.dir") + "/input/" + jarName);
-        } else {
-            // VISiBLE runs from VISiBLE/
-            args[1] = SITE_PROPERTIES_PRE_PATH + System.getProperty("user.dir") + SITE_PROPERTIES;
-            config.setProperty("classpath", ABSOLUTE_PATH_TO_INPUT + jarName);
-        }
+        config.setProperty("classpath", ABSOLUTE_PATH_TO_INPUT + jarName);
         config.setProperty("target", mainClassName);
 
         String symbolicMethod = className + "." + method + getSymbArgs(isSymb, argNum);
@@ -209,7 +196,4 @@ public class JPFAdapter implements SymbolicExecutor {
         return Executors.newFixedThreadPool(NUMBER_OF_THREADS);
     }
 
-    void setIsTest() {
-        this.isTest = true;
-    }
 }

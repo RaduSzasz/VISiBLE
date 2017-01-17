@@ -38,7 +38,7 @@ public class FileUploadController {
 
   }
 
-  @Bean
+//  @Bean
   public JavaProgram javaProgram(String fileName, byte[] data) {
       return new JavaProgram(fileName, data);
   }

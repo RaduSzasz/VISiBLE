@@ -20,7 +20,7 @@ public class JavaProgramTest {
 
     @Test
     public void saveJarTest() throws IOException {
-        byte[] expectedData = Files.readAllBytes(Paths.get("src/test/resources/MaxOfFour.jar"));
+        byte[] expectedData = Files.readAllBytes(Paths.get("backend/src/test/resources/MaxOfFour.jar"));
         JavaProgram javaProgram = new JavaProgram("MaxOfFour.jar", expectedData);
 
         // Check that file is saved
@@ -28,13 +28,13 @@ public class JavaProgramTest {
         assertTrue(success);
 
         // Check that saved file is correct
-        byte[] data = Files.readAllBytes(Paths.get("input/MaxOfFour.jar"));
+        byte[] data = Files.readAllBytes(Paths.get("backend/input/MaxOfFour.jar"));
         assertArrayEquals(expectedData, data);
     }
 
     @Test
     public void saveNotJarFailsTest() throws IOException {
-        byte[] expectedData = Files.readAllBytes(Paths.get("src/test/resources/WouldIUseJPFAgain.java"));
+        byte[] expectedData = Files.readAllBytes(Paths.get("backend/src/test/resources/WouldIUseJPFAgain.java"));
         JavaProgram javaProgram = new JavaProgram("WouldIUseJPFAgain.java", expectedData);
 
         // Check that file is not saved
@@ -44,7 +44,7 @@ public class JavaProgramTest {
 
     @Test
     public void getClassMethodsFromJarSimpleTest() throws IOException, ClassNotFoundException, InterruptedException {
-        byte[] expectedData = Files.readAllBytes(Paths.get("src/test/resources/MaxOfFour.jar"));
+        byte[] expectedData = Files.readAllBytes(Paths.get("backend/src/test/resources/MaxOfFour.jar"));
         String jarName = "MaxOfFour.jar";
         JavaProgram javaProgram = new JavaProgram(jarName, expectedData);
 
@@ -67,7 +67,7 @@ public class JavaProgramTest {
 
     @Test
     public void getClassMethodsFromJarPackageFolderTest() throws IOException, ClassNotFoundException, InterruptedException {
-        byte[] expectedData = Files.readAllBytes(Paths.get("src/test/resources/Zero.jar"));
+        byte[] expectedData = Files.readAllBytes(Paths.get("backend/src/test/resources/Zero.jar"));
         String jarName = "Zero.jar";
         JavaProgram javaProgram = new JavaProgram(jarName, expectedData);
 

@@ -38,7 +38,6 @@ public class JPFAdapterTest {
         JPFAdapter jpfAdapter =
                 new JPFAdapter(JAR_NAME, CLASS_NAME, SYMBOLIC_METHOD_NAME, SYMBOLIC_METHOD_NO_ARGS, generateBooleanArray(true, true, true, true));
 
-        jpfAdapter.setIsTest();
         State expectedResult = new State(0, null)
                                 .setIfPC("x>=y")
                                 .setElsePC("x<y")
@@ -51,7 +50,6 @@ public class JPFAdapterTest {
     @Test
     public void stepLeftReturnsIfNode() throws ExecutionException, InterruptedException {
         JPFAdapter jpfAdapter = new JPFAdapter(JAR_NAME, CLASS_NAME, SYMBOLIC_METHOD_NAME, SYMBOLIC_METHOD_NO_ARGS, generateBooleanArray(true, true, true, true));
-        jpfAdapter.setIsTest();
         State parent = jpfAdapter.execute();
         Map<String, Integer> map = new HashMap<>();
         map.put("x_1_SYMINT", -10);
@@ -67,7 +65,6 @@ public class JPFAdapterTest {
     @Test
     public void stepRightReturnsElseNode() throws ExecutionException, InterruptedException {
         JPFAdapter jpfAdapter = new JPFAdapter(JAR_NAME, CLASS_NAME, SYMBOLIC_METHOD_NAME, SYMBOLIC_METHOD_NO_ARGS, generateBooleanArray(true, true, true, true));
-        jpfAdapter.setIsTest();
         State parent = jpfAdapter.execute();
         Map<String, Integer> map = new HashMap<>();
         map.put("x_1_SYMINT", -10);
@@ -83,7 +80,6 @@ public class JPFAdapterTest {
     @Test
     public void leafTypeIsSet() throws ExecutionException, InterruptedException {
         JPFAdapter jpfAdapter = new JPFAdapter(JAR_NAME, CLASS_NAME, SYMBOLIC_METHOD_NAME, SYMBOLIC_METHOD_NO_ARGS, generateBooleanArray(true, true, true, true));
-        jpfAdapter.setIsTest();
         jpfAdapter.execute();
         jpfAdapter.stepLeft();
         State parent = jpfAdapter.stepLeft();
