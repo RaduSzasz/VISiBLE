@@ -107,14 +107,15 @@ public class JPFAdapter implements SymbolicExecutor {
         }
 
         args[0] = RELATIVE_PATH_TO_INPUT + jpfFileName;
-        args[1] = SITE_PROPERTIES_PRE_PATH + System.getProperty("user.dir") + SITE_PROPERTIES;
 
         Config config = JPF.createConfig(args);
         if (isTest) {
             // Spring tests run from VISiBLE/backend
+            args[1] = SITE_PROPERTIES_PRE_PATH + System.getProperty("user.dir") + "/.." + SITE_PROPERTIES;
             config.setProperty("classpath",  System.getProperty("user.dir") + "/input/" + jarName);
         } else {
             // VISiBLE runs from VISiBLE/
+            args[1] = SITE_PROPERTIES_PRE_PATH + System.getProperty("user.dir") + SITE_PROPERTIES;
             config.setProperty("classpath", ABSOLUTE_PATH_TO_INPUT + jarName);
         }
         config.setProperty("target", mainClassName);

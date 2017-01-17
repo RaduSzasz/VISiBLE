@@ -34,7 +34,7 @@ public class JPFAdapterTest {
     @Test
     public void atStartFirstNodeIsReturned() throws IOException, ExecutionException, InterruptedException {
         JPFAdapter jpfAdapter =
-                new JPFAdapter(JAR_NAME, CLASS_NAME, SYMBOLIC_METHOD_NAME, SYMBOLIC_METHOD_NO_ARGS, generateBooleanArray());
+                new JPFAdapter(JAR_NAME, CLASS_NAME, SYMBOLIC_METHOD_NAME, SYMBOLIC_METHOD_NO_ARGS, generateBooleanArray(true, true, true, true));
 
         jpfAdapter.setIsTest();
         State expectedResult = new State(0, null)
@@ -46,17 +46,13 @@ public class JPFAdapterTest {
         assertEquals(expectedResult.toString(), jpfAdapter.execute().toString());
     }
 
-    private boolean[] generateBooleanArray() {
-        boolean[] array = new boolean[SYMBOLIC_METHOD_NO_ARGS];
-        for (int i = 0; i < SYMBOLIC_METHOD_NO_ARGS; i++) {
-            array[i] = true;
-        }
-        return array;
+    private boolean[] generateBooleanArray(boolean... isSymb) {
+        return isSymb;
     }
 
     @AfterClass
     public static void tearDown() throws IOException, InterruptedException {
-        Process processRM = Runtime.getRuntime().exec("rm -rf input/*");
+        Process processRM = Runtime.getRuntime().exec("rm -rf backend/input/");
         processRM.waitFor();
     }
 }
