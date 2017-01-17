@@ -31,19 +31,19 @@ public class JPFAdapterTest {
         assertTrue(success);
     }
 
-    @Ignore
     @Test
     public void atStartFirstNodeIsReturned() throws IOException, ExecutionException, InterruptedException {
         JPFAdapter jpfAdapter =
                 new JPFAdapter(JAR_NAME, CLASS_NAME, SYMBOLIC_METHOD_NAME, SYMBOLIC_METHOD_NO_ARGS, generateBooleanArray());
 
-        jpfAdapter.setIsTest(true);
+        jpfAdapter.setIsTest();
         State expectedResult = new State(0, null)
-                                .setIfPC("x >= y")
-                                .setElsePC("x < y")
+                                .setIfPC("x>=y")
+                                .setElsePC("x<y")
                                 .setType("normal");
 
-        assertEquals(expectedResult, jpfAdapter.execute());
+        // The assertEquals only works with String representations, not actual States
+        assertEquals(expectedResult.toString(), jpfAdapter.execute().toString());
     }
 
     private boolean[] generateBooleanArray() {

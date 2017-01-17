@@ -85,6 +85,7 @@ public final class State {
         if (id != state.id) return false;
         if (parent != null ? !parent.equals(state.parent) : state.parent != null) return false;
         if (ifPC != null ? !ifPC.equals(state.ifPC) : state.ifPC != null) return false;
+        if (concreteValues.keySet() != state.concreteValues.keySet()) return false;
         return elsePC != null ? elsePC.equals(state.elsePC) : state.elsePC == null;
 
     }

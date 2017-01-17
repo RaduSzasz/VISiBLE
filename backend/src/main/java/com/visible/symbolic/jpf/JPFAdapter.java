@@ -29,6 +29,7 @@ public class JPFAdapter implements SymbolicExecutor {
     private static final String SITE_PROPERTIES_PRE_PATH = "+site=";
     private static final String SITE_PROPERTIES = "/site.properties";
     private static final int NUMBER_OF_THREADS = 8;
+    private static final String TEST_PATH = "build/resources/test/";
 
     private static VisualiserListener visualiser;
     private String jarName;
@@ -63,7 +64,7 @@ public class JPFAdapter implements SymbolicExecutor {
         try {
             Manifest manifest;
             if (isTest) {
-                manifest = new JarFile("build/resources/test/" + jarName).getManifest();
+                manifest = new JarFile(TEST_PATH + jarName).getManifest();
             } else {
                 manifest = new JarFile(RELATIVE_PATH_TO_INPUT + "/" + jarName).getManifest();
             }
@@ -109,7 +110,13 @@ public class JPFAdapter implements SymbolicExecutor {
         args[1] = SITE_PROPERTIES_PRE_PATH + System.getProperty("user.dir") + SITE_PROPERTIES;
 
         Config config = JPF.createConfig(args);
-        config.setProperty("classpath", ABSOLUTE_PATH_TO_INPUT + jarName);
+        if (isTest) {
+            // Spring tests run from VISiBLE/backend
+            config.setProperty("classpath",  System.getProperty("user.dir") + "/input/" + jarName);
+        } else {
+            // VISiBLE runs from VISiBLE/
+            config.setProperty("classpath", ABSOLUTE_PATH_TO_INPUT + jarName);
+        }
         config.setProperty("target", mainClassName);
 
         String symbolicMethod = className + "." + method + getSymbArgs(isSymb, argNum);
@@ -201,7 +208,7 @@ public class JPFAdapter implements SymbolicExecutor {
         return Executors.newFixedThreadPool(NUMBER_OF_THREADS);
     }
 
-    public void setIsTest(boolean isTest) {
-        this.isTest = isTest;
+    void setIsTest() {
+        this.isTest = true;
     }
 }
