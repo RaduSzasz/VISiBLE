@@ -43,6 +43,7 @@ public class JPFAdapter implements SymbolicExecutor {
     private ExecutorService executorService;
     @Autowired
     private ExecutorService jpfExecutor;
+    private boolean isTest;
 
     public JPFAdapter(String jarName, String className, String methodName, int numArgs, boolean[] isSymb) {
         this.jarName = jarName;
@@ -60,7 +61,12 @@ public class JPFAdapter implements SymbolicExecutor {
         String mainClassName;
 
         try {
-            Manifest manifest = new JarFile(RELATIVE_PATH_TO_INPUT + "/" + jarName).getManifest();
+            Manifest manifest;
+            if (isTest) {
+                manifest = new JarFile("build/resources/test/" + jarName).getManifest();
+            } else {
+                manifest = new JarFile(RELATIVE_PATH_TO_INPUT + "/" + jarName).getManifest();
+            }
             mainClassName = manifest.getMainAttributes().getValue("Main-Class");
         } catch (IOException e) {
             String errorMsg = jarName == null ? State.ERR_MISSING_FILE : "Manifest file in " + jarName + " could not be read.";
@@ -195,4 +201,7 @@ public class JPFAdapter implements SymbolicExecutor {
         return Executors.newFixedThreadPool(NUMBER_OF_THREADS);
     }
 
+    public void setIsTest(boolean isTest) {
+        this.isTest = isTest;
+    }
 }

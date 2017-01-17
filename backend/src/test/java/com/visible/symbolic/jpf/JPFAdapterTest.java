@@ -2,14 +2,15 @@ package com.visible.symbolic.jpf;
 
 import com.visible.JavaProgram;
 import com.visible.symbolic.state.State;
-import org.junit.*;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -30,18 +31,19 @@ public class JPFAdapterTest {
         assertTrue(success);
     }
 
+    @Ignore
     @Test
     public void atStartFirstNodeIsReturned() throws IOException, ExecutionException, InterruptedException {
         JPFAdapter jpfAdapter =
                 new JPFAdapter(JAR_NAME, CLASS_NAME, SYMBOLIC_METHOD_NAME, SYMBOLIC_METHOD_NO_ARGS, generateBooleanArray());
 
+        jpfAdapter.setIsTest(true);
         State expectedResult = new State(0, null)
                                 .setIfPC("x >= y")
                                 .setElsePC("x < y")
                                 .setType("normal");
 
-        assertTrue(true);
-//        assertEquals(expectedResult, jpfAdapter.execute());
+        assertEquals(expectedResult, jpfAdapter.execute());
     }
 
     private boolean[] generateBooleanArray() {
