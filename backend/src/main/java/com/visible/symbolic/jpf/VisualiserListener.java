@@ -43,23 +43,19 @@ public class VisualiserListener extends PropertyListenerAdapter {
     private Direction direction;
     private State currentState;
     private boolean firstCG = true;
+    private List<String> pc;
+    private ConcreteValueGenerator cvg;
 
     private CountDownLatch jpfInitialised;
     private CountDownLatch movedForwardLatch;
     private CountDownLatch canMakeSelection;
 
+    private String nextLeft;
+    private String nextRight;
+
     private static final Map<Class, Comparator> singleBranchComparators = singleBranchComparatorsBuilder();
     private final Map<Class, Comparator> doubleBranchComparators = doubleBranchComparatorsBuilder();
     private static final Map<Comparator, Comparator> comparatorsComplement = comparatorsComplementBuilder();
-
-    Optional<CountDownLatch> moveForward(Direction direction) {
-        this.direction = direction;
-        this.shouldMoveForward = true;
-        canMakeSelection.countDown();
-        threadInfo.setRunning();
-        movedForwardLatch = new CountDownLatch(1);
-        return searchHasFinished ? Optional.empty() : Optional.of(movedForwardLatch);
-    }
 
     VisualiserListener(Config config, JPF jpf, CountDownLatch jpfInitialised) {
         prev = null;
@@ -70,6 +66,17 @@ public class VisualiserListener extends PropertyListenerAdapter {
         this.currentState = null;
         this.jpfInitialised = jpfInitialised;
         this.canMakeSelection = new CountDownLatch(1);
+        this.pc = new ArrayList<>();
+        this.cvg = new ConcreteValueGenerator();
+    }
+
+    Optional<CountDownLatch> moveForward(Direction direction) {
+        this.direction = direction;
+        this.shouldMoveForward = true;
+        canMakeSelection.countDown();
+        movedForwardLatch = new CountDownLatch(1);
+        threadInfo.setRunning();
+        return searchHasFinished ? Optional.empty() : Optional.of(movedForwardLatch);
     }
 
     public void stateAdvanced(Search search) {
@@ -77,7 +84,6 @@ public class VisualiserListener extends PropertyListenerAdapter {
             this.threadInfo = search.getVM().getCurrentThread();
         }
         if (search.isIgnoredState()) {
-            System.out.println("[advanced] ignored state");
             return;
         }
 
@@ -101,12 +107,6 @@ public class VisualiserListener extends PropertyListenerAdapter {
     }
 
     private State createNewState(Search search) {
-        PathCondition pc = null;
-        ChoiceGenerator<?> cg = search.getVM().getLastChoiceGeneratorOfType(PCChoiceGenerator.class);
-        if (cg != null) {
-            pc = ((PCChoiceGenerator) cg).getCurrentPC();
-        }
-
         State s = new State(search.getStateId(), prev);
         if (prev != null) {
             prev.children.add(s);
@@ -122,20 +122,24 @@ public class VisualiserListener extends PropertyListenerAdapter {
     @Override
     public void stateRestored(Search search) {
         State s = stateById.get(search.getStateId());
-        System.out.println("[restored]");
         prev = s;
     }
 
     @Override
     public void stateBacktracked(Search search) {
         State s = stateById.get(search.getStateId());
-        System.out.println("[backtracked]");
         prev = s;
     }
     @Override
     public void searchFinished(Search search) {
-        System.out.println("[finished]");
         this.currentState.setType(END_NODE);
+        if (this.direction == Direction.LEFT) {
+            cvg.addConstraint(currentState.getParent().getIfPC());
+        } else {
+            cvg.addConstraint(currentState.getParent().getElsePC());
+        }
+        Map<String, Integer> map = cvg.getConcreteValues();
+        currentState.setConcreteValues(map);
         if (this.movedForwardLatch != null) {
             this.movedForwardLatch.countDown();
         }
@@ -155,10 +159,19 @@ public class VisualiserListener extends PropertyListenerAdapter {
 
         if (cg instanceof PCChoiceGenerator) {
             if (cg.getTotalNumberOfChoices() > 1) {
-                System.out.println("CG ADVANCED");
                 Instruction instruction = vm.getInstruction();
                 ThreadInfo threadInfo = vm.getCurrentThread();
                 if (instruction instanceof IfInstruction) {
+                    String pathCondition;
+                    if (direction == Direction.LEFT) {
+                        pathCondition = nextLeft;
+                    } else {
+                        pathCondition = nextRight;
+                    }
+                    if (!firstCG) {
+                        cvg.addConstraint(pathCondition);
+                        currentState.setConcreteValues(cvg.getConcreteValues());
+                    }
                     computeIFBranchPC(instruction, threadInfo, cg);
 
                     if (jpfInitialised != null) {
@@ -172,8 +185,6 @@ public class VisualiserListener extends PropertyListenerAdapter {
                         e.printStackTrace();
                     }
 
-                    System.out.println("Before selecting next destination");
-                    System.out.println(currentState);
                     if (direction == Direction.LEFT) {
                         cg.select(0);
                     } else {
@@ -254,7 +265,9 @@ public class VisualiserListener extends PropertyListenerAdapter {
         this.currentState.setElsePC(elsePC);
         this.currentState.setType(MIDDLE_NODE);
 
-        this.choicesTrace = this.direction == Direction.LEFT ? choicesTraceELSE : choicesTraceIF;
+        this.nextLeft = ifPC;
+        this.nextRight = elsePC;
+        this.choicesTrace =  this.direction == Direction.LEFT ? choicesTraceELSE : choicesTraceIF;
     }
 
     private String cleanConstraint(String constraint) {

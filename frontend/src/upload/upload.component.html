@@ -1,22 +1,54 @@
-<input type="file"
-       ngFileSelect 
-       [options]="options"
-       (onUpload)="selectSymbolic($event)" >
+<label>
+  <span class="glyphicon glyphicon-upload upload-icon"></span>
+  <input type="file" class="hide"
+                     ngFileSelect 
+                     [options]="options"
+                     (onUpload)="selectSymbolic($event)" >
+</label>
+
+<div class="message">
+  <div class="message-main">
+    Upload a .jar
+  </div>
+  <div class="message-subtitle">
+    Compile with -g.
+    <br>
+    Specify Main-Class in MANIFEST.
+  </div>
+</div>
 
 <div class="modal fade" bsModal #staticModal="bs-modal" [config]="{backdrop: 'static'}"
      tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-sm">
-    <div class="modal-content">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content modal-color">
       <div class="modal-header">
         <button type="button" class="close" aria-label="Close" (click)="staticModal.hide()">
           <span aria-hidden="true">&times;</span>
         </button>
-        <h4 class="modal-title">Select Symbolic Method </h4>
+        <h4 class="modal-title">Select Method for Symbolic Execution</h4>
       </div>
       <div class="modal-body">
-        <select [(ngModel)]="symbolicMethod" (ngModelChange)="setInitialTree()">
-          <option *ngFor="let method of methods" [ngValue]="method.name"> {{method.toString()}} </option>
+
+        <select [(ngModel)]="symbolicMethod" (ngModelChange)="isSymbSetup()">
+          <option *ngFor="let method of methods" [ngValue]="method">{{method.signature}}</option>
         </select>
+
+        <div *ngIf="symbolicMethod" style="width: 40%; margin: auto; margin-top: 10px; text-align:left">
+          Select the Symbolic Arguments:
+          <div *ngFor="let b of isSymb; let i = index">
+            <label>
+              <input type="checkbox" [(ngModel)]="isSymb[i].value">
+              Argument {{i+1}}
+            </label>
+          </div>
+
+          <div class="progress" *ngIf="isLoading">
+            <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="1" aria-valuemin="0" aria-valuemax="1" style="width: 100%">
+              Loading...
+            </div>
+          </div>
+        </div>
+        <button (click)="setInitialTree()" *ngIf="symbolicMethod && !isLoading">Start!</button>
       </div>
     </div>
   </div>

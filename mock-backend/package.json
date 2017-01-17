@@ -2,12 +2,12 @@
   "name": "mock-backend",
   "version": "1.0.0",
   "description": "",
-  "main": "nodes.service.js",
+  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "Jason Yu <me@ycmjason.com> (ycmjason.com)",
   "license": "ISC",
   "dependencies": {
     "express": "^4.14.0"

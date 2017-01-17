@@ -6,8 +6,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public final class State {
 
@@ -15,11 +17,19 @@ public final class State {
     @JsonSerialize(using = ParentSerializer.class)
     private State parent;
     @JsonIgnore public List<State> children;
+
+    @JsonSerialize(using = ConditionSerializer.class)
     private String ifPC;
+
+    @JsonSerialize(using = ConditionSerializer.class)
     private String elsePC;
+
     private String type;
     @JsonInclude(JsonInclude.Include.NON_EMPTY) private String errorMsg;
     private int id;
+
+    @JsonSerialize(keyUsing = VarNameSerializer.class)
+    private Map<String, Integer> concreteValues;
 
     public State setIfPC(String ifPC) {
         this.ifPC = ifPC;
@@ -53,14 +63,20 @@ public final class State {
         this.parent = parent;
         this.ifPC = null;
         this.elsePC = null;
+        this.concreteValues = new HashMap<>();
     }
 
-    public State(int id, State parent, String ifPC, String elsePC) {
-        this.id = id;
-        this.children = new LinkedList<>();
-        this.parent = parent;
-        this.ifPC = ifPC;
-        this.elsePC = elsePC;
+    public State() {
+        this.id = -1;
+        this.children = null;
+        this.parent = null;
+        this.ifPC = null;
+        this.elsePC = null;
+    }
+
+    public State withError(String errorMsg) {
+        setError(errorMsg);
+        return this;
     }
 
     @Override
@@ -112,5 +128,13 @@ public final class State {
         this.type = ERROR;
         this.errorMsg = errorMsg;
         return this;
+    }
+
+    public Map<String, Integer> getConcreteValues() {
+        return concreteValues;
+    }
+
+    public void setConcreteValues(Map<String, Integer> concreteValues) {
+        this.concreteValues = concreteValues;
     }
 }

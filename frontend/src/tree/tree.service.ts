@@ -4,16 +4,30 @@ import { ApiService } from '../shared/api.service';
 
 import { Tree } from './tree';
 import { Node_ } from './node';
-import { Method, Arg } from '../upload/method';
+import { Method } from '../upload/method';
 
 @Injectable()
 export class TreeService {
 
   constructor(private api: ApiService) {}
-  drawTree(symbolicMethod : Method) : Promise<Tree> {
-    let json : Object = {name: symbolicMethod.name, no_args: 4};
+  private last_symbolicmethod = null;
+
+  drawTree(jar, method : Method, isSymb) : Promise<Tree> {
+    this.last_symbolicmethod = {
+      jar_name: jar,
+      class_name: method.class_name,
+      method_name: method.name,
+      no_args: method.numArgs,
+      is_symb: isSymb
+    };
+    return this.restart();
+  }
+
+  restart(): Promise<Tree> {
+    console.log(this.last_symbolicmethod);
     return new Promise((resolve, reject) => {
-      this.api.post(`symbolicmethod`, null, json).then(node => resolve(this.parseTree(node)));
+      // note that the json is sent as a query, i.e. in the url
+      this.api.post(`symbolicmethod`, this.last_symbolicmethod, null).then(node => resolve(this.parseTree(node)));
     });
   }
 
@@ -30,10 +44,10 @@ export class TreeService {
   }
 
   parseTree(n) {
-    // parseTree :: Node] -> Tree
+    // parseTree :: [Node] -> Tree
 
     // construct the trees from the node
-    return new Tree(new Node_(n.id, n.parent_, null, n.IfPC, n.ElsePC));
+    return new Tree(new Node_(n.id, n.parent_, null, n.concreteValues, n.ifPC, n.elsePC));
   }
 
   addNewLeft(currNode, node) {
@@ -41,8 +55,9 @@ export class TreeService {
     node = new Node_(node.id,
                     currNode,
                     currNode.getIfPC(),
-                    node.IfPC,
-                    node.ElsePC);
+                    node.concreteValues,
+                    node.ifPC,
+                    node.elsePC);
     console.log(node);
     currNode.addLeft(node);
     console.log(currNode);
@@ -54,8 +69,9 @@ export class TreeService {
     node = new Node_(node.id,
                     currNode,
                     currNode.getElsePC(),
-                    node.IfPC,
-                    node.ElsePC);
+                    node.concreteValues,
+                    node.ifPC,
+                    node.elsePC);
     currNode.addRight(node);
     return currNode;
   }

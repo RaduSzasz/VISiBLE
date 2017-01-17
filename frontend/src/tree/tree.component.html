@@ -1,5 +1,26 @@
-<div>
-  <button (click)="drawTree()">Draw Tree</button>
+<div class="row">
+  <div class="col-md-9">
+    <svg></svg>
+  </div>
+
+  <div class="col-md-3">
+    <div *ngIf="currNode" class="concrete-values-box">
+      <table class="table table-condensed">
+        <thead>
+          <th>Variable</th>
+          <th>Value</th>
+        </thead>
+        <tr *ngFor="let variable of currNode.getConcreteVariableNames()">
+          <td>
+            {{variable}}:
+          </td>
+          <td>
+            {{currNode.getConcreteValue(variable)}}
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
 </div>
 
-<svg></svg>
+<button (click)="restart()" class="restart btn btn-link" [disabled]="!tree"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> restart</button>

@@ -1,0 +1,31 @@
+.modal-color{
+  background-color: #e8edf3;
+  color: #657b83;
+}
+
+.upload-icon{
+  font-size: 4em;
+}
+.upload-icon:hover{
+  cursor: pointer;
+  color: #6ed3cf;
+}
+
+.message-main {
+  /*color: yellow;*/
+  font-size: 1.5em;
+  color: darkgray;
+}
+
+.message-subtitle {
+  /*color: yellow;*/
+  color: #b58900;
+}
+
+caption {
+  color: red;
+}
+
+.table-title {
+  color: yellow;
+}

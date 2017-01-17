@@ -4,18 +4,27 @@ export class Node_ {
   constructor(private id: number,
               private parent_: Node_,
               private pc: string,
+              private concreteValues: any,
               private ifPC?: string,
               private elsePC?: string) {
     if (ifPC && elsePC) {
       // Then this is an actual node and will have
       // two virtual nodes as children
-      this.children = [new Node_((-2) * id - 1, this, ifPC), 
-                       new Node_((-2) * id - 2, this, elsePC)];
+      this.children = [new Node_((-2) * id - 1, this, ifPC, []), 
+                       new Node_((-2) * id - 2, this, elsePC, [])];
     } else {
       // Then this is a virtual node and it has
       // no children
       this.children = undefined;
     }
+  }
+
+  public getConcreteVariableNames() {
+    return Object.keys(this.concreteValues);
+  }
+
+  public getConcreteValue(variableName: string) {
+    return this.concreteValues[variableName];
   }
 
   public addLeft(leftNode: Node_) {
