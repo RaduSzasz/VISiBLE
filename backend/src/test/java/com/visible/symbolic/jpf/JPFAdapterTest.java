@@ -10,6 +10,8 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.assertEquals;
@@ -40,10 +42,63 @@ public class JPFAdapterTest {
         State expectedResult = new State(0, null)
                                 .setIfPC("x>=y")
                                 .setElsePC("x<y")
-                                .setType("normal");
+                                .setType("normal")
+                                .setConcreteValues(new HashMap<>());
 
-        // The assertEquals only works with String representations, not actual States
         assertEquals(expectedResult.toString(), jpfAdapter.execute().toString());
+    }
+
+    @Test
+    public void stepLeftReturnsIfNode() throws ExecutionException, InterruptedException {
+        JPFAdapter jpfAdapter = new JPFAdapter(JAR_NAME, CLASS_NAME, SYMBOLIC_METHOD_NAME, SYMBOLIC_METHOD_NO_ARGS, generateBooleanArray(true, true, true, true));
+        jpfAdapter.setIsTest();
+        State parent = jpfAdapter.execute();
+        Map<String, Integer> map = new HashMap<>();
+        map.put("x_1_SYMINT", -10);
+        map.put("y_2_SYMINT", -10);
+        State expectedResult = new State(1, parent).setIfPC("x>=z")
+                                                        .setElsePC("x<z")
+                                                        .setType("normal")
+                                                        .setConcreteValues(map);
+
+        assertEquals(expectedResult.toString(), jpfAdapter.stepLeft().toString());
+    }
+
+    @Test
+    public void stepRightReturnsElseNode() throws ExecutionException, InterruptedException {
+        JPFAdapter jpfAdapter = new JPFAdapter(JAR_NAME, CLASS_NAME, SYMBOLIC_METHOD_NAME, SYMBOLIC_METHOD_NO_ARGS, generateBooleanArray(true, true, true, true));
+        jpfAdapter.setIsTest();
+        State parent = jpfAdapter.execute();
+        Map<String, Integer> map = new HashMap<>();
+        map.put("x_1_SYMINT", -10);
+        map.put("y_2_SYMINT", -9);
+        State expectedResult = new State(1, parent).setIfPC("y>=z")
+                                                        .setElsePC("y<z")
+                                                        .setType("normal")
+                                                        .setConcreteValues(map);
+
+        assertEquals(expectedResult.toString(), jpfAdapter.stepRight().toString());
+    }
+
+    @Test
+    public void leafTypeIsSet() throws ExecutionException, InterruptedException {
+        JPFAdapter jpfAdapter = new JPFAdapter(JAR_NAME, CLASS_NAME, SYMBOLIC_METHOD_NAME, SYMBOLIC_METHOD_NO_ARGS, generateBooleanArray(true, true, true, true));
+        jpfAdapter.setIsTest();
+        jpfAdapter.execute();
+        jpfAdapter.stepLeft();
+        State parent = jpfAdapter.stepLeft();
+        State child = jpfAdapter.stepLeft();
+        Map<String, Integer> map = new HashMap<>();
+        map.put("x_1_SYMINT", -10);
+        map.put("y_2_SYMINT", -10);
+        map.put("z_3_SYMINT", -10);
+        map.put("t_4_SYMINT", -10);
+        State expectedResult = new State(3, parent).setIfPC(null)
+                                                        .setElsePC(null)
+                                                        .setType("leaf")
+                                                        .setConcreteValues(map);
+
+        assertEquals(expectedResult, child);
     }
 
     private boolean[] generateBooleanArray(boolean... isSymb) {

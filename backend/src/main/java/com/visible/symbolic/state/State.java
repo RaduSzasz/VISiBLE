@@ -85,9 +85,10 @@ public final class State {
         if (id != state.id) return false;
         if (parent != null ? !parent.equals(state.parent) : state.parent != null) return false;
         if (ifPC != null ? !ifPC.equals(state.ifPC) : state.ifPC != null) return false;
-        if (concreteValues.keySet() != state.concreteValues.keySet()) return false;
-        return elsePC != null ? elsePC.equals(state.elsePC) : state.elsePC == null;
-
+        if (elsePC != null ? !elsePC.equals(state.elsePC) : state.elsePC != null) return false;
+        if (!type.equals(state.type)) return false;
+        if (errorMsg != null ? !errorMsg.equals(state.errorMsg) : state.errorMsg != null) return false;
+        return concreteValues != null ? concreteValues.entrySet().containsAll(state.concreteValues.entrySet()) && state.concreteValues.entrySet().containsAll(concreteValues.entrySet()) : state.concreteValues == null;
     }
 
     @Override
@@ -95,7 +96,10 @@ public final class State {
         int result = parent != null ? parent.hashCode() : 0;
         result = 31 * result + (ifPC != null ? ifPC.hashCode() : 0);
         result = 31 * result + (elsePC != null ? elsePC.hashCode() : 0);
+        result = 31 * result + type.hashCode();
+        result = 31 * result + (errorMsg != null ? errorMsg.hashCode() : 0);
         result = 31 * result + id;
+        result = 31 * result + (concreteValues != null ? concreteValues.hashCode() : 0);
         return result;
     }
 
@@ -131,7 +135,8 @@ public final class State {
         return concreteValues;
     }
 
-    public void setConcreteValues(Map<String, Integer> concreteValues) {
+    public State setConcreteValues(Map<String, Integer> concreteValues) {
         this.concreteValues = concreteValues;
+        return this;
     }
 }
