@@ -24,7 +24,6 @@ import java.util.concurrent.Executors;
 
 public class SymMethodController {
 
-    private static final int NUMBER_OF_THREADS = 8;
     private String jarName;
     private String className;
     private String methodName;
@@ -52,16 +51,10 @@ public class SymMethodController {
         return symbolicExecutor().execute();
     }
 
-
     @Bean
     @Scope("session")
     public SymbolicExecutor symbolicExecutor() {
         return new JPFAdapter(jarName, className, methodName, numArgs, isSymb);
     }
 
-    @Bean
-    @ApplicationScope
-    public ExecutorService executorService() {
-        return Executors.newFixedThreadPool(NUMBER_OF_THREADS);
-    }
 }
