@@ -14,7 +14,7 @@ public class JavaProgramTest {
 
     @BeforeClass
     public static void setup() throws IOException, InterruptedException {
-        Process processRM = Runtime.getRuntime().exec("rm -rf input/*");
+        Process processRM = Runtime.getRuntime().exec("rm -rf backend/input/*");
         processRM.waitFor();
     }
 
@@ -94,7 +94,7 @@ public class JavaProgramTest {
 
     @After
     public void clearInputFolder() throws IOException, InterruptedException {
-        Process processRM = Runtime.getRuntime().exec("rm -rf input/*");
+        Process processRM = Runtime.getRuntime().exec("rm -rf backend/input/");
         processRM.waitFor();
     }
 
