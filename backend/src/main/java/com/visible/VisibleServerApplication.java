@@ -48,10 +48,14 @@ public class VisibleServerApplication {
 		}
 
         Volume input = new Volume("/backend/input/");
+        Volume jpfCore = new Volume("/jpf/jpf-core");
+        Volume jpfSymbc = new Volume("/jpf/jpf-symbc");
         CreateContainerResponse container = dockerClient.createContainerCmd("visible")
                 .withPublishAllPorts(true)
                 .withVolumes(input)
-                .withBinds(new Bind(System.getProperty("user.dir") + "/backend/input/", input))
+                .withBinds(new Bind(System.getProperty("user.dir") + "/backend/input/", input),
+                            new Bind(System.getProperty("user.dir") + "/backend/jpf-core", jpfCore),
+                            new Bind(System.getProperty("user.dir") + "/backend/jpf-symbc", jpfSymbc))
                 .exec();
 
         dockerClient.startContainerCmd(container.getId()).exec();
