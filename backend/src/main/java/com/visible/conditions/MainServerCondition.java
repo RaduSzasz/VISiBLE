@@ -7,6 +7,6 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 public final class MainServerCondition implements Condition {
     @Override
     public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
-        return context.getEnvironment().getProperty("within.docker", "false").equals("false");
+        return !context.getEnvironment().getProperty("WITHIN_DOCKER", "false").equals("true");
     }
 }

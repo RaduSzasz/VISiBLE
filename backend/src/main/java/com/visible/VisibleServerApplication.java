@@ -3,9 +3,7 @@ package com.visible;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.api.command.InspectContainerResponse;
-import com.github.dockerjava.api.model.ExposedPort;
-import com.github.dockerjava.api.model.NetworkSettings;
-import com.github.dockerjava.api.model.Ports;
+import com.github.dockerjava.api.model.*;
 import com.github.dockerjava.core.DockerClientBuilder;
 import com.visible.symbolic.docker.DockerContainer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,14 +39,19 @@ public class VisibleServerApplication {
 	@Bean
 	@Scope(value = "session", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public DockerContainer dockerContainer() {
-		if (dockerClient == null) {
-			throw new RuntimeException("Docker client was null");
+        System.out.println("CREATING DOCKER CONTAINER");
+        if (dockerClient == null) {
+            throw new RuntimeException("Docker client was null");
 		}
 		if (dockerClient.createContainerCmd("visible") == null) {
-			throw new RuntimeException("Did not manage to get visible image");
+            throw new RuntimeException("Did not manage to get visible image");
 		}
+
+        Volume input = new Volume("/backend/input/");
         CreateContainerResponse container = dockerClient.createContainerCmd("visible")
                 .withPublishAllPorts(true)
+                .withVolumes(input)
+                .withBinds(new Bind(System.getProperty("user.dir") + "/backend/input/", input))
                 .exec();
 
         dockerClient.startContainerCmd(container.getId()).exec();
@@ -66,7 +69,6 @@ public class VisibleServerApplication {
             Ports.Binding[] portBindings = bindings.get(exposedPort);
             System.out.println(portBindings);
             for(Ports.Binding portBinding : portBindings) {
-                System.out.println("IN THE FOR LOOP");
                 if (portBinding != null) {
                     String containerIP = portBinding.getHostIp();
                     int containerPort = Integer.valueOf(portBinding.getHostPortSpec());

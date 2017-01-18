@@ -4,32 +4,50 @@ import com.visible.symbolic.Direction;
 import com.visible.symbolic.SymbolicExecutor;
 import com.visible.symbolic.state.State;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.concurrent.ExecutionException;
 
-@Scope(value = "session", proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class DockerizedExecutor implements SymbolicExecutor {
     @Autowired
     private RestTemplate restTemplate;
 
-    @Autowired
     private DockerContainer dockerContainer;
 
+    private String jarName;
+    private String className;
+    private String methodName;
+    private int numArgs;
+    private boolean[] isSymb;
 
-    public DockerizedExecutor() {}
+    @Autowired
+    public DockerizedExecutor(String jarName,
+                              String className,
+                              String methodName,
+                              int numArgs,
+                              boolean[] isSymb,
+                              DockerContainer dockerContainer) {
+        this.jarName = jarName;
+        this.className = className;
+        this.methodName = methodName;
+        this.numArgs = numArgs;
+        this.isSymb = isSymb;
+        this.dockerContainer = dockerContainer;
+    }
 
     private State makeStepRequest(Direction direction) {
         try {
             URL url = new URL("http", dockerContainer.getIp(), dockerContainer.getPort(), direction.getEndpoint());
             System.out.println(url.toString());
-
-            ResponseEntity<State> responseEntity = restTemplate.postForEntity(url.toURI(), null, State.class);
-            return responseEntity.getBody();
+            return restTemplate.getForObject(url.toURI(), State.class);
         } catch (Exception e) {
             return new State(-1, null).withError("Could not connect to Dockerized JPF");
         }
@@ -46,17 +64,34 @@ public class DockerizedExecutor implements SymbolicExecutor {
     }
 
     @Override
-    public State execute() throws ExecutionException, InterruptedException {
-        return null;
+    public State execute() throws ExecutionException, InterruptedException, MalformedURLException, URISyntaxException {
+        if (dockerContainer == null) {
+            System.out.println("Docker container is null :( in DockerizedExecutor");
+        } else {
+            System.out.println("We have a docker container in DockerizedExecutor");
+        }
+        URL url = new URL("http", dockerContainer.getIp(), dockerContainer.getPort(), "/symbolicmethod");
+        System.out.println(url.toString());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+        MultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
+        map.add("jar_name", jarName);
+        map.add("class_name", className);
+        map.add("method_name", methodName);
+        map.add("no_args", Integer.toString(numArgs));
+        for (boolean symbArg : isSymb) {
+            map.add("is_symb", symbArg);
+        }
+
+        HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(map, headers);
+
+        return restTemplate.postForObject(url.toURI(), request, State.class);
     }
 
     @Override
     public State restart() throws ExecutionException, InterruptedException {
-        return null;
-    }
-
-    @Override
-    public State call() throws Exception {
         return null;
     }
 

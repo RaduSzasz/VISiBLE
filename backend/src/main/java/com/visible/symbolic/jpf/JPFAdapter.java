@@ -6,19 +6,18 @@ import com.visible.symbolic.state.State;
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.context.annotation.SessionScope;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
-@SessionScope
-public class JPFAdapter implements SymbolicExecutor {
+public class JPFAdapter implements SymbolicExecutor, Callable<State> {
 
     private static final String RELATIVE_PATH_TO_INPUT = "backend/input/";
     private static final String ABSOLUTE_PATH_TO_INPUT = System.getProperty("user.dir") + "/" + RELATIVE_PATH_TO_INPUT;
