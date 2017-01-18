@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, async } from '@angular/core/testing';
 import { By }              from '@angular/platform-browser';
 import { DebugElement }    from '@angular/core';
 
@@ -11,7 +11,11 @@ describe('AppComponent has a h1', () => {
   let de:      DebugElement;
   let el:      HTMLElement;
 
-  beforeEach(() => {
+  beforeEach(async(() => {
+    TestBed.compileComponents();
+  }));
+
+  beforeEach(async() => {
     TestBed.configureTestingModule({
       declarations: [ AppComponent ], // declare the test component
     });
@@ -25,14 +29,14 @@ describe('AppComponent has a h1', () => {
     el = de.nativeElement;
   });
 
-	it('should display original title', () => {
+	it('should display original title', async() => {
 		fixture.detectChanges();
 		expect(el.textContent).toContain(comp.title);
 	});
 
-/*	it('should display a different test title', () => {
+	it('should display a different test title', async() => {
 		comp.title = 'Test Title';
 		fixture.detectChanges();
 		expect(el.textContent).toContain('Test Title');
-	});*/
+	});
 });

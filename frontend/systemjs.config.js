@@ -3,7 +3,7 @@
     'npm:': 'node_modules/'
   };
 
-  var maps = {
+  var map = {
     // our app is within the app folder
     app: 'dist',
 
@@ -63,7 +63,7 @@
   }
   // Bundled (~40 requests):
   function packUmd(pkgName) {
-    packages['@angular/'+pkgName] = { main: '/bundles/' + pkgName + '.umd.js', defaultExtension: 'js' };
+    packages['@angular/'+pkgName] = { main: 'bundles/' + pkgName + '.umd.js', defaultExtension: 'js' };
   }
   // Most environments should use UMD; some (Karma) need the individual index files
   var setPackageConfig = System.packageWithIndex ? packIndex : packUmd;
