@@ -4,6 +4,7 @@ package com.visible.web;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.visible.ClassMethods;
 import com.visible.JavaProgram;
+import com.visible.symbolic.SymbolicExecutor;
 import com.visible.symbolic.state.State;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,6 +20,7 @@ import org.springframework.util.MultiValueMap;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.BDDMockito.given;
@@ -26,16 +28,17 @@ import static org.mockito.BDDMockito.given;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class VisibleServerTest {
-	
-	private ObjectMapper om = new ObjectMapper();
-	
-	@Autowired
-	private TestRestTemplate restTemplate;
 
-	@MockBean
+    private ObjectMapper om = new ObjectMapper();
+
+    @Autowired
+    private TestRestTemplate restTemplate;
+
+    @MockBean
     private JavaProgram javaProgram;
 
-	//@MockBean private SymbolicExecutor executor;
+    @MockBean
+    private SymbolicExecutor executor;
 
 	@Test
 	public void testUploadSuccess() throws IOException, ClassNotFoundException, InterruptedException {
@@ -50,17 +53,17 @@ public class VisibleServerTest {
         expected.setJarName("MaxOfFour.jar");
 
         given(this.javaProgram.saveToDirectory()).willReturn(true);
-		given(this.javaProgram.getClassMethods()).willReturn(expected);
+        given(this.javaProgram.getClassMethods()).willReturn(expected);
 
-		// Make POST request
-		MultiValueMap<String, Object> parts = new LinkedMultiValueMap<>();
-		parts.add("file", new FileSystemResource(filePath));
-		String response = this.restTemplate.postForObject("/upload", parts, String.class);
+        // Make POST request
+        MultiValueMap<String, Object> parts = new LinkedMultiValueMap<>();
+        parts.add("file", new FileSystemResource(filePath));
+        String response = this.restTemplate.postForObject("/upload", parts, String.class);
 
-		// Assert that both JSON objects are equivalent
-		assertEquals(om.readValue(expected.toString(), Map.class),
-					 om.readValue(response, Map.class));
-	}
+        // Assert that both JSON objects are equivalent
+        assertEquals(om.readValue(expected.toString(), Map.class),
+                om.readValue(response, Map.class));
+    }
 
     @Test
     public void testUploadFail() throws IOException, ClassNotFoundException, InterruptedException {
@@ -103,6 +106,60 @@ public class VisibleServerTest {
         assertEquals(om.readValue(expected.toString(), Map.class),
                 om.readValue(response, Map.class));
     }
-	
+
+    @Test
+    public void testSymbolicMethod() throws IOException, ExecutionException, InterruptedException {
+
+        // Build a state to check if that state is returned by the application
+        State expected = new State(Integer.MAX_VALUE, null);
+        given(this.executor.execute()).willReturn(expected);
+
+        // Make POST request
+        MultiValueMap<String, Object> parts = new LinkedMultiValueMap<>();
+        parts.add("jar_name", "MaxOfFour.jar");
+        parts.add("class_name", "MaxOfFour");
+        parts.add("method_name", "symVis");
+        parts.add("no_args", "4");
+        parts.add("is_symb", true);
+        parts.add("is_symb", true);
+        parts.add("is_symb", true);
+        parts.add("is_symb", true);
+
+        String response = this.restTemplate.postForObject("/symbolicmethod", parts, String.class);
+
+        // Assert that both JSON objects are equivalent
+        assertEquals(om.readValue(expected.toString(), Map.class),
+                om.readValue(response, Map.class));
+    }
+
+    @Test
+    public void testStepLeft() throws IOException {
+
+        // Build a state to check if that state is returned by the application
+        State expected = new State(Integer.MAX_VALUE, null);
+        given(this.executor.stepLeft()).willReturn(expected);
+
+        // GET Request
+        String response = this.restTemplate.getForObject("/stepleft", String.class);
+
+        // Assert that both JSON objects are equivalent
+        assertEquals(om.readValue(expected.toString(), Map.class),
+                om.readValue(response, Map.class));
+    }
+
+    @Test
+    public void testStepRight() throws IOException {
+
+        // Build a state to check if that state is returned by the application
+        State expected = new State(Integer.MAX_VALUE, null);
+        given(this.executor.stepRight()).willReturn(expected);
+
+        // GET Request
+        String response = this.restTemplate.getForObject("/stepright", String.class);
+
+        // Assert that both JSON objects are equivalent
+        assertEquals(om.readValue(expected.toString(), Map.class),
+                om.readValue(response, Map.class));
+    }
 }
 

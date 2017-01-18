@@ -2,6 +2,7 @@ package com.visible.symbolic.jpf;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.visible.JavaProgram;
+import com.visible.symbolic.SymbolicExecutor;
 import com.visible.symbolic.state.State;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -9,6 +10,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.LinkedMultiValueMap;
@@ -23,6 +25,7 @@ import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.BDDMockito.given;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -38,6 +41,9 @@ public class JPFAdapterTest {
     private final static int SYMBOLIC_METHOD_NO_ARGS = 4;
     // We need to get back to the base package, which is 4 packages up.
     private final static String PACKAGE_LEVEL = "../../../../";
+
+    @MockBean
+    private SymbolicExecutor executor;
 
     @BeforeClass
     public static void setUpJavaProgram() throws Exception {
@@ -115,9 +121,14 @@ public class JPFAdapterTest {
 
     @Test
     public void adapterRestarts() throws ExecutionException, InterruptedException, IOException {
-        JPFAdapter jpfAdapter = new JPFAdapter(JAR_NAME, CLASS_NAME, SYMBOLIC_METHOD_NAME, SYMBOLIC_METHOD_NO_ARGS, generateBooleanArray(true, true, true, true));
-        State expected = jpfAdapter.execute();
-        jpfAdapter.stepLeft();
+
+        State expected = new State(0, null)
+                .setIfPC("x>=y")
+                .setElsePC("x<y")
+                .setType("normal")
+                .setConcreteValues(new HashMap<>());
+
+        given(this.executor.execute()).willReturn(expected);
 
         // Make POST request
         MultiValueMap<String, Object> parts = new LinkedMultiValueMap<>();
