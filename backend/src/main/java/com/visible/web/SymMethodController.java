@@ -15,13 +15,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.context.annotation.ApplicationScope;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.net.URISyntaxException;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 @Configuration
 @RestController
@@ -45,7 +42,7 @@ public class SymMethodController {
             throws java.io.IOException, InterruptedException, ExecutionException, ClassNotFoundException, URISyntaxException {
 
         if (!(isSymb.length == numArgs)) {
-            return new State().withError("Mismatch in number of argument.");
+            return State.createErrorState("Mismatch in number of argument.");
         }
 
         SymbolicExecutor symbolicExecutor = applicationContext.getBean(SymbolicExecutor.class);
@@ -61,7 +58,6 @@ public class SymMethodController {
         return symbolicExecutor.execute();
     }
 
-
     @Bean
     @Conditional(MainServerCondition.class)
     @Scope(value = "session", proxyMode = ScopedProxyMode.TARGET_CLASS)
@@ -76,9 +72,4 @@ public class SymMethodController {
         return new JPFAdapter();
     }
 
-    @Bean
-    @ApplicationScope
-    public ExecutorService executorService() {
-        return Executors.newFixedThreadPool(NUMBER_OF_THREADS);
-    }
 }

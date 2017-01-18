@@ -20,5 +20,4 @@ public interface SymbolicExecutor {
     State stepLeft();
     State stepRight();
     State execute() throws ExecutionException, InterruptedException, MalformedURLException, URISyntaxException;
-    State restart() throws ExecutionException, InterruptedException;
 }

@@ -14,7 +14,7 @@ public final class ClassMethods {
 	private final Map<String, Set<MethodData>> classes = new HashMap<>();
 
 	private String errorMsg;
-	void addMethodToClass(String className, String methodName,
+	public void addMethodToClass(String className, String methodName,
                           int numArgs, String signature) {
 		Set<MethodData> methods = classes.get(className);
 		if (methods == null) {

@@ -43,10 +43,14 @@ public class VisualiserListener extends PropertyListenerAdapter {
     private Direction direction;
     private State currentState;
     private boolean firstCG = true;
+    private ConcreteValueGenerator cvg;
 
     private CountDownLatch jpfInitialised;
     private CountDownLatch movedForwardLatch;
     private CountDownLatch canMakeSelection;
+
+    private String nextLeft;
+    private String nextRight;
 
     private static final Map<Class, Comparator> singleBranchComparators = singleBranchComparatorsBuilder();
     private final Map<Class, Comparator> doubleBranchComparators = doubleBranchComparatorsBuilder();
@@ -61,14 +65,15 @@ public class VisualiserListener extends PropertyListenerAdapter {
         this.currentState = null;
         this.jpfInitialised = jpfInitialised;
         this.canMakeSelection = new CountDownLatch(1);
+        this.cvg = new ConcreteValueGenerator();
     }
 
     Optional<CountDownLatch> moveForward(Direction direction) {
         this.direction = direction;
         this.shouldMoveForward = true;
         canMakeSelection.countDown();
-        threadInfo.setRunning();
         movedForwardLatch = new CountDownLatch(1);
+        threadInfo.setRunning();
         return searchHasFinished ? Optional.empty() : Optional.of(movedForwardLatch);
     }
 
@@ -100,17 +105,7 @@ public class VisualiserListener extends PropertyListenerAdapter {
     }
 
     private State createNewState(Search search) {
-        PathCondition pc = null;
-        ChoiceGenerator<?> cg = search.getVM().getLastChoiceGeneratorOfType(PCChoiceGenerator.class);
-        if (cg != null) {
-            pc = ((PCChoiceGenerator) cg).getCurrentPC();
-        }
-
-        State s = new State(search.getStateId(), prev);
-        if (prev != null) {
-            prev.children.add(s);
-        }
-        return s;
+        return new State(search.getStateId(), prev);
     }
 
     @Override
@@ -120,18 +115,24 @@ public class VisualiserListener extends PropertyListenerAdapter {
 
     @Override
     public void stateRestored(Search search) {
-        State s = stateById.get(search.getStateId());
-        prev = s;
+        prev = stateById.get(search.getStateId());
     }
 
     @Override
     public void stateBacktracked(Search search) {
-        State s = stateById.get(search.getStateId());
-        prev = s;
+        prev = stateById.get(search.getStateId());
     }
+
     @Override
     public void searchFinished(Search search) {
         this.currentState.setType(END_NODE);
+        if (this.direction == Direction.LEFT) {
+            cvg.addConstraint(currentState.getParent().getIfPC());
+        } else {
+            cvg.addConstraint(currentState.getParent().getElsePC());
+        }
+        Map<String, Integer> map = cvg.getConcreteValues();
+        currentState.setConcreteValues(map);
         if (this.movedForwardLatch != null) {
             this.movedForwardLatch.countDown();
         }
@@ -154,6 +155,16 @@ public class VisualiserListener extends PropertyListenerAdapter {
                 Instruction instruction = vm.getInstruction();
                 ThreadInfo threadInfo = vm.getCurrentThread();
                 if (instruction instanceof IfInstruction) {
+                    String pathCondition;
+                    if (direction == Direction.LEFT) {
+                        pathCondition = nextLeft;
+                    } else {
+                        pathCondition = nextRight;
+                    }
+                    if (!firstCG) {
+                        cvg.addConstraint(pathCondition);
+                        currentState.setConcreteValues(cvg.getConcreteValues());
+                    }
                     computeIFBranchPC(instruction, threadInfo, cg);
 
                     if (jpfInitialised != null) {
@@ -239,7 +250,8 @@ public class VisualiserListener extends PropertyListenerAdapter {
             }
         }
 
-        // The code above returns the PCs swapped around for some reason...
+        // Code above provided by JPF
+        // It returns the PCs swapped around for some reason...
         String ifPC = choicesTraceELSE.get(choicesTraceELSE.size() - 1);
         this.currentState.setIfPC(ifPC);
 
@@ -247,7 +259,9 @@ public class VisualiserListener extends PropertyListenerAdapter {
         this.currentState.setElsePC(elsePC);
         this.currentState.setType(MIDDLE_NODE);
 
-        this.choicesTrace = this.direction == Direction.LEFT ? choicesTraceELSE : choicesTraceIF;
+        this.nextLeft = ifPC;
+        this.nextRight = elsePC;
+        this.choicesTrace =  this.direction == Direction.LEFT ? choicesTraceIF : choicesTraceELSE;
     }
 
     private String cleanConstraint(String constraint) {

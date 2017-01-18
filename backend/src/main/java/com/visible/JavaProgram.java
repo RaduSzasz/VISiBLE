@@ -14,6 +14,7 @@ import java.util.jar.JarFile;
 public final class JavaProgram {
     private static final String CLASS_EXT = ".class";
     private static final String JACOCO_METHOD = "$jacocoInit";
+    private static final String PATH_TO_INPUT = "/backend/input/";
 
     private String pathToJar;
     private String fileName;
@@ -21,15 +22,7 @@ public final class JavaProgram {
 
     public JavaProgram(String fileName, byte[] data) {
         String pwd = System.getProperty("user.dir");
-        String pathToInput;
-        if (pwd.endsWith("backend")) {
-            // Spring tests run from VISiBLE/backend
-            pathToInput = "/input/";
-        } else {
-            // Server runs from VISiBLE/
-            pathToInput = "/backend/input/";
-        }
-        this.pathToJar = pwd + "/" + pathToInput + fileName;
+        this.pathToJar = pwd + PATH_TO_INPUT + fileName;
         this.fileName = fileName;
         this.data = data;
     }

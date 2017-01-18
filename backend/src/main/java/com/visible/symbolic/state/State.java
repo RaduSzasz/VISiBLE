@@ -1,20 +1,26 @@
 package com.visible.symbolic.state;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public final class State {
+
+    public static final String ERR_UNKNOWN = "An unknown error occurred.";
+    public static final String ERR_ARG_MISMATCH = "Mismatch in number of arguments";
+    public static final String ERR_EXEC_NOT_INIT = "Symbolic Executor has not been initialised yet";
+    public static final String ERR_RESTART_FAIL = "Restart could not be completed";
+    public static final String ERR_NO_MAIN_CLASS = "No entry-point specified in Manifest file";
+    public static final String ERR_MISSING_FILE = "No file has been uploaded";
+    public static final String ERR_JPF_INTERNAL = "Internal error in JPF";
 
     private static final String ERROR = "error";
     @JsonSerialize(using = ParentSerializer.class)
     private State parent;
-    @JsonIgnore public List<State> children;
 
     @JsonSerialize(using = ConditionSerializer.class)
     private String ifPC;
@@ -25,6 +31,9 @@ public final class State {
     private String type;
     @JsonInclude(JsonInclude.Include.NON_EMPTY) private String errorMsg;
     private int id;
+
+    @JsonSerialize(keyUsing = VarNameSerializer.class)
+    private Map<String, Integer> concreteValues;
 
     public State setIfPC(String ifPC) {
         this.ifPC = ifPC;
@@ -54,23 +63,16 @@ public final class State {
 
     public State(int id, State parent) {
         this.id = id;
-        this.children = new LinkedList<>();
         this.parent = parent;
         this.ifPC = null;
         this.elsePC = null;
+        this.concreteValues = new HashMap<>();
     }
 
-    public State() {
-        this.id = -1;
-        this.children = null;
-        this.parent = null;
-        this.ifPC = null;
-        this.elsePC = null;
-    }
-
-    public State withError(String errorMsg) {
-        setError(errorMsg);
-        return this;
+    public static State createErrorState(String errorMsg) {
+        State s = new State(-1, null);
+        s.setError(errorMsg);
+        return s;
     }
 
     @Override
@@ -83,8 +85,10 @@ public final class State {
         if (id != state.id) return false;
         if (parent != null ? !parent.equals(state.parent) : state.parent != null) return false;
         if (ifPC != null ? !ifPC.equals(state.ifPC) : state.ifPC != null) return false;
-        return elsePC != null ? elsePC.equals(state.elsePC) : state.elsePC == null;
-
+        if (elsePC != null ? !elsePC.equals(state.elsePC) : state.elsePC != null) return false;
+        if (!type.equals(state.type)) return false;
+        if (errorMsg != null ? !errorMsg.equals(state.errorMsg) : state.errorMsg != null) return false;
+        return concreteValues != null ? concreteValues.entrySet().containsAll(state.concreteValues.entrySet()) && state.concreteValues.entrySet().containsAll(concreteValues.entrySet()) : state.concreteValues == null;
     }
 
     @Override
@@ -92,7 +96,10 @@ public final class State {
         int result = parent != null ? parent.hashCode() : 0;
         result = 31 * result + (ifPC != null ? ifPC.hashCode() : 0);
         result = 31 * result + (elsePC != null ? elsePC.hashCode() : 0);
+        result = 31 * result + type.hashCode();
+        result = 31 * result + (errorMsg != null ? errorMsg.hashCode() : 0);
         result = 31 * result + id;
+        result = 31 * result + (concreteValues != null ? concreteValues.hashCode() : 0);
         return result;
     }
 
@@ -121,6 +128,15 @@ public final class State {
     public State setError(String errorMsg) {
         this.type = ERROR;
         this.errorMsg = errorMsg;
+        return this;
+    }
+
+    public Map<String, Integer> getConcreteValues() {
+        return concreteValues;
+    }
+
+    public State setConcreteValues(Map<String, Integer> concreteValues) {
+        this.concreteValues = concreteValues;
         return this;
     }
 }

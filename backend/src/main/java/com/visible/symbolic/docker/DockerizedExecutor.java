@@ -40,7 +40,7 @@ public class DockerizedExecutor implements SymbolicExecutor {
             return restTemplate.getForObject(url.toURI(), State.class);
         } catch (Exception e) {
             e.printStackTrace();
-            return new State(-1, null).withError("Could not connect to Dockerized JPF");
+            return State.createErrorState("Could not connect to Dockerized JPF");
         }
     }
 
@@ -105,10 +105,4 @@ public class DockerizedExecutor implements SymbolicExecutor {
 
         return restTemplate.postForObject(url.toURI(), request, State.class);
     }
-
-    @Override
-    public State restart() throws ExecutionException, InterruptedException {
-        return null;
-    }
-
 }
