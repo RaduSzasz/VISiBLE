@@ -1,29 +1,50 @@
-/**
- * System configuration for Angular 2 samples
- * Adjust as necessary for your application needs.
- */
-(function(global) {
-  // map tells the System loader where to look for things
+(function (global) {
+  var paths = {
+    'npm:': 'node_modules/'
+  };
+
   var map = {
-    'app':                        'dist',
-    '@angular':                   'node_modules/@angular',
-    'ng2-uploader':               'node_modules/ng2-uploader',
-    'angular-in-memory-web-api':  'node_modules/angular-in-memory-web-api',
-    'd3':                         'node_modules/d3',
-    'rxjs':                       'node_modules/rxjs',
-    'moment':                     'node_modules/moment',
-    'ng2-bootstrap':              'node_modules/ng2-bootstrap',
+    // our app is within the app folder
+    app: 'dist',
+
+    // angular bundles
+    '@angular':      'npm:@angular',
+    'ng2-uploader':  'npm:ng2-uploader',
+    'ng2-bootstrap': 'npm:ng2-bootstrap',
+
+    // other libraries
+    'd3':            'npm:d3',
+    'rxjs':          'npm:rxjs',
+    'moment':        'npm:moment',
   };
-  // packages tells the System loader how to load when no filename and/or no extension
+
   var packages = {
-    'app':                        { main: 'main.js',  defaultExtension: 'js' },
-    'ng2-uploader':               { defaultExtension: 'js' },
-    'rxjs':                       { defaultExtension: 'js' },
-    'angular-in-memory-web-api':  { main: 'index.js', defaultExtension: 'js' },
-    'd3':                         { main: 'd3.js', defaultExtension: 'js' },
-    'ng2-bootstrap':              { format: 'cjs', main: 'bundles/ng2-bootstrap.umd.js', defaultExtension: 'js' },
-    'moment':                     { main: 'moment.js', defaultExtension: 'js' },
+    'app': {
+      main: './main.js',
+      defaultExtension: 'js'
+    },
+    'rxjs': {
+      defaultExtension: 'js'
+    },
+    'ng2-uploader': {
+      main: 'index.js',
+      defaultExtension: 'js'
+    },
+    'd3': {
+      main: 'd3.js',
+      defaultExtension: 'js'
+    },
+    'ng2-bootstrap': {
+      format: 'cjs',
+      main: 'bundles/ng2-bootstrap.umd.js',
+      defaultExtension: 'js'
+    },
+    'moment': {
+      main: 'moment.js',
+      defaultExtension: 'js'
+    },
   };
+
   var ngPackageNames = [
     'common',
     'compiler',
@@ -36,19 +57,20 @@
     'router-deprecated',
     'upgrade',
   ];
-  // Individual files (~300 requests):
+
   function packIndex(pkgName) {
     packages['@angular/'+pkgName] = { main: 'index.js', defaultExtension: 'js' };
   }
   // Bundled (~40 requests):
   function packUmd(pkgName) {
-    packages['@angular/'+pkgName] = { main: '/bundles/' + pkgName + '.umd.js', defaultExtension: 'js' };
+    packages['@angular/'+pkgName] = { main: 'bundles/' + pkgName + '.umd.js', defaultExtension: 'js' };
   }
   // Most environments should use UMD; some (Karma) need the individual index files
   var setPackageConfig = System.packageWithIndex ? packIndex : packUmd;
   // Add package entries for angular packages
   ngPackageNames.forEach(setPackageConfig);
   var config = {
+    paths: paths,
     map: map,
     packages: packages
   };

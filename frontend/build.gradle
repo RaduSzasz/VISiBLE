@@ -12,17 +12,22 @@ buildscript {
 
 apply plugin: 'com.moowork.node'
 
-npm_run{
-  args = ['build:prod']
+task npm_build(type: NpmTask) {
+  args = ['run', 'build:prod']
 }
 
-task build(dependsOn: [npm_install, npm_run]) << {}
-npm_run.mustRunAfter npm_install
+task npm_test_once(type: NpmTask) {
+  args = ['run', 'test-once']
+}
+
+task build(dependsOn: [npm_install, npm_build]) << {}
+npm_build.mustRunAfter npm_install
 
 task clean() << {
   delete "node_modules"
   delete "dist"
+  delete "typings"
 }
 
 task stage(dependsOn: build) << {}
-task check(dependsOn: [npm_run_test]) << {}
+task check(dependsOn: [npm_test_once]) << {}
