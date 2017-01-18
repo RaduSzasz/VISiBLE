@@ -29,17 +29,7 @@ public class DockerizedExecutor implements SymbolicExecutor {
     private boolean[] isSymb;
 
     @Autowired
-    public DockerizedExecutor(String jarName,
-                              String className,
-                              String methodName,
-                              int numArgs,
-                              boolean[] isSymb,
-                              DockerContainer dockerContainer) {
-        this.jarName = jarName;
-        this.className = className;
-        this.methodName = methodName;
-        this.numArgs = numArgs;
-        this.isSymb = isSymb;
+    public DockerizedExecutor(DockerContainer dockerContainer) {
         this.dockerContainer = dockerContainer;
     }
 
@@ -49,8 +39,34 @@ public class DockerizedExecutor implements SymbolicExecutor {
             System.out.println(url.toString());
             return restTemplate.getForObject(url.toURI(), State.class);
         } catch (Exception e) {
+            e.printStackTrace();
             return new State(-1, null).withError("Could not connect to Dockerized JPF");
         }
+    }
+
+    @Override
+    public void setJarName(String jarName) {
+        this.jarName = jarName;
+    }
+
+    @Override
+    public void setClassName(String className) {
+        this.className = className;
+    }
+
+    @Override
+    public void setMethod(String method) {
+        this.methodName = method;
+    }
+
+    @Override
+    public void setArgNum(int argNum) {
+        this.numArgs = argNum;
+    }
+
+    @Override
+    public void setIsSymb(boolean[] isSymb) {
+        this.isSymb = isSymb;
     }
 
     @Override

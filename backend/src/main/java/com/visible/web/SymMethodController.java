@@ -30,13 +30,7 @@ import java.util.concurrent.Executors;
 public class SymMethodController {
 
     private static final int NUMBER_OF_THREADS = 8;
-    private String jarName;
-    private String className;
-    private String methodName;
-    private int numArgs;
-    private boolean[] isSymb;
     private boolean isRestartCall = false;
-    private SymbolicExecutor symbolicExecutor;
 
     @Autowired
     private ApplicationContext applicationContext;
@@ -50,34 +44,20 @@ public class SymMethodController {
                                       RedirectAttributes redirectAttributes)
             throws java.io.IOException, InterruptedException, ExecutionException, ClassNotFoundException, URISyntaxException {
 
-        this.jarName = jarName;
-        this.className = className;
-        this.methodName = methodName;
-        this.numArgs = numArgs;
-        this.isSymb = isSymb;
-
-        if (!(this.isSymb.length == numArgs)) {
+        if (!(isSymb.length == numArgs)) {
             return new State().withError("Mismatch in number of argument.");
         }
 
-        if (isRestartCall) {
-            if (symbolicExecutor == null) {
-                return new State().withError("Restart not allowed at this point.");
-            }
-            return symbolicExecutor.restart();
-        }
+        SymbolicExecutor symbolicExecutor = applicationContext.getBean(SymbolicExecutor.class);
+
+        symbolicExecutor.setJarName(jarName);
+        symbolicExecutor.setClassName(className);
+        symbolicExecutor.setMethod(methodName);
+        symbolicExecutor.setArgNum(numArgs);
+        symbolicExecutor.setIsSymb(isSymb);
 
         // This piece of code only executes on first run
         isRestartCall = true;
-        this.symbolicExecutor = applicationContext.getBean(SymbolicExecutor.class);
-
-        System.out.println("DOCKER CONTAINER SHOULD BE CREATED AT THIS POINT");
-        if (this.symbolicExecutor == null) {
-            System.out.println("BUT IT WAS NULL");
-        } else {
-            System.out.println("AND IT WAS INDEED CREATED");
-        }
-
         return symbolicExecutor.execute();
     }
 
@@ -86,15 +66,14 @@ public class SymMethodController {
     @Conditional(MainServerCondition.class)
     @Scope(value = "session", proxyMode = ScopedProxyMode.TARGET_CLASS)
     public SymbolicExecutor dockerizedContainerExecutor(DockerContainer dockerContainer) {
-        return new DockerizedExecutor(jarName, className, methodName, numArgs, isSymb, dockerContainer);
+        return new DockerizedExecutor(dockerContainer);
     }
 
     @Bean
     @Conditional(DockerCondition.class)
-    @Scope(value = "session", proxyMode = ScopedProxyMode.TARGET_CLASS)
     public SymbolicExecutor mainServerSymbolicExecutor() {
         System.out.println("GENERATING ADAPTER");
-        return new JPFAdapter(jarName, className, methodName, numArgs, isSymb);
+        return new JPFAdapter();
     }
 
     @Bean

@@ -7,6 +7,16 @@ import java.net.URISyntaxException;
 import java.util.concurrent.ExecutionException;
 
 public interface SymbolicExecutor {
+    void setJarName(String jarName);
+
+    void setClassName(String className);
+
+    void setMethod(String method);
+
+    void setArgNum(int argNum);
+
+    void setIsSymb(boolean[] isSymb);
+
     State stepLeft();
     State stepRight();
     State execute() throws ExecutionException, InterruptedException, MalformedURLException, URISyntaxException;

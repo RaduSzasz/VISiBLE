@@ -1,8 +1,8 @@
 package com.visible.symbolic;
 
 public enum Direction {
-    LEFT("stepLeft"),
-    RIGHT("stepRight");
+    LEFT("/stepleft"),
+    RIGHT("/stepright");
 
     private String endpoint;
 

@@ -27,7 +27,7 @@ public class FileUploadController {
         JavaProgram javaProgram = new JavaProgram(fileName, file.getBytes());
         boolean success = javaProgram.saveToDirectory();
 
-        if (success) {
+        if (success && !"true".equals(System.getProperty("WITHIN_DOCKER"))) {
             DockerContainer dockerContainer = applicationContext.getBean(DockerContainer.class);
             System.out.println("UPLOADED FILE AND CREATED DOCKER CONTAINER:");
             System.out.println(dockerContainer.getIp());

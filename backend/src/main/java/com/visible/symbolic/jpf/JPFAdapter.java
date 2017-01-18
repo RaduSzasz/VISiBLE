@@ -28,6 +28,32 @@ public class JPFAdapter implements SymbolicExecutor, Callable<State> {
 
     private static VisualiserListener visualiser;
     private String jarName;
+
+    @Override
+    public void setJarName(String jarName) {
+        this.jarName = jarName;
+    }
+
+    @Override
+    public void setClassName(String className) {
+        this.className = className;
+    }
+
+    @Override
+    public void setMethod(String method) {
+        this.method = method;
+    }
+
+    @Override
+    public void setArgNum(int argNum) {
+        this.argNum = argNum;
+    }
+
+    @Override
+    public void setIsSymb(boolean[] isSymb) {
+        this.isSymb = isSymb;
+    }
+
     private String className;
     private String method;
     private int argNum;
@@ -40,12 +66,7 @@ public class JPFAdapter implements SymbolicExecutor, Callable<State> {
     @Autowired
     private ExecutorService jpfExecutor;
 
-    public JPFAdapter(String jarName, String className, String methodName, int numArgs, boolean[] isSymb) {
-        this.jarName = jarName;
-        this.className = className;
-        this.method = methodName;
-        this.argNum = numArgs;
-        this.isSymb = isSymb;
+    public JPFAdapter() {
         this.errorState = new State().withError("An unknown error occurred.");
     }
 
