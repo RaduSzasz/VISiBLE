@@ -11,16 +11,13 @@ describe('AppComponent has a h1', () => {
   let de:      DebugElement;
   let el:      HTMLElement;
 
-  beforeEach(async(() => {
-    TestBed.compileComponents();
-  }));
-
   beforeEach(async() => {
     TestBed.configureTestingModule({
       declarations: [ AppComponent ], // declare the test component
     });
 
     fixture = TestBed.createComponent(AppComponent);
+    TestBed.compileComponents();
 
     comp = fixture.componentInstance; // AppComponent test instance
 
