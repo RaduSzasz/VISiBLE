@@ -26,6 +26,7 @@ npm_build.mustRunAfter npm_install
 task clean() << {
   delete "node_modules"
   delete "dist"
+  delete "typings"
 }
 
 task stage(dependsOn: build) << {}
