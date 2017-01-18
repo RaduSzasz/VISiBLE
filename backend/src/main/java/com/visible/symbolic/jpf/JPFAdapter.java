@@ -60,7 +60,8 @@ public class JPFAdapter implements SymbolicExecutor {
         String mainClassName;
 
         try {
-            Manifest manifest = new JarFile(RELATIVE_PATH_TO_INPUT + "/" + jarName).getManifest();
+            Manifest manifest;
+            manifest = new JarFile(RELATIVE_PATH_TO_INPUT + "/" + jarName).getManifest();
             mainClassName = manifest.getMainAttributes().getValue("Main-Class");
         } catch (IOException e) {
             String errorMsg = jarName == null ? State.ERR_MISSING_FILE : "Manifest file in " + jarName + " could not be read.";

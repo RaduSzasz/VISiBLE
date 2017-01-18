@@ -40,9 +40,9 @@ public class VisibleServerTest {
     @MockBean
     private SymbolicExecutor executor;
 
-    @Test
-    public void testUploadSuccess() throws IOException, ClassNotFoundException, InterruptedException {
-        String filePath = "src/test/resources/MaxOfFour.jar";
+	@Test
+	public void testUploadSuccess() throws IOException, ClassNotFoundException, InterruptedException {
+		String filePath = "backend/src/test/resources/MaxOfFour.jar";
 
         // Build expected ClassMethods
         ClassMethods expected = new ClassMethods();
