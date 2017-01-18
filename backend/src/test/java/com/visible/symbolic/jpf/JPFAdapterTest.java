@@ -42,8 +42,10 @@ public class JPFAdapterTest {
     @BeforeClass
     public static void setUpJavaProgram() throws Exception {
         File f = new File(JPFAdapterTest.class.getResource(PACKAGE_LEVEL + JAR_NAME).toURI());
-        JavaProgram javaProgram = new JavaProgram(JAR_NAME, Files.readAllBytes(f.toPath()));
-        boolean success = javaProgram.saveToDirectory();
+        File g = new File(JPFAdapterTest.class.getResource(PACKAGE_LEVEL + "Concolic.jar").toURI());
+        JavaProgram javaProgram1 = new JavaProgram(JAR_NAME, Files.readAllBytes(f.toPath()));
+        JavaProgram javaProgram2 = new JavaProgram("Concolic.jar", Files.readAllBytes(g.toPath()));
+        boolean success = javaProgram1.saveToDirectory() && javaProgram2.saveToDirectory();
         assertTrue(success);
     }
 
@@ -128,10 +130,18 @@ public class JPFAdapterTest {
         parts.add("is_symb", true);
         parts.add("is_symb", true);
 
-        System.out.println(restTemplate);
         String response = this.restTemplate.postForObject("/symbolicmethod", parts, String.class);
         assertEquals(om.readValue(expected.toString(), Map.class),
                 om.readValue(response, Map.class));
+    }
+
+    @Test
+    public void checkConcolicExecution() throws ExecutionException, InterruptedException {
+        JPFAdapter jpfAdapter = new JPFAdapter("Concolic.jar", "Test", "symVis", 2, generateBooleanArray(true, false));
+        State result = jpfAdapter.execute();
+        State expected = new State(0, null).setIfPC("x<=5").setElsePC("x>5").setType("normal").setConcreteValues(new HashMap<>());
+
+        assertEquals(expected.toString(), result.toString());
     }
 
     private boolean[] generateBooleanArray(boolean... isSymb) {
