@@ -1,11 +1,18 @@
 package com.visible.symbolic.jpf;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.visible.JavaProgram;
 import com.visible.symbolic.state.State;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,7 +24,14 @@ import java.util.concurrent.ExecutionException;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class JPFAdapterTest {
+
+    @Autowired
+    private TestRestTemplate restTemplate;
+
+    private ObjectMapper om = new ObjectMapper();
     private final static String JAR_NAME = "MaxOfFour.jar";
     private final static String CLASS_NAME = "MaxOfFour";
     private final static String SYMBOLIC_METHOD_NAME = "symVis";
@@ -95,6 +109,29 @@ public class JPFAdapterTest {
                                                         .setConcreteValues(map);
 
         assertEquals(expectedResult, child);
+    }
+
+    @Test
+    public void adapterRestarts() throws ExecutionException, InterruptedException, IOException {
+        JPFAdapter jpfAdapter = new JPFAdapter(JAR_NAME, CLASS_NAME, SYMBOLIC_METHOD_NAME, SYMBOLIC_METHOD_NO_ARGS, generateBooleanArray(true, true, true, true));
+        State expected = jpfAdapter.execute();
+        jpfAdapter.stepLeft();
+
+        // Make POST request
+        MultiValueMap<String, Object> parts = new LinkedMultiValueMap<>();
+        parts.add("jar_name", JAR_NAME);
+        parts.add("class_name", CLASS_NAME);
+        parts.add("method_name", SYMBOLIC_METHOD_NAME);
+        parts.add("no_args", SYMBOLIC_METHOD_NO_ARGS);
+        parts.add("is_symb", true);
+        parts.add("is_symb", true);
+        parts.add("is_symb", true);
+        parts.add("is_symb", true);
+
+        System.out.println(restTemplate);
+        String response = this.restTemplate.postForObject("/symbolicmethod", parts, String.class);
+        assertEquals(om.readValue(expected.toString(), Map.class),
+                om.readValue(response, Map.class));
     }
 
     private boolean[] generateBooleanArray(boolean... isSymb) {
