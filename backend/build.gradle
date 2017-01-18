@@ -56,6 +56,8 @@ test {
     destinationFile = file("$buildDir/jacoco/jacocoTest.exec")
     classDumpFile = file("$buildDir/jacoco/classpathdumps")
   }
+
+  workingDir = '../'
 }
 
 

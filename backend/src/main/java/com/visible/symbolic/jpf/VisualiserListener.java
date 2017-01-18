@@ -43,7 +43,6 @@ public class VisualiserListener extends PropertyListenerAdapter {
     private Direction direction;
     private State currentState;
     private boolean firstCG = true;
-    private List<String> pc;
     private ConcreteValueGenerator cvg;
 
     private CountDownLatch jpfInitialised;
@@ -66,7 +65,6 @@ public class VisualiserListener extends PropertyListenerAdapter {
         this.currentState = null;
         this.jpfInitialised = jpfInitialised;
         this.canMakeSelection = new CountDownLatch(1);
-        this.pc = new ArrayList<>();
         this.cvg = new ConcreteValueGenerator();
     }
 
@@ -107,11 +105,7 @@ public class VisualiserListener extends PropertyListenerAdapter {
     }
 
     private State createNewState(Search search) {
-        State s = new State(search.getStateId(), prev);
-        if (prev != null) {
-            prev.children.add(s);
-        }
-        return s;
+        return new State(search.getStateId(), prev);
     }
 
     @Override
@@ -121,15 +115,14 @@ public class VisualiserListener extends PropertyListenerAdapter {
 
     @Override
     public void stateRestored(Search search) {
-        State s = stateById.get(search.getStateId());
-        prev = s;
+        prev = stateById.get(search.getStateId());
     }
 
     @Override
     public void stateBacktracked(Search search) {
-        State s = stateById.get(search.getStateId());
-        prev = s;
+        prev = stateById.get(search.getStateId());
     }
+
     @Override
     public void searchFinished(Search search) {
         this.currentState.setType(END_NODE);
@@ -257,7 +250,8 @@ public class VisualiserListener extends PropertyListenerAdapter {
             }
         }
 
-        // The code above returns the PCs swapped around for some reason...
+        // Code above provided by JPF
+        // It returns the PCs swapped around for some reason...
         String ifPC = choicesTraceELSE.get(choicesTraceELSE.size() - 1);
         this.currentState.setIfPC(ifPC);
 
@@ -267,7 +261,7 @@ public class VisualiserListener extends PropertyListenerAdapter {
 
         this.nextLeft = ifPC;
         this.nextRight = elsePC;
-        this.choicesTrace =  this.direction == Direction.LEFT ? choicesTraceELSE : choicesTraceIF;
+        this.choicesTrace =  this.direction == Direction.LEFT ? choicesTraceIF : choicesTraceELSE;
     }
 
     private String cleanConstraint(String constraint) {

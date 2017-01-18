@@ -30,11 +30,13 @@ public class SymMethodController {
     private String methodName;
     private int numArgs;
     private boolean[] isSymb;
-    private boolean isRestartCall = false;
-    private SymbolicExecutor symbolicExecutor;
 
     @PostMapping
-    public State runSelectedSymMethod(@RequestParam("jar_name") String jarName, @RequestParam("class_name") String className, @RequestParam("method_name") String methodName, @RequestParam("no_args") int numArgs, @RequestParam("is_symb") boolean[] isSymb,  RedirectAttributes redirectAttributes)
+    public State runSelectedSymMethod(@RequestParam("jar_name") String jarName,
+                                      @RequestParam("class_name") String className,
+                                      @RequestParam("method_name") String methodName,
+                                      @RequestParam("no_args") int numArgs,
+                                      @RequestParam("is_symb") boolean[] isSymb, RedirectAttributes redirectAttributes)
             throws java.io.IOException, InterruptedException, ExecutionException, ClassNotFoundException {
 
         this.jarName = jarName;
@@ -44,20 +46,10 @@ public class SymMethodController {
         this.isSymb = isSymb;
 
         if (!(this.isSymb.length == numArgs)) {
-            return new State().withError("Mismatch in number of argument.");
+            return State.createErrorState(State.ERR_ARG_MISMATCH);
         }
 
-        if (isRestartCall) {
-            if (symbolicExecutor == null) {
-                return new State().withError("Restart not allowed at this point.");
-            }
-            return symbolicExecutor.restart();
-        }
-
-        // This piece of code only executes on first run
-        isRestartCall = true;
-        this.symbolicExecutor = symbolicExecutor();
-        return symbolicExecutor.execute();
+        return symbolicExecutor().execute();
     }
 
 

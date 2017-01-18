@@ -13,7 +13,6 @@ public class ConditionSerializer extends JsonSerializer<String> {
                           JsonGenerator gen,
                           SerializerProvider serializers) throws IOException {
 
-        // Currently assumes that no &&, ||
         String[] delims = {"!=", "<=", ">=", "==", "<", ">"};
 
         String op = null;
@@ -44,6 +43,4 @@ public class ConditionSerializer extends JsonSerializer<String> {
         String condition = String.join(" " + op + " ", newVars);
         gen.writeString(condition);
     }
-
-
 }
